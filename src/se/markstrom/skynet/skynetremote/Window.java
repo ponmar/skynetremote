@@ -32,9 +32,15 @@ public class Window {
 		Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
 		fileMenuHeader.setMenu(fileMenu);
 		
+		MenuItem fileConnectItem = new MenuItem(fileMenu, SWT.PUSH);
+		fileConnectItem.setText("&Connect...");
+
+		MenuItem fileDisconnectItem = new MenuItem(fileMenu, SWT.PUSH);
+		fileDisconnectItem.setText("&Disconnect");
+
 		MenuItem fileExitItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileExitItem.setText("E&xit");
-		
+
 		fileExitItem.addSelectionListener(new FileExitItemListener());
 		
 		shell.setText("Skynet Remote");
