@@ -11,19 +11,34 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
+import se.markstrom.skynet.api.SkynetAPI;
+import se.markstrom.skynet.api.SkynetAPI.SkynetAPIError;
+
 public class Window {
 	
 	private Display display;
 	private Shell shell;
+	private MenuItem fileConnectItem;
+	private MenuItem fileDisconnectItem;
+	
+	private SkynetAPI api = null;
 	
 	public Window() {
 		createGui();
 	}
+	
+	public void close() {
+		if (api != null) {
+			api.close();
+		}
+	}
 
 	private void createGui() {
-		display = new Display();
+		display = Display.getDefault();
 		shell = new Shell(display);
-
+		shell.setText("Skynet Remote");
+		shell.setSize(800, 600);
+		
 		Menu menuBar = new Menu(shell, SWT.BAR);
 		
 		MenuItem fileMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
@@ -32,20 +47,18 @@ public class Window {
 		Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
 		fileMenuHeader.setMenu(fileMenu);
 		
-		MenuItem fileConnectItem = new MenuItem(fileMenu, SWT.PUSH);
+		fileConnectItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileConnectItem.setText("&Connect...");
+		fileConnectItem.addSelectionListener(new FileConnectItemListener());
 
-		MenuItem fileDisconnectItem = new MenuItem(fileMenu, SWT.PUSH);
+		fileDisconnectItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileDisconnectItem.setText("&Disconnect");
+		fileDisconnectItem.addSelectionListener(new FileDisconnectItemListener());
 
 		MenuItem fileExitItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileExitItem.setText("E&xit");
-
 		fileExitItem.addSelectionListener(new FileExitItemListener());
 		
-		shell.setText("Skynet Remote");
-		shell.setSize(800, 600);
-
 		shell.setLayout(new FillLayout());
 		//shell.setLayout(new RowLayout());
 		// TODO: create generic row
@@ -71,6 +84,19 @@ public class Window {
 	    
 	    shell.setMenuBar(menuBar);
 		shell.open();
+		
+		updateFileMenuItems();
+	}
+	
+	private void updateFileMenuItems() {
+		if (api != null) {
+			fileConnectItem.setEnabled(false);
+			fileDisconnectItem.setEnabled(true);
+		}
+		else {
+			fileConnectItem.setEnabled(true);
+			fileDisconnectItem.setEnabled(false);
+		}
 	}
 	
 	public void run() {
@@ -80,10 +106,6 @@ public class Window {
 			}
 		}
 		display.dispose();
-	}
-	
-	public static void main(String[] args) {
-		new Window().run();
 	}
 	
 	class FileExitItemListener implements SelectionListener {
@@ -96,5 +118,62 @@ public class Window {
 			shell.close();
 			display.dispose();
 		}
+	}
+
+	class FileConnectItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			connect();			
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+			connect();
+		}
+	}
+
+	class FileDisconnectItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			disconnect();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+			disconnect();
+		}
+	}
+	
+	private void connect() {
+		if (api == null) {
+			ConnectWindow connectWindow = new ConnectWindow();
+			connectWindow.run();
+			
+			if (connectWindow.hasValidInput()) {
+				String host = connectWindow.getHost();
+				int port = connectWindow.getPort();
+				SkynetAPI.Protocol protocol = connectWindow.getProtocol();
+				String password = connectWindow.getPassword();
+				boolean debug = false;
+				
+				try {
+					api = new SkynetAPI(host, port, protocol, password, debug);
+					updateFileMenuItems();
+				}
+				catch (SkynetAPIError e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void disconnect() {
+		if (api != null) {
+			api.close();
+			api = null;
+			updateFileMenuItems();
+		}
+	}
+
+	public static void main(String[] args) {
+		Window window = new Window();
+		window.run();
+		window.close();
 	}
 }
