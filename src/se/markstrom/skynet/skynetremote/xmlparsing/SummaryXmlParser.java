@@ -34,6 +34,10 @@ public class SummaryXmlParser extends XmlParser {
 	public double getLogTimestamp() {
 		return logTimestamp;
 	}
+	
+	public boolean getArmedState() {
+		return armed;
+	}
 
 	@Override
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {

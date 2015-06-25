@@ -277,16 +277,6 @@ public class Window implements GUI {
 	}
 	
 	@Override
-	public void updateArmState(boolean state) {
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				updateArmMenuItems(state);
-			}
-		});
-	}
-
-	@Override
 	public void updateEventsXml(String xml) {
 		display.asyncExec(new Runnable() {
 			@Override
@@ -348,6 +338,9 @@ public class Window implements GUI {
 			public void run() {
 				SummaryXmlParser parser = new SummaryXmlParser(xml);
 				if (parser.isValid()) {
+					
+					updateArmMenuItems(parser.getArmedState());
+					
 					if (prevLatestEventId != parser.getLatestEventId()) {
 						prevLatestEventId = parser.getLatestEventId();
 						System.out.println("New events!");

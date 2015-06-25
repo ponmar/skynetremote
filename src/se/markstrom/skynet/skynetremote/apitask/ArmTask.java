@@ -12,8 +12,6 @@ public class ArmTask implements ApiTask {
 		SkynetAPI api = apiThread.getApi();
 		if (api != null) {
 			api.arm(0);
-			// TODO: fetch JSON/XML and send arm state?
-			gui.updateArmState(true);
 		}
 	}
 }
