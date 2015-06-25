@@ -44,10 +44,11 @@ public class Window implements GUI {
 	private MenuItem fileDisconnectItem;
 	private MenuItem actionArmItem;
 	private MenuItem actionDisarmItem;
+	private MenuItem actionGetLogItem;
 	private Table eventsTable;
 	private Text logText;
 	
-	private double prevLogTimestamp = 0; 
+	//private double prevLogTimestamp = 0; 
 	private int prevLatestEventId = -1;
 	
 	private ApiThread apiThread = new ApiThread(this);
@@ -102,6 +103,10 @@ public class Window implements GUI {
 		actionDisarmItem.setText("Disarm");
 		actionDisarmItem.addSelectionListener(new ActionDisarmItemListener());
 
+		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionGetLogItem.setText("Update log");
+		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
+
 		shell.setLayout(new FillLayout());
 	
 		// Tabs
@@ -127,8 +132,10 @@ public class Window implements GUI {
 	    TableColumn eventSensorColumn = new TableColumn(eventsTable, SWT.NULL);
 	    eventSensorColumn.setText("Sensor");
 	    eventSensorColumn.pack();
+	    TableColumn eventArmedColumn = new TableColumn(eventsTable, SWT.NULL);
+	    eventArmedColumn.setText("Armed");
+	    eventArmedColumn.pack();
 	    eventsTab.setControl(eventsTable);
-	    //eventsTableEditor = new TableEditor(eventsTable);
 
 	    TabItem streamingTab = new TabItem(tf, SWT.BORDER);
 	    streamingTab.setText("Live Streaming");
@@ -158,6 +165,7 @@ public class Window implements GUI {
 		// Note: the armed state is unknown until summary XML/JSON has been fetched
 		actionArmItem.setEnabled(connectedState);
 		actionDisarmItem.setEnabled(connectedState);
+		actionGetLogItem.setEnabled(connectedState);
 		
 		if (connectedState) {
 			shell.setText(TITLE + " (connected)");
@@ -238,7 +246,16 @@ public class Window implements GUI {
 		public void widgetDefaultSelected(SelectionEvent event) {
 		}
 	}
-	
+
+	class ActionGetLogItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			updateLog();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
 	private void connect() {
 		ConnectWindow connectWindow = new ConnectWindow();
 		connectWindow.run();
@@ -264,6 +281,10 @@ public class Window implements GUI {
 	
 	private void disarm() {
 		apiThread.runTask(new DisarmTask());
+	}
+	
+	private void updateLog() {
+		apiThread.runTask(new GetLogXmlTask());
 	}
 
 	@Override
@@ -300,6 +321,7 @@ public class Window implements GUI {
 						item.setText(2, event.getSeverityStr());
 						item.setText(3, event.message);
 						item.setText(4, event.sensor);
+						item.setText(5, event.getArmedStr());
 					}
 					
 					for (int i=0; i<eventsTable.getColumnCount(); i++) {
@@ -318,7 +340,6 @@ public class Window implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				//System.out.println("New log.xml: " + xml);
 				LogXmlParser parser = new LogXmlParser(xml);
 				if (parser.isValid()) {
 					logText.setText(parser.getLogText());
@@ -343,13 +364,8 @@ public class Window implements GUI {
 					
 					if (prevLatestEventId != parser.getLatestEventId()) {
 						prevLatestEventId = parser.getLatestEventId();
-						System.out.println("New events!");
+						System.out.println("New event detected, getting events...");
 						apiThread.runTask(new GetEventsXmlTask());
-					}
-
-					if (prevLogTimestamp != parser.getLogTimestamp()) {
-						prevLogTimestamp = parser.getLogTimestamp();
-						//apiThread.runTask(new GetLogXmlTask());
 					}
 				}
 			}
