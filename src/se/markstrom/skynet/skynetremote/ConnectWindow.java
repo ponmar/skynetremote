@@ -47,6 +47,7 @@ public class ConnectWindow {
 		passwordLabel.setText("Password:");
 		
 		passwordText = new Text(shell, SWT.BORDER);
+		passwordText.setEchoChar('*');
 		passwordText.setText("");
 		
 		// TODO: protocol radio buttons (or a checkbox)

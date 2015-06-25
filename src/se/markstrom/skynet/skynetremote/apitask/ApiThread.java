@@ -38,13 +38,12 @@ public class ApiThread extends Thread {
 			}
 		}
 		catch (SkynetAPIClientError e) {
-			e.printStackTrace();
+			gui.showApiError(e.getMessage());
 		}
 		catch (SkynetAPIError e) {
-			e.printStackTrace();
+			gui.showApiError(e.getMessage());
 		}
         api = null;
-        gui.updateConnectedState(false);
     }
 	
 	/**
@@ -60,13 +59,6 @@ public class ApiThread extends Thread {
 		}
 	}
 	
-	/**
-	 * Call this method from the GUI thread to check if the API is connected. 
-	 */
-	public boolean isConnected() {
-		return api != null;
-	}
-	
 	public void runTask(ApiTask task) {
 		queue.add(task);
 	}
@@ -76,5 +68,16 @@ public class ApiThread extends Thread {
 			System.out.println("Connecting to host: " + host);
 			api = new SkynetAPI(host, port, protocol, password, debug);
 		}
+	}
+	
+	void disconnect() {
+		if (api != null) {
+			api.close();
+			api = null;
+		}
+	}
+	
+	SkynetAPI getApi() {
+		return api;
 	}
 }
