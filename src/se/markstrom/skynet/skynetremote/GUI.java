@@ -9,8 +9,8 @@ public interface GUI {
 	void updateConnectedState(boolean state);
 	void updateArmState(boolean state);
 
+	void updateEventsXml(String xml);
 	void updateLogXml(String xml);
-	
 	void updateSummaryJson(String json);
 	void updateSummaryXml(String xml);
 	

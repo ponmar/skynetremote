@@ -17,10 +17,15 @@ public class LogXmlParser extends XmlParser {
 		super(xml);
 	}
 
+	public String getLogText() {
+		return log;
+	}
+
 	@Override
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
 		NodeList nl = xmlDoc.getElementsByTagName("entry");
 		if (nl != null) {
+			log = "";
 			for (int i=0; i<nl.getLength(); i++) {
 				Node entryNode = nl.item(i);
 				Node entryDataNode = entryNode.getFirstChild();
@@ -31,9 +36,5 @@ public class LogXmlParser extends XmlParser {
 			return true;
 		}
 		return false;
-	}
-	
-	public String getLog() {
-		return log;
 	}
 }

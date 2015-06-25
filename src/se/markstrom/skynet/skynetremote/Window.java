@@ -1,5 +1,8 @@
 package se.markstrom.skynet.skynetremote;
 
+import java.util.List;
+import java.util.ListIterator;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -11,6 +14,10 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 import se.markstrom.skynet.api.SkynetAPI;
 import se.markstrom.skynet.skynetremote.apitask.ApiThread;
@@ -18,8 +25,11 @@ import se.markstrom.skynet.skynetremote.apitask.ArmTask;
 import se.markstrom.skynet.skynetremote.apitask.ConnectTask;
 import se.markstrom.skynet.skynetremote.apitask.DisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.DisconnectTask;
+import se.markstrom.skynet.skynetremote.apitask.GetEventsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
+import se.markstrom.skynet.skynetremote.xmlparsing.Event;
+import se.markstrom.skynet.skynetremote.xmlparsing.EventsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparsing.LogXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparsing.SummaryXmlParser;
 
@@ -34,8 +44,11 @@ public class Window implements GUI {
 	private MenuItem fileDisconnectItem;
 	private MenuItem actionArmItem;
 	private MenuItem actionDisarmItem;
+	private Table eventsTable;
+	private Text logText;
 	
 	private double prevLogTimestamp = 0; 
+	private int prevLatestEventId = -1;
 	
 	private ApiThread apiThread = new ApiThread(this);
 	
@@ -96,18 +109,39 @@ public class Window implements GUI {
 		
 	    TabItem eventsTab = new TabItem(tf, SWT.BORDER);
 	    eventsTab.setText("Events");
-	    //eventsTab.setControl(new GroupExample(tf, SWT.SHADOW_ETCHED_IN));
+	    eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+	    eventsTable.setHeaderVisible(true);
+	    eventsTable.setLinesVisible(true);
+	    TableColumn eventIdColumn = new TableColumn(eventsTable, SWT.NULL);
+	    eventIdColumn.setText("Id");
+	    eventIdColumn.pack();
+	    TableColumn eventTimeColumn = new TableColumn(eventsTable, SWT.NULL);
+	    eventTimeColumn.setText("Time");
+	    eventTimeColumn.pack();
+	    TableColumn eventSeverityColumn = new TableColumn(eventsTable, SWT.NULL);
+	    eventSeverityColumn.setText("Severity");
+	    eventSeverityColumn.pack();
+	    TableColumn eventMessageColumn = new TableColumn(eventsTable, SWT.NULL);
+	    eventMessageColumn.setText("Message");
+	    eventMessageColumn.pack();
+	    TableColumn eventSensorColumn = new TableColumn(eventsTable, SWT.NULL);
+	    eventSensorColumn.setText("Sensor");
+	    eventSensorColumn.pack();
+	    eventsTab.setControl(eventsTable);
+	    //eventsTableEditor = new TableEditor(eventsTable);
 
 	    TabItem streamingTab = new TabItem(tf, SWT.BORDER);
 	    streamingTab.setText("Live Streaming");
-	    //ti3.setControl(new GridComposite(tf));
 
 	    TabItem controlTab = new TabItem(tf, SWT.BORDER);
 	    controlTab.setText("Control");
-	    //ti4.setControl(new GridComposite(tf));
 
 	    TabItem logTab = new TabItem(tf, SWT.BORDER);
 	    logTab.setText("Log");
+	    
+	    logText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+	    logText.setEditable(false);
+	    logTab.setControl(logText);	    
 	    
 	    shell.setMenuBar(menuBar);
 		shell.open();
@@ -253,25 +287,60 @@ public class Window implements GUI {
 	}
 
 	@Override
-	public void updateSummaryJson(String json) {
-	}
-
-	@Override
-	public void updateLogXml(String xml) {
+	public void updateEventsXml(String xml) {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("New log.xml: " + xml);
-				// TODO: parse xml and fill log tab with text
-				LogXmlParser parser = new LogXmlParser(xml);
+				System.out.println("New events.xml");
+				EventsXmlParser parser = new EventsXmlParser(xml);
 				if (parser.isValid()) {
-					System.out.println("Parsed updated log.xml:\n" + parser.getLog());
-					parser.getLog();
+					System.out.println("Parsed events.xml");
+
+					eventsTable.setRedraw(false);
+					
+					eventsTable.removeAll();
+					List<Event> events = parser.getEvents(); 
+					ListIterator<Event> it = events.listIterator(events.size());
+					
+					while (it.hasPrevious()) {
+						Event event = it.previous();
+						TableItem item = new TableItem(eventsTable, SWT.NULL);
+						item.setText(0, String.valueOf(event.id));
+						item.setText(1, event.time);
+						item.setText(2, event.getSeverityStr());
+						item.setText(3, event.message);
+						item.setText(4, event.sensor);
+					}
+					
+					for (int i=0; i<eventsTable.getColumnCount(); i++) {
+						eventsTable.getColumn(i).pack();
+					}
+					
+					eventsTable.setRedraw(true);
+					eventsTable.redraw();
 				}
 			}
 		});
 	}
 	
+	@Override
+	public void updateLogXml(String xml) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				//System.out.println("New log.xml: " + xml);
+				LogXmlParser parser = new LogXmlParser(xml);
+				if (parser.isValid()) {
+					logText.setText(parser.getLogText());
+				}
+			}
+		});
+	}
+
+	@Override
+	public void updateSummaryJson(String json) {
+	}
+
 	@Override
 	public void updateSummaryXml(String xml) {
 		display.asyncExec(new Runnable() {
@@ -279,9 +348,15 @@ public class Window implements GUI {
 			public void run() {
 				SummaryXmlParser parser = new SummaryXmlParser(xml);
 				if (parser.isValid()) {
+					if (prevLatestEventId != parser.getLatestEventId()) {
+						prevLatestEventId = parser.getLatestEventId();
+						System.out.println("New events!");
+						apiThread.runTask(new GetEventsXmlTask());
+					}
+
 					if (prevLogTimestamp != parser.getLogTimestamp()) {
 						prevLogTimestamp = parser.getLogTimestamp();
-						apiThread.runTask(new GetLogXmlTask());
+						//apiThread.runTask(new GetLogXmlTask());
 					}
 				}
 			}
