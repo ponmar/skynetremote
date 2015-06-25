@@ -18,10 +18,15 @@ import se.markstrom.skynet.skynetremote.apitask.ArmTask;
 import se.markstrom.skynet.skynetremote.apitask.ConnectTask;
 import se.markstrom.skynet.skynetremote.apitask.DisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.DisconnectTask;
+import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
+import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
+import se.markstrom.skynet.skynetremote.xmlparsing.LogXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparsing.SummaryXmlParser;
 
 public class Window implements GUI {
 	
 	private static final String TITLE = "Skynet Remote";
+	private static final int SUMMARY_TIME = 5000;
 	
 	private Display display;
 	private Shell shell;
@@ -29,6 +34,8 @@ public class Window implements GUI {
 	private MenuItem fileDisconnectItem;
 	private MenuItem actionArmItem;
 	private MenuItem actionDisarmItem;
+	
+	private double prevLogTimestamp = 0; 
 	
 	private ApiThread apiThread = new ApiThread(this);
 	
@@ -106,13 +113,15 @@ public class Window implements GUI {
 		shell.open();
 		
 		updateConnectedMenuItems(false);
+		
+		startSummaryXmlTimer();
 	}
 	
 	private void updateConnectedMenuItems(boolean connectedState) {
 		fileConnectItem.setEnabled(!connectedState);
 		fileDisconnectItem.setEnabled(connectedState);
 		
-		// Note: the armed state is unknown 
+		// Note: the armed state is unknown until summary XML/JSON has been fetched
 		actionArmItem.setEnabled(connectedState);
 		actionDisarmItem.setEnabled(connectedState);
 		
@@ -127,6 +136,16 @@ public class Window implements GUI {
 	private void updateArmMenuItems(boolean armedState) {
 		actionArmItem.setEnabled(!armedState);
 		actionDisarmItem.setEnabled(armedState);
+	}
+	
+	private void startSummaryXmlTimer() {
+		Runnable timer = new Runnable() {
+			public void run() {
+				apiThread.runTask(new GetSummaryXmlTask());
+				display.timerExec(SUMMARY_TIME, this);
+			}
+		};
+		display.timerExec(SUMMARY_TIME, timer);
 	}
 	
 	public void run() {
@@ -229,6 +248,42 @@ public class Window implements GUI {
 			@Override
 			public void run() {
 				updateArmMenuItems(state);
+			}
+		});
+	}
+
+	@Override
+	public void updateSummaryJson(String json) {
+	}
+
+	@Override
+	public void updateLogXml(String xml) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("New log.xml: " + xml);
+				// TODO: parse xml and fill log tab with text
+				LogXmlParser parser = new LogXmlParser(xml);
+				if (parser.isValid()) {
+					System.out.println("Parsed updated log.xml:\n" + parser.getLog());
+					parser.getLog();
+				}
+			}
+		});
+	}
+	
+	@Override
+	public void updateSummaryXml(String xml) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				SummaryXmlParser parser = new SummaryXmlParser(xml);
+				if (parser.isValid()) {
+					if (prevLogTimestamp != parser.getLogTimestamp()) {
+						prevLogTimestamp = parser.getLogTimestamp();
+						apiThread.runTask(new GetLogXmlTask());
+					}
+				}
 			}
 		});
 	}
