@@ -12,25 +12,25 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import se.markstrom.skynet.api.SkynetAPI;
-import se.markstrom.skynet.api.SkynetAPI.SkynetAPIError;
+import se.markstrom.skynet.skynetremote.apitask.ApiThread;
+import se.markstrom.skynet.skynetremote.apitask.ConnectTask;
 
-public class Window {
+public class Window implements GUI {
 	
 	private Display display;
 	private Shell shell;
 	private MenuItem fileConnectItem;
 	private MenuItem fileDisconnectItem;
 	
-	private SkynetAPI api = null;
+	private ApiThread apiThread = new ApiThread(this);
 	
 	public Window() {
 		createGui();
+		apiThread.start();
 	}
 	
 	public void close() {
-		if (api != null) {
-			api.close();
-		}
+		apiThread.close();
 	}
 
 	private void createGui() {
@@ -85,11 +85,11 @@ public class Window {
 	    shell.setMenuBar(menuBar);
 		shell.open();
 		
-		updateFileMenuItems();
+		updateFileMenuItems(false);
 	}
 	
-	private void updateFileMenuItems() {
-		if (api != null) {
+	private void updateFileMenuItems(boolean connectedState) {
+		if (connectedState) {
 			fileConnectItem.setEnabled(false);
 			fileDisconnectItem.setEnabled(true);
 		}
@@ -141,7 +141,7 @@ public class Window {
 	}
 	
 	private void connect() {
-		if (api == null) {
+		if (!apiThread.isConnected()) {
 			ConnectWindow connectWindow = new ConnectWindow();
 			connectWindow.run();
 			
@@ -151,23 +151,15 @@ public class Window {
 				SkynetAPI.Protocol protocol = connectWindow.getProtocol();
 				String password = connectWindow.getPassword();
 				boolean debug = false;
-				
-				try {
-					api = new SkynetAPI(host, port, protocol, password, debug);
-					updateFileMenuItems();
-				}
-				catch (SkynetAPIError e) {
-					e.printStackTrace();
-				}
+
+				apiThread.runTask(new ConnectTask(host, port, protocol, password, debug));
 			}
 		}
 	}
 
 	private void disconnect() {
-		if (api != null) {
-			api.close();
-			api = null;
-			updateFileMenuItems();
+		if (apiThread.isConnected()) {
+			apiThread.close();
 		}
 	}
 
@@ -175,5 +167,16 @@ public class Window {
 		Window window = new Window();
 		window.run();
 		window.close();
+	}
+
+	@Override
+	public void updateConnectedState(boolean state) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run()
+			{
+				updateFileMenuItems(state);
+			}
+		});
 	}
 }
