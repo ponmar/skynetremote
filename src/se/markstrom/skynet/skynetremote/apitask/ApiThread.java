@@ -20,13 +20,11 @@ public class ApiThread extends Thread {
 	}
 	
 	public void run() {
-		System.out.println("Starting Skynet API thread");
-		
 		try {
 			while (run) {
 				ApiTask task = queue.poll();
 				if (task != null) {
-					task.run(this, gui);
+					task.run(this, api, gui);
 				}
 				else {
 					try {
@@ -43,6 +41,7 @@ public class ApiThread extends Thread {
 		catch (SkynetAPIError e) {
 			gui.showApiError(e.getMessage());
 		}
+		// TODO: api.close()?
         api = null;
     }
 	
@@ -65,8 +64,9 @@ public class ApiThread extends Thread {
 
 	void connect(String host, int port, Protocol protocol, String password, boolean debug) throws SkynetAPIError {
 		if (api == null) {
-			System.out.println("Connecting to host: " + host);
+			System.out.println("Connecting to host " + host + "...");
 			api = new SkynetAPI(host, port, protocol, password, debug);
+			System.out.println("Connected");
 		}
 	}
 	
@@ -74,10 +74,11 @@ public class ApiThread extends Thread {
 		if (api != null) {
 			api.close();
 			api = null;
+			System.out.println("Disconnected");
 		}
 	}
 	
-	SkynetAPI getApi() {
-		return api;
+	int getNumQueuedTasks() {
+		return queue.size();
 	}
 }

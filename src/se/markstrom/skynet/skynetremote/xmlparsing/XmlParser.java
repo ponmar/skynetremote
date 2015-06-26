@@ -16,11 +16,17 @@ import org.xml.sax.SAXException;
 abstract class XmlParser {
 	
 	private boolean isValid = true;
+	private static final String PROMPT = ">> ";
 	
 	XmlParser(String xml) {
 		try {
-			xml = xml.substring(0, xml.length()-3);
+			// TODO: Some timing issue. Sometimes the prompt is included in the XML.
+			if (xml.endsWith(PROMPT)) {
+				xml = xml.substring(0, xml.length() - PROMPT.length());
+			}
+
 			System.out.println("Parsing xml:\n" + xml);
+			
 			Document xmlDoc = loadXMLFromString(xml);
 			isValid = parse(xmlDoc);
 		}

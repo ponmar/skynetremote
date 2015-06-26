@@ -8,8 +8,7 @@ import se.markstrom.skynet.skynetremote.GUI;
 public class GetEventsXmlTask implements ApiTask {
 	
 	@Override
-	public void run(ApiThread apiThread, GUI gui) throws SkynetAPIClientError, SkynetAPIError {
-		SkynetAPI api = apiThread.getApi();
+	public void run(ApiThread apiThread, SkynetAPI api, GUI gui) throws SkynetAPIClientError, SkynetAPIError {
 		if (api != null) {
 			String xml = api.getEventsXml();
 			gui.updateEventsXml(xml);

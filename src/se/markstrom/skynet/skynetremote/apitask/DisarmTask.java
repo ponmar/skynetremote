@@ -8,8 +8,7 @@ import se.markstrom.skynet.skynetremote.GUI;
 public class DisarmTask implements ApiTask {
 
 	@Override
-	public void run(ApiThread apiThread, GUI gui) throws SkynetAPIClientError, SkynetAPIError {
-		SkynetAPI api = apiThread.getApi();
+	public void run(ApiThread apiThread, SkynetAPI api, GUI gui) throws SkynetAPIClientError, SkynetAPIError {
 		if (api != null) {
 			api.disarm(0);
 		}

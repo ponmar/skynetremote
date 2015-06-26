@@ -28,6 +28,9 @@ import se.markstrom.skynet.skynetremote.apitask.DisconnectTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
+import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
+import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
+import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
 import se.markstrom.skynet.skynetremote.xmlparsing.Event;
 import se.markstrom.skynet.skynetremote.xmlparsing.EventsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparsing.LogXmlParser;
@@ -36,19 +39,23 @@ import se.markstrom.skynet.skynetremote.xmlparsing.SummaryXmlParser;
 public class Window implements GUI {
 	
 	private static final String TITLE = "Skynet Remote";
-	private static final int SUMMARY_TIME = 5000;
+	private static final int SUMMARY_TIME = 30000;
 	
 	private Display display;
 	private Shell shell;
+	
 	private MenuItem fileConnectItem;
 	private MenuItem fileDisconnectItem;
 	private MenuItem actionArmItem;
 	private MenuItem actionDisarmItem;
+	private MenuItem actionTempDisarmItem;
 	private MenuItem actionGetLogItem;
+	private MenuItem actionTurnOnAllDevicesItem;
+	private MenuItem actionTurnOffAllDevicesItem;
+	
 	private Table eventsTable;
 	private Text logText;
 	
-	//private double prevLogTimestamp = 0; 
 	private int prevLatestEventId = -1;
 	
 	private ApiThread apiThread = new ApiThread(this);
@@ -103,9 +110,21 @@ public class Window implements GUI {
 		actionDisarmItem.setText("Disarm");
 		actionDisarmItem.addSelectionListener(new ActionDisarmItemListener());
 
+		actionTempDisarmItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionTempDisarmItem.setText("Temporary disarm (5 min)");
+		actionTempDisarmItem.addSelectionListener(new ActionTemporaryDisarmItemListener());
+
 		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionGetLogItem.setText("Update log");
 		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
+
+		actionTurnOnAllDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionTurnOnAllDevicesItem.setText("Turn on all devices");
+		actionTurnOnAllDevicesItem.addSelectionListener(new ActionTurnOnAllDevicesListener());
+
+		actionTurnOffAllDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionTurnOffAllDevicesItem.setText("Turn on all devices");
+		actionTurnOffAllDevicesItem.addSelectionListener(new ActionTurnOffAllDevicesListener());
 
 		shell.setLayout(new FillLayout());
 	
@@ -166,6 +185,9 @@ public class Window implements GUI {
 		actionArmItem.setEnabled(connectedState);
 		actionDisarmItem.setEnabled(connectedState);
 		actionGetLogItem.setEnabled(connectedState);
+		actionTurnOnAllDevicesItem.setEnabled(connectedState);
+		actionTurnOffAllDevicesItem.setEnabled(connectedState);
+		actionTempDisarmItem.setEnabled(connectedState);
 		
 		if (connectedState) {
 			shell.setText(TITLE + " (connected)");
@@ -178,6 +200,7 @@ public class Window implements GUI {
 	private void updateArmMenuItems(boolean armedState) {
 		actionArmItem.setEnabled(!armedState);
 		actionDisarmItem.setEnabled(armedState);
+		actionTempDisarmItem.setEnabled(armedState);
 	}
 	
 	private void startSummaryXmlTimer() {
@@ -247,9 +270,36 @@ public class Window implements GUI {
 		}
 	}
 
+	class ActionTemporaryDisarmItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			temporaryDisarm(300);
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
 	class ActionGetLogItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			updateLog();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
+	class ActionTurnOnAllDevicesListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			turnOnAllDevices();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
+	class ActionTurnOffAllDevicesListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			turnOffAllDevices();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -282,9 +332,21 @@ public class Window implements GUI {
 	private void disarm() {
 		apiThread.runTask(new DisarmTask());
 	}
-	
+
+	private void temporaryDisarm(int seconds) {
+		apiThread.runTask(new TemporaryDisarmTask(seconds));
+	}
+
 	private void updateLog() {
 		apiThread.runTask(new GetLogXmlTask());
+	}
+	
+	private void turnOnAllDevices() {
+		apiThread.runTask(new TurnOnAllDevicesTask());
+	}
+
+	private void turnOffAllDevices() {
+		apiThread.runTask(new TurnOffAllDevicesTask());
 	}
 
 	@Override
