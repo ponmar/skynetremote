@@ -3,6 +3,8 @@ package se.markstrom.skynet.skynetremote;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
@@ -66,12 +68,11 @@ public class ConnectWindow {
 		connectButton.addSelectionListener(new SelectionAdapter() {
 		    @Override
 		    public void widgetSelected(SelectionEvent e) {
-		    	if (saveTextInput() && hasValidInput()) {
-		    		// Only close window if the input is valid
-		    		shell.dispose();
-		    	}
+		    	connect();
 		    }
 		});
+		
+		shell.addTraverseListener(new EnterListener());
 		
 		shell.pack();
 		shell.open();
@@ -83,6 +84,13 @@ public class ConnectWindow {
 				display.sleep();
 			}
 		}
+	}
+	
+	private void connect() {
+    	if (saveTextInput() && hasValidInput()) {
+    		// Only close window if the input is valid
+    		shell.dispose();
+    	}
 	}
 	
 	private boolean saveTextInput() {
@@ -118,5 +126,14 @@ public class ConnectWindow {
 	
 	public String getPassword() {
 		return password;
+	}
+	
+	private class EnterListener implements TraverseListener {
+		@Override
+		public void keyTraversed(TraverseEvent event) {
+			if (event.detail == SWT.TRAVERSE_RETURN) {
+				connect();
+			}
+		}
 	}
 }

@@ -16,7 +16,7 @@ public class SummaryXmlParser extends XmlParser {
 	private String site;
 	private boolean armed;
 	private double countdown;
-	private int latestEventId;
+	private long latestEventId;
 	private int numInfoEvents;
 	private int numMinorEvents;
 	private int numMajorEvents;
@@ -27,7 +27,7 @@ public class SummaryXmlParser extends XmlParser {
 		super(xml);
 	}
 
-	public int getLatestEventId() {
+	public long getLatestEventId() {
 		return latestEventId;
 	}
 	
@@ -74,7 +74,7 @@ public class SummaryXmlParser extends XmlParser {
 		if (value == null) {
 			return false;
 		}
-		latestEventId = Integer.parseInt(value);
+		latestEventId = Long.parseLong(value);
 
 		value = getUniqueNodeText(xmlDoc, "info");
 		if (value == null) {

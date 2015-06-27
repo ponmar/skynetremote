@@ -25,10 +25,14 @@ abstract class XmlParser {
 				xml = xml.substring(0, xml.length() - PROMPT.length());
 			}
 
-			System.out.println("Parsing xml:\n" + xml);
-			
+			System.out.println("Pre parsing xml doc");
 			Document xmlDoc = loadXMLFromString(xml);
+			System.out.println("Post parsing xml doc");
+			
+			System.out.println("Pre loading xml doc data");
 			isValid = parse(xmlDoc);
+			System.out.println("Post loading xml doc data with result: " + isValid);
+			
 		}
 		catch (ParserConfigurationException | SAXException | IOException e) {
 			isValid = false;

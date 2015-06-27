@@ -35,7 +35,7 @@ public class EventsXmlParser extends XmlParser {
 				for (Node eventChildNode = eventNode.getFirstChild(); eventChildNode != null; eventChildNode = eventChildNode.getNextSibling()) {
 					String nodeName = eventChildNode.getNodeName();
 					if (nodeName.equals("id")) {
-						event.id = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue());
+						event.id = Long.parseLong(eventChildNode.getFirstChild().getNodeValue());
 					}
 					else if (nodeName.equals("severity")) {
 						event.severity = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue());
@@ -60,6 +60,9 @@ public class EventsXmlParser extends XmlParser {
 						else {
 							event.areas = "";
 						}
+					}
+					else if (nodeName.equals("image")) {
+						event.images++;
 					}
 				}
 				events.add(event);

@@ -2,8 +2,11 @@ package se.markstrom.skynet.skynetremote;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Base64;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
@@ -25,6 +28,7 @@ import se.markstrom.skynet.skynetremote.apitask.ArmTask;
 import se.markstrom.skynet.skynetremote.apitask.ConnectTask;
 import se.markstrom.skynet.skynetremote.apitask.DisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.DisconnectTask;
+import se.markstrom.skynet.skynetremote.apitask.GetEventImageTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
@@ -39,7 +43,11 @@ import se.markstrom.skynet.skynetremote.xmlparsing.SummaryXmlParser;
 public class Window implements GUI {
 	
 	private static final String TITLE = "Skynet Remote";
-	private static final int SUMMARY_TIME = 30000;
+	
+	private static final int SUMMARY_DELAY = 30000;
+	
+	private static final int EVENT_ID_COLUMN = 0;
+	private static final int EVENT_IMAGES_COLUMN = 6;
 	
 	private Display display;
 	private Shell shell;
@@ -56,7 +64,7 @@ public class Window implements GUI {
 	private Table eventsTable;
 	private Text logText;
 	
-	private int prevLatestEventId = -1;
+	private long prevLatestEventId = -1;
 	
 	private ApiThread apiThread = new ApiThread(this);
 	
@@ -72,7 +80,7 @@ public class Window implements GUI {
 	private void createGui() {
 		display = Display.getDefault();
 		shell = new Shell(display);
-		shell.setSize(800, 600);
+		shell.setSize(1024, 768);
 		
 		Menu menuBar = new Menu(shell, SWT.BAR);
 		
@@ -133,9 +141,10 @@ public class Window implements GUI {
 		
 	    TabItem eventsTab = new TabItem(tf, SWT.BORDER);
 	    eventsTab.setText("Events");
-	    eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+	    eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION);
 	    eventsTable.setHeaderVisible(true);
 	    eventsTable.setLinesVisible(true);
+	    eventsTable.addMouseListener(new EventSelectedListener());
 	    TableColumn eventIdColumn = new TableColumn(eventsTable, SWT.NULL);
 	    eventIdColumn.setText("Id");
 	    eventIdColumn.pack();
@@ -154,6 +163,9 @@ public class Window implements GUI {
 	    TableColumn eventArmedColumn = new TableColumn(eventsTable, SWT.NULL);
 	    eventArmedColumn.setText("Armed");
 	    eventArmedColumn.pack();
+	    TableColumn eventImagesColumn = new TableColumn(eventsTable, SWT.NULL);
+	    eventImagesColumn.setText("Images");
+	    eventImagesColumn.pack();
 	    eventsTab.setControl(eventsTable);
 
 	    TabItem streamingTab = new TabItem(tf, SWT.BORDER);
@@ -165,7 +177,7 @@ public class Window implements GUI {
 	    TabItem logTab = new TabItem(tf, SWT.BORDER);
 	    logTab.setText("Log");
 	    
-	    logText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+	    logText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 	    logText.setEditable(false);
 	    logTab.setControl(logText);	    
 	    
@@ -173,8 +185,6 @@ public class Window implements GUI {
 		shell.open();
 		
 		updateConnectedMenuItems(false);
-		
-		startSummaryXmlTimer();
 	}
 	
 	private void updateConnectedMenuItems(boolean connectedState) {
@@ -206,11 +216,20 @@ public class Window implements GUI {
 	private void startSummaryXmlTimer() {
 		Runnable timer = new Runnable() {
 			public void run() {
-				apiThread.runTask(new GetSummaryXmlTask());
-				display.timerExec(SUMMARY_TIME, this);
+				// Wait with the polling until other queued tasks are done to not
+				// delay, for example, getting a number of event images.
+				if (apiThread.getNumQueuedTasks() == 0) {
+					apiThread.runTask(new GetSummaryXmlTask());
+					display.timerExec(SUMMARY_DELAY, this);
+				}
+				else {
+					// TODO: Use a shorter delay here until next try?
+					display.timerExec(SUMMARY_DELAY, this);
+				}
 			}
 		};
-		display.timerExec(SUMMARY_TIME, timer);
+
+		timer.run();
 	}
 	
 	public void run() {
@@ -222,7 +241,7 @@ public class Window implements GUI {
 		display.dispose();
 	}
 	
-	class FileExitItemListener implements SelectionListener {
+	private class FileExitItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			shell.close();
 			display.dispose();
@@ -234,7 +253,7 @@ public class Window implements GUI {
 		}
 	}
 
-	class FileConnectItemListener implements SelectionListener {
+	private class FileConnectItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			connect();			
 		}
@@ -243,7 +262,7 @@ public class Window implements GUI {
 		}
 	}
 
-	class FileDisconnectItemListener implements SelectionListener {
+	private class FileDisconnectItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			disconnect();
 		}
@@ -252,7 +271,7 @@ public class Window implements GUI {
 		}
 	}
 
-	class ActionArmItemListener implements SelectionListener {
+	private class ActionArmItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			arm();
 		}
@@ -261,7 +280,7 @@ public class Window implements GUI {
 		}
 	}
 	
-	class ActionDisarmItemListener implements SelectionListener {
+	private class ActionDisarmItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			disarm();
 		}
@@ -270,7 +289,7 @@ public class Window implements GUI {
 		}
 	}
 
-	class ActionTemporaryDisarmItemListener implements SelectionListener {
+	private class ActionTemporaryDisarmItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			temporaryDisarm(300);
 		}
@@ -279,7 +298,7 @@ public class Window implements GUI {
 		}
 	}
 
-	class ActionGetLogItemListener implements SelectionListener {
+	private class ActionGetLogItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			updateLog();
 		}
@@ -288,7 +307,7 @@ public class Window implements GUI {
 		}
 	}
 
-	class ActionTurnOnAllDevicesListener implements SelectionListener {
+	private class ActionTurnOnAllDevicesListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			turnOnAllDevices();
 		}
@@ -297,12 +316,39 @@ public class Window implements GUI {
 		}
 	}
 
-	class ActionTurnOffAllDevicesListener implements SelectionListener {
+	private class ActionTurnOffAllDevicesListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			turnOffAllDevices();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+	
+	private class EventSelectedListener implements MouseListener {
+		@Override
+		public void mouseDoubleClick(MouseEvent e) {
+			Table table = (Table)e.getSource();
+
+			// Note: currently only one selected event is supported 
+			if (table.getSelectionCount() > 0) {
+				TableItem selection = table.getSelection()[0];
+				System.out.println("Selected event id: " + selection.getText(EVENT_ID_COLUMN));
+				int numImages = Integer.parseInt(selection.getText(EVENT_IMAGES_COLUMN));
+				if (numImages > 0) {
+					long eventId = Long.parseLong(selection.getText(EVENT_ID_COLUMN));
+					int imageIndex = 0;
+					apiThread.runTask(new GetEventImageTask(eventId, imageIndex));
+				}
+			}
+		}
+
+		@Override
+		public void mouseDown(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseUp(MouseEvent e) {
 		}
 	}
 
@@ -355,6 +401,12 @@ public class Window implements GUI {
 			@Override
 			public void run() {
 				updateConnectedMenuItems(state);
+				if (state) {
+					// Request event list after connected
+					apiThread.runTask(new GetEventsXmlTask());
+					
+					startSummaryXmlTimer();
+				}
 			}
 		});
 	}
@@ -372,26 +424,31 @@ public class Window implements GUI {
 					eventsTable.setRedraw(false);
 					
 					eventsTable.removeAll();
-					List<Event> events = parser.getEvents(); 
-					ListIterator<Event> it = events.listIterator(events.size());
+					List<Event> events = parser.getEvents();
 					
-					while (it.hasPrevious()) {
-						Event event = it.previous();
-						TableItem item = new TableItem(eventsTable, SWT.NULL);
-						item.setText(0, String.valueOf(event.id));
-						item.setText(1, event.time);
-						item.setText(2, event.getSeverityStr());
-						item.setText(3, event.message);
-						item.setText(4, event.sensor);
-						item.setText(5, event.getArmedStr());
-					}
-					
-					for (int i=0; i<eventsTable.getColumnCount(); i++) {
-						eventsTable.getColumn(i).pack();
-					}
-					
-					eventsTable.setRedraw(true);
-					eventsTable.redraw();
+					if (!events.isEmpty()) {
+						prevLatestEventId = events.get(events.size() - 1).id;
+
+						ListIterator<Event> it = events.listIterator(events.size());
+						while (it.hasPrevious()) {
+							Event event = it.previous();
+							TableItem item = new TableItem(eventsTable, SWT.NULL);
+							item.setText(EVENT_ID_COLUMN, String.valueOf(event.id));
+							item.setText(1, event.time);
+							item.setText(2, event.getSeverityStr());
+							item.setText(3, event.message);
+							item.setText(4, event.sensor);
+							item.setText(5, event.getArmedStr());
+							item.setText(EVENT_IMAGES_COLUMN, String.valueOf(event.images));
+						}
+						
+						for (int i=0; i<eventsTable.getColumnCount(); i++) {
+							eventsTable.getColumn(i).pack();
+						}
+						
+						eventsTable.setRedraw(true);
+						eventsTable.redraw();
+					}					
 				}
 			}
 		});
@@ -411,10 +468,6 @@ public class Window implements GUI {
 	}
 
 	@Override
-	public void updateSummaryJson(String json) {
-	}
-
-	@Override
 	public void updateSummaryXml(String xml) {
 		display.asyncExec(new Runnable() {
 			@Override
@@ -426,9 +479,31 @@ public class Window implements GUI {
 					
 					if (prevLatestEventId != parser.getLatestEventId()) {
 						prevLatestEventId = parser.getLatestEventId();
-						System.out.println("New event detected, getting events...");
+						System.out.println("New event detected, requesting events");
 						apiThread.runTask(new GetEventsXmlTask());
 					}
+				}
+			}
+		});
+	}
+
+	@Override
+	public void updateEventImage(long eventId, int imageIndex, String base64Image) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				System.out.println("Received image: " + base64Image);
+				// TODO: error handling
+				try {
+					byte[] jpeg = Base64.getDecoder().decode(base64Image);
+					String windowTitle = "Image " + imageIndex + " for event " + eventId; 
+					ImageWindow imageWindow = new ImageWindow(windowTitle, jpeg);
+					imageWindow.run();
+					// TODO: cache image
+				}
+				catch (IllegalArgumentException e) {
+					showApiError("Received invalid Base64 image");
 				}
 			}
 		});

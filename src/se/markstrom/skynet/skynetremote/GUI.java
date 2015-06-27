@@ -10,8 +10,9 @@ public interface GUI {
 
 	void updateEventsXml(String xml);
 	void updateLogXml(String xml);
-	void updateSummaryJson(String json);
 	void updateSummaryXml(String xml);
+	
+	void updateEventImage(long eventId, int imageIndex, String base64Image);
 	
 	void showApiError(String message);
 }

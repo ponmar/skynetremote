@@ -24,7 +24,9 @@ public class ApiThread extends Thread {
 			while (run) {
 				ApiTask task = queue.poll();
 				if (task != null) {
+					System.out.println("Pre task run");
 					task.run(this, api, gui);
+					System.out.println("Post task run");
 				}
 				else {
 					try {
@@ -41,8 +43,8 @@ public class ApiThread extends Thread {
 		catch (SkynetAPIError e) {
 			gui.showApiError(e.getMessage());
 		}
-		// TODO: api.close()?
-        api = null;
+		
+		disconnect();
     }
 	
 	/**
@@ -78,7 +80,11 @@ public class ApiThread extends Thread {
 		}
 	}
 	
-	int getNumQueuedTasks() {
+	/**
+	 * A thread safe method for checking number of queued API tasks.
+	 * @return
+	 */
+	public int getNumQueuedTasks() {
 		return queue.size();
 	}
 }
