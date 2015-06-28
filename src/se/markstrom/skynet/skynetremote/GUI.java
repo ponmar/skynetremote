@@ -13,6 +13,7 @@ public interface GUI {
 	void updateSummaryXml(String xml);
 	
 	void updateEventImage(long eventId, int imageIndex, byte[] jpegData);
+	void updateCameraImage(int cameraIndex, byte[] jpegData);
 	
 	void showApiError(String message);
 }

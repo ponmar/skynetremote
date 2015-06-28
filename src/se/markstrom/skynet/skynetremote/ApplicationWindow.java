@@ -2,7 +2,6 @@ package se.markstrom.skynet.skynetremote;
 
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Base64;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -40,7 +39,7 @@ import se.markstrom.skynet.skynetremote.xmlparsing.EventsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparsing.LogXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparsing.SummaryXmlParser;
 
-public class Window implements GUI {
+public class ApplicationWindow implements GUI {
 	
 	private static final String TITLE = "Skynet Remote";
 	
@@ -68,7 +67,13 @@ public class Window implements GUI {
 	
 	private ApiThread apiThread = new ApiThread(this);
 	
-	public Window() {
+	private Runnable getSummaryXmlRunnable = new Runnable() {
+		public void run() {
+			apiThread.runTask(new GetSummaryXmlTask());
+		}
+	};
+	
+	public ApplicationWindow() {
 		createGui();
 		apiThread.start();
 	}
@@ -212,26 +217,7 @@ public class Window implements GUI {
 		actionDisarmItem.setEnabled(armedState);
 		actionTempDisarmItem.setEnabled(armedState);
 	}
-	
-	private void startSummaryXmlTimer() {
-		Runnable timer = new Runnable() {
-			public void run() {
-				// Wait with the polling until other queued tasks are done to not
-				// delay, for example, getting a number of event images.
-				if (apiThread.getNumQueuedTasks() == 0) {
-					apiThread.runTask(new GetSummaryXmlTask());
-					display.timerExec(settings.summaryPollInterval, this);
-				}
-				else {
-					// TODO: Use a shorter delay here until next try?
-					display.timerExec(settings.summaryPollInterval, this);
-				}
-			}
-		};
 
-		timer.run();
-	}
-	
 	public void run() {
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
@@ -401,13 +387,12 @@ public class Window implements GUI {
 			public void run() {
 				updateConnectedMenuItems(state);
 				if (state) {
-					// Request event list after connected
 					if (settings.getNewEvents) {
 						apiThread.runTask(new GetEventsXmlTask());
 					}
 					
 					if (settings.pollSummary) {
-						startSummaryXmlTimer();
+						display.timerExec(settings.summaryPollInterval, getSummaryXmlRunnable);
 					}
 				}
 			}
@@ -489,6 +474,10 @@ public class Window implements GUI {
 						}
 					}
 				}
+
+				if (settings.pollSummary) {
+					display.timerExec(settings.summaryPollInterval, getSummaryXmlRunnable);
+				}
 			}
 		});
 	}
@@ -501,6 +490,17 @@ public class Window implements GUI {
 				String windowTitle = "Event " + eventId + " (image " + (imageIndex+1) + ")"; 
 				ImageWindow imageWindow = new ImageWindow(windowTitle, jpegData);
 				imageWindow.run();
+			}
+		});
+	}
+	
+	@Override
+	public void updateCameraImage(int cameraIndex, byte[] jpegData) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				// TODO: update gui
+				System.out.println("Received new camera image");
 			}
 		});
 	}
@@ -519,7 +519,7 @@ public class Window implements GUI {
 	}
 
 	public static void main(String[] args) {
-		Window window = new Window();
+		ApplicationWindow window = new ApplicationWindow();
 		window.run();
 		window.close();
 	}
