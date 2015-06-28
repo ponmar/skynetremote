@@ -59,6 +59,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionGetLogItem;
 	private MenuItem actionTurnOnAllDevicesItem;
 	private MenuItem actionTurnOffAllDevicesItem;
+	private MenuItem helpAboutItem;
 	
 	private Table eventsTable;
 	private Text logText;
@@ -139,8 +140,19 @@ public class ApplicationWindow implements GUI {
 		actionTurnOffAllDevicesItem.setText("Turn on all devices");
 		actionTurnOffAllDevicesItem.addSelectionListener(new ActionTurnOffAllDevicesListener());
 
+		// Help menu
+		MenuItem helpMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
+		helpMenuHeader.setText("&Help");
+		
+		Menu helpMenu = new Menu(shell, SWT.DROP_DOWN);
+		helpMenuHeader.setMenu(helpMenu);
+		
+		helpAboutItem = new MenuItem(helpMenu, SWT.PUSH);
+		helpAboutItem.setText("&About...");
+		helpAboutItem.addSelectionListener(new HelpAboutItemListener());
+		
 		shell.setLayout(new FillLayout());
-	
+
 		// Tabs
 		TabFolder tf = new TabFolder(shell, SWT.BORDER);
 		
@@ -316,6 +328,15 @@ public class ApplicationWindow implements GUI {
 	private class ActionTurnOffAllDevicesListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			turnOffAllDevices();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+	
+	private class HelpAboutItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			System.out.println("Help!");;
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
