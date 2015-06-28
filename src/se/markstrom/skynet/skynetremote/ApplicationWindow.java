@@ -189,26 +189,37 @@ public class ApplicationWindow implements GUI {
 	    shell.setMenuBar(menuBar);
 		shell.open();
 		
-		updateConnectedMenuItems(false);
+		updateConnectedMenuItems(CONNECTED_STATE.DISCONNECTED);
 	}
 	
-	private void updateConnectedMenuItems(boolean connectedState) {
-		fileConnectItem.setEnabled(!connectedState);
-		fileDisconnectItem.setEnabled(connectedState);
+	private void updateConnectedMenuItems(CONNECTED_STATE connectedState) {
+		
+		boolean connected = connectedState == CONNECTED_STATE.CONNECTED;
+		
+		fileConnectItem.setEnabled(!connected);
+		fileDisconnectItem.setEnabled(connected);
 		
 		// Note: the armed state is unknown until summary XML/JSON has been fetched
-		actionArmItem.setEnabled(connectedState);
-		actionDisarmItem.setEnabled(connectedState);
-		actionGetLogItem.setEnabled(connectedState);
-		actionTurnOnAllDevicesItem.setEnabled(connectedState);
-		actionTurnOffAllDevicesItem.setEnabled(connectedState);
-		actionTempDisarmItem.setEnabled(connectedState);
+		actionArmItem.setEnabled(connected);
+		actionDisarmItem.setEnabled(connected);
+		actionGetLogItem.setEnabled(connected);
+		actionTurnOnAllDevicesItem.setEnabled(connected);
+		actionTurnOffAllDevicesItem.setEnabled(connected);
+		actionTempDisarmItem.setEnabled(connected);
 		
-		if (connectedState) {
-			shell.setText(TITLE + " (connected)");
-		}
-		else {
+		switch (connectedState) {
+		case DISCONNECTING:
+			shell.setText(TITLE + " (disconnecting...)");
+			break;
+		case DISCONNECTED:
 			shell.setText(TITLE + " (disconnected)");
+			break;
+		case CONNECTING:
+			shell.setText(TITLE + " (connecting...)");
+			break;
+		case CONNECTED:
+			shell.setText(TITLE + " (connected)");
+			break;
 		}
 	}
 	
@@ -381,12 +392,13 @@ public class ApplicationWindow implements GUI {
 	}
 
 	@Override
-	public void updateConnectedState(boolean state) {
+	public void updateConnectedState(CONNECTED_STATE state) {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				updateConnectedMenuItems(state);
-				if (state) {
+				switch (state) {
+				case CONNECTED:
 					if (settings.getNewEvents) {
 						apiThread.runTask(new GetEventsXmlTask());
 					}
@@ -394,6 +406,7 @@ public class ApplicationWindow implements GUI {
 					if (settings.pollSummary) {
 						display.timerExec(settings.summaryPollInterval, getSummaryXmlRunnable);
 					}
+				default:
 				}
 			}
 		});

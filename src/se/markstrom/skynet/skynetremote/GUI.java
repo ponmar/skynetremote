@@ -6,7 +6,15 @@ package se.markstrom.skynet.skynetremote;
  * changed after API calls.
  */
 public interface GUI {
-	void updateConnectedState(boolean state);
+	
+	public enum CONNECTED_STATE {
+		DISCONNECTING,
+		DISCONNECTED,
+		CONNECTING,
+		CONNECTED
+	}
+	
+	void updateConnectedState(CONNECTED_STATE state);
 
 	void updateEventsXml(String xml);
 	void updateLogXml(String xml);

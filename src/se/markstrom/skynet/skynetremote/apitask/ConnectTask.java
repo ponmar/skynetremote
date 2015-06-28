@@ -24,7 +24,8 @@ public class ConnectTask implements ApiTask {
 
 	@Override
 	public void run(ApiThread apiThread, SkynetAPI api, GUI gui) throws SkynetAPIClientError, SkynetAPIError {
+		gui.updateConnectedState(GUI.CONNECTED_STATE.CONNECTING);
 		apiThread.connect(host, port, protocol, password, debug);
-		gui.updateConnectedState(true);
+		gui.updateConnectedState(GUI.CONNECTED_STATE.CONNECTED);
 	}
 }

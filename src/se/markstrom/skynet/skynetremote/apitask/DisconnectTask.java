@@ -9,7 +9,8 @@ public class DisconnectTask implements ApiTask {
 	
 	@Override
 	public void run(ApiThread apiThread, SkynetAPI api, GUI gui) throws SkynetAPIClientError, SkynetAPIError {
+		gui.updateConnectedState(GUI.CONNECTED_STATE.DISCONNECTING);
 		apiThread.disconnect();
-		gui.updateConnectedState(false);
+		gui.updateConnectedState(GUI.CONNECTED_STATE.DISCONNECTED);
 	}
 }
