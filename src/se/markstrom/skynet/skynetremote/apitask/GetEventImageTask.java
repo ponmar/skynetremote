@@ -1,5 +1,7 @@
 package se.markstrom.skynet.skynetremote.apitask;
 
+import java.util.Base64;
+
 import se.markstrom.skynet.api.SkynetAPI;
 import se.markstrom.skynet.api.SkynetAPIClientError;
 import se.markstrom.skynet.api.SkynetAPI.SkynetAPIError;
@@ -26,7 +28,14 @@ public class GetEventImageTask implements ApiTask {
 				base64Image = base64Image.substring(0, base64Image.length() - PROMPT.length());
 			}
 			
-			gui.updateEventImage(eventId, imageIndex, base64Image);
+			try {
+				byte[] jpegData = Base64.getDecoder().decode(base64Image);
+				gui.updateEventImage(eventId, imageIndex, jpegData);
+				// TODO: write image to file if cache is enabled?
+			}
+			catch (IllegalArgumentException e) {
+				gui.showApiError("Received invalid Base64 image for event " + eventId + " image " + (imageIndex+1));
+			}
 		}
 	}
 }

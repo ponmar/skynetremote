@@ -12,7 +12,7 @@ public interface GUI {
 	void updateLogXml(String xml);
 	void updateSummaryXml(String xml);
 	
-	void updateEventImage(long eventId, int imageIndex, String base64Image);
+	void updateEventImage(long eventId, int imageIndex, byte[] jpegData);
 	
 	void showApiError(String message);
 }

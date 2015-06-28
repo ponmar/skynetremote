@@ -29,8 +29,9 @@ public class ApiThread extends Thread {
 					System.out.println("Post task run");
 				}
 				else {
+					// Do not sleep when there are queued tasks
 					try {
-						sleep(100);
+						sleep(250);
 					}
 					catch (InterruptedException e) {
 					}

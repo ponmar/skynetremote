@@ -44,10 +44,10 @@ public class Window implements GUI {
 	
 	private static final String TITLE = "Skynet Remote";
 	
-	private static final int SUMMARY_DELAY = 30000;
-	
 	private static final int EVENT_ID_COLUMN = 0;
 	private static final int EVENT_IMAGES_COLUMN = 6;
+	
+	private Settings settings = new Settings();
 	
 	private Display display;
 	private Shell shell;
@@ -141,7 +141,7 @@ public class Window implements GUI {
 		
 	    TabItem eventsTab = new TabItem(tf, SWT.BORDER);
 	    eventsTab.setText("Events");
-	    eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION);
+	    eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 	    eventsTable.setHeaderVisible(true);
 	    eventsTable.setLinesVisible(true);
 	    eventsTable.addMouseListener(new EventSelectedListener());
@@ -220,11 +220,11 @@ public class Window implements GUI {
 				// delay, for example, getting a number of event images.
 				if (apiThread.getNumQueuedTasks() == 0) {
 					apiThread.runTask(new GetSummaryXmlTask());
-					display.timerExec(SUMMARY_DELAY, this);
+					display.timerExec(settings.summaryPollInterval, this);
 				}
 				else {
 					// TODO: Use a shorter delay here until next try?
-					display.timerExec(SUMMARY_DELAY, this);
+					display.timerExec(settings.summaryPollInterval, this);
 				}
 			}
 		};
@@ -335,9 +335,8 @@ public class Window implements GUI {
 				TableItem selection = table.getSelection()[0];
 				System.out.println("Selected event id: " + selection.getText(EVENT_ID_COLUMN));
 				int numImages = Integer.parseInt(selection.getText(EVENT_IMAGES_COLUMN));
-				if (numImages > 0) {
+				for (int imageIndex = 0; imageIndex < numImages; imageIndex++) {
 					long eventId = Long.parseLong(selection.getText(EVENT_ID_COLUMN));
-					int imageIndex = 0;
 					apiThread.runTask(new GetEventImageTask(eventId, imageIndex));
 				}
 			}
@@ -403,9 +402,13 @@ public class Window implements GUI {
 				updateConnectedMenuItems(state);
 				if (state) {
 					// Request event list after connected
-					apiThread.runTask(new GetEventsXmlTask());
+					if (settings.getNewEvents) {
+						apiThread.runTask(new GetEventsXmlTask());
+					}
 					
-					startSummaryXmlTimer();
+					if (settings.pollSummary) {
+						startSummaryXmlTimer();
+					}
 				}
 			}
 		});
@@ -479,8 +482,11 @@ public class Window implements GUI {
 					
 					if (prevLatestEventId != parser.getLatestEventId()) {
 						prevLatestEventId = parser.getLatestEventId();
-						System.out.println("New event detected, requesting events");
-						apiThread.runTask(new GetEventsXmlTask());
+						
+						if (settings.getNewEvents) {
+							System.out.println("New event detected, requesting events");
+							apiThread.runTask(new GetEventsXmlTask());
+						}
 					}
 				}
 			}
@@ -488,23 +494,13 @@ public class Window implements GUI {
 	}
 
 	@Override
-	public void updateEventImage(long eventId, int imageIndex, String base64Image) {
+	public void updateEventImage(long eventId, int imageIndex, byte[] jpegData) {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-
-				System.out.println("Received image: " + base64Image);
-				// TODO: error handling
-				try {
-					byte[] jpeg = Base64.getDecoder().decode(base64Image);
-					String windowTitle = "Image " + imageIndex + " for event " + eventId; 
-					ImageWindow imageWindow = new ImageWindow(windowTitle, jpeg);
-					imageWindow.run();
-					// TODO: cache image
-				}
-				catch (IllegalArgumentException e) {
-					showApiError("Received invalid Base64 image");
-				}
+				String windowTitle = "Event " + eventId + " (image " + (imageIndex+1) + ")"; 
+				ImageWindow imageWindow = new ImageWindow(windowTitle, jpegData);
+				imageWindow.run();
 			}
 		});
 	}
