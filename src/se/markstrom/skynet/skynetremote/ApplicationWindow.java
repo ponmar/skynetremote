@@ -543,6 +543,17 @@ public class ApplicationWindow implements GUI {
 	}
 
 	@Override
+	public void updateApiWorkingState(boolean isWorking) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				// TODO: update gui
+				System.out.println("Working: " + isWorking);
+			}
+		});
+	}
+
+	@Override
 	public void showApiError(String message) {
 		display.asyncExec(new Runnable() {
 			@Override

@@ -14,6 +14,7 @@ public class ApiThread extends Thread {
 	private SkynetAPI api = null;
 	private ConcurrentLinkedQueue<ApiTask> queue = new ConcurrentLinkedQueue<ApiTask>();
 	private GUI gui;
+	private boolean workingState = false;
 	
 	public ApiThread(GUI gui) {
 		this.gui = gui;
@@ -24,6 +25,7 @@ public class ApiThread extends Thread {
 			while (run) {
 				ApiTask task = queue.poll();
 				if (task != null) {
+					isWorking(true);
 					System.out.println("Pre task run");
 					task.run(this, api, gui);
 					System.out.println("Post task run");
@@ -31,6 +33,7 @@ public class ApiThread extends Thread {
 				else {
 					// Do not sleep when there are queued tasks
 					try {
+						isWorking(false);
 						sleep(250);
 					}
 					catch (InterruptedException e) {
@@ -47,6 +50,13 @@ public class ApiThread extends Thread {
 		
 		disconnect();
     }
+	
+	private void isWorking(boolean state) {
+		if (state != workingState) {
+			workingState = state;
+			gui.updateApiWorkingState(workingState);
+		}
+	}
 	
 	/**
 	 * Call this method from the GUI thread to close the API connection

@@ -23,5 +23,7 @@ public interface GUI {
 	void updateEventImage(long eventId, int imageIndex, byte[] jpegData);
 	void updateCameraImage(int cameraIndex, byte[] jpegData);
 	
+	void updateApiWorkingState(boolean isWorking);
+	
 	void showApiError(String message);
 }
