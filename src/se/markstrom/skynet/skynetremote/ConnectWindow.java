@@ -27,7 +27,7 @@ public class ConnectWindow {
 	private int port;
 	private String password;
 	
-	public ConnectWindow() {
+	public ConnectWindow(String defaultHost, int defaultPort) {
 		display = Display.getDefault();
 		shell = new Shell(display);
 		shell.setText("Connect");
@@ -37,13 +37,13 @@ public class ConnectWindow {
 		hostLabel.setText("Host:");
 		
 		hostText = new Text(shell, SWT.BORDER);
-		hostText.setText("");
+		hostText.setText(defaultHost);
 		
 		Label portLabel = new Label(shell, SWT.NONE);
 		portLabel.setText("Port:");
 		
 		portText = new Text(shell, SWT.BORDER);
-		portText.setText("22");
+		portText.setText(new Integer(defaultPort).toString());
 
 		Label passwordLabel = new Label(shell, SWT.NONE);
 		passwordLabel.setText("Password:");
@@ -51,6 +51,9 @@ public class ConnectWindow {
 		passwordText = new Text(shell, SWT.BORDER);
 		passwordText.setEchoChar('*');
 		passwordText.setText("");
+		if (!defaultHost.equals("")) {
+			passwordText.setFocus();
+		}
 		
 		// TODO: protocol radio buttons (or a checkbox)
 

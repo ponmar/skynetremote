@@ -1,17 +1,29 @@
 package se.markstrom.skynet.skynetremote;
 
 public class Settings {
-	public boolean getNewEvents = true;
-	public boolean pollSummary = true;
-	public int summaryPollInterval = 30000;
-	public int cameraImagePollInterval = 1000;
+	public boolean getNewEvents;
+	public boolean pollSummary;
+	public int summaryPollInterval;
+	public int cameraImagePollInterval;
+	public String host;
+	public int port;
 	
 	public Settings() {
+		resetDefaults();
 		// TODO: read settings from file
 	}
 	
-	boolean save() {
+	public boolean save() {
 		// TODO: save settings to file
 		return true;
+	}
+	
+	public void resetDefaults() {
+		getNewEvents = true;
+		pollSummary = true;
+		summaryPollInterval = 30000;
+		cameraImagePollInterval = 1000;
+		host = "";
+		port = 22;
 	}
 }

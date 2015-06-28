@@ -349,7 +349,7 @@ public class ApplicationWindow implements GUI {
 	}
 
 	private void connect() {
-		ConnectWindow connectWindow = new ConnectWindow();
+		ConnectWindow connectWindow = new ConnectWindow(settings.host, settings.port);
 		connectWindow.run();
 		
 		if (connectWindow.hasValidInput()) {
@@ -359,6 +359,9 @@ public class ApplicationWindow implements GUI {
 			String password = connectWindow.getPassword();
 			boolean debug = false;
 
+			settings.host = host;
+			settings.port = port;
+			
 			apiThread.runTask(new ConnectTask(host, port, protocol, password, debug));
 		}
 	}
