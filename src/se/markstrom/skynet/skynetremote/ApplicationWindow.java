@@ -137,7 +137,7 @@ public class ApplicationWindow implements GUI {
 		actionTurnOnAllDevicesItem.addSelectionListener(new ActionTurnOnAllDevicesListener());
 
 		actionTurnOffAllDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionTurnOffAllDevicesItem.setText("Turn on all devices");
+		actionTurnOffAllDevicesItem.setText("Turn off all devices");
 		actionTurnOffAllDevicesItem.addSelectionListener(new ActionTurnOffAllDevicesListener());
 
 		// Help menu
