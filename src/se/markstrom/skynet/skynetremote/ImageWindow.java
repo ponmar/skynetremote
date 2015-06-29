@@ -14,6 +14,10 @@ public class ImageWindow {
 	private Shell shell;
 	
 	public ImageWindow(String title, byte [] jpegData) {
+		createGui(title, jpegData);
+	}
+	
+	private void createGui(String title, byte [] jpegData) {
 		display = Display.getDefault();
 		shell = new Shell(display);
 		shell.setText(title);
@@ -26,7 +30,7 @@ public class ImageWindow {
 		label.pack();
 		
 		shell.pack();
-		shell.open();
+		shell.open();		
 	}
 	
 	public void run() {

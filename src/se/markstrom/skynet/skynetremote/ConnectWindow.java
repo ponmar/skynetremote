@@ -28,6 +28,10 @@ public class ConnectWindow {
 	private String password;
 	
 	public ConnectWindow(String defaultHost, int defaultPort) {
+		createGui(defaultHost, defaultPort);
+	}
+	
+	private void createGui(String defaultHost, int defaultPort) {
 		display = Display.getDefault();
 		shell = new Shell(display);
 		shell.setText("Connect");
