@@ -8,6 +8,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -20,6 +22,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tray;
+import org.eclipse.swt.widgets.TrayItem;
 
 import se.markstrom.skynet.api.SkynetAPI;
 import se.markstrom.skynet.skynetremote.apitask.ApiThread;
@@ -55,6 +59,7 @@ public class ApplicationWindow implements GUI {
 	
 	private MenuItem fileConnectItem;
 	private MenuItem fileDisconnectItem;
+	private MenuItem fileSettingsItem;
 	private MenuItem actionArmItem;
 	private MenuItem actionDisarmItem;
 	private MenuItem actionTempDisarmItem;
@@ -63,6 +68,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionTurnOffAllDevicesItem;
 	private MenuItem helpAboutItem;
 	
+	private TrayItem trayItem;
 	private Table eventsTable;
 	private Text logText;
 	
@@ -109,6 +115,27 @@ public class ApplicationWindow implements GUI {
 		shell = new Shell(display);
 		shell.setSize(1024, 768);
 		
+		Tray tray = display.getSystemTray();
+		if (tray != null) {
+			Image image = new Image(display, 16, 16);
+			Image image2 = new Image(display, 16, 16);
+			
+			GC gc = new GC(image2);
+			gc.setBackground(display.getSystemColor(SWT.COLOR_BLACK));
+			gc.fillRectangle(image2.getBounds());
+			gc.dispose();
+			
+			trayItem = new TrayItem(tray, SWT.NONE);
+			// TODO: set to program title
+			trayItem.setToolTipText("Skynet Remote");
+			
+			trayItem.setImage(image2);
+			trayItem.setHighlightImage(image);
+		}
+		else {
+			System.out.println("No system tray available");
+		}
+		
 		Menu menuBar = new Menu(shell, SWT.BAR);
 		
 		// File menu
@@ -126,6 +153,10 @@ public class ApplicationWindow implements GUI {
 		fileDisconnectItem.setText("&Disconnect");
 		fileDisconnectItem.addSelectionListener(new FileDisconnectItemListener());
 
+		fileSettingsItem = new MenuItem(fileMenu, SWT.PUSH);
+		fileSettingsItem.setText("&Settings...");
+		fileSettingsItem.addSelectionListener(new FileSettingsItemListener());
+		
 		MenuItem fileExitItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileExitItem.setText("E&xit");
 		fileExitItem.addSelectionListener(new FileExitItemListener());
@@ -242,17 +273,24 @@ public class ApplicationWindow implements GUI {
 		
 		switch (connectedState) {
 		case DISCONNECTING:
-			shell.setText(TITLE + " (disconnecting...)");
+			setTitle(TITLE + " (disconnecting...)");
 			break;
 		case DISCONNECTED:
-			shell.setText(TITLE + " (disconnected)");
+			setTitle(TITLE + " (disconnected)");
 			break;
 		case CONNECTING:
-			shell.setText(TITLE + " (connecting...)");
+			setTitle(TITLE + " (connecting...)");
 			break;
 		case CONNECTED:
-			shell.setText(TITLE + " (connected)");
+			setTitle(TITLE + " (connected)");
 			break;
+		}
+	}
+	
+	private void setTitle(String title) {
+		shell.setText(title);
+		if (trayItem != null) {
+			trayItem.setToolTipText(title);
 		}
 	}
 	
@@ -295,6 +333,15 @@ public class ApplicationWindow implements GUI {
 	private class FileDisconnectItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			disconnect();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
+	private class FileSettingsItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			System.out.println("Settings");
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -463,6 +510,7 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				System.out.println("New events.xml");
+				
 				EventsXmlParser parser = new EventsXmlParser(xml);
 				if (parser.isValid()) {
 					System.out.println("Parsed events.xml");
@@ -473,8 +521,12 @@ public class ApplicationWindow implements GUI {
 					List<Event> events = parser.getEvents();
 					
 					if (!events.isEmpty()) {
+						if (settings.showEventNotification) {
+							new Notification("New events detected!");
+						}
+						
 						prevLatestEventId = events.get(events.size() - 1).id;
-
+						
 						ListIterator<Event> it = events.listIterator(events.size());
 						while (it.hasPrevious()) {
 							Event event = it.previous();
