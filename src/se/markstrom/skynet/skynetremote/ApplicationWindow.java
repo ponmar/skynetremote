@@ -31,6 +31,7 @@ import se.markstrom.skynet.skynetremote.apitask.ArmTask;
 import se.markstrom.skynet.skynetremote.apitask.ConnectTask;
 import se.markstrom.skynet.skynetremote.apitask.DisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.DisconnectTask;
+import se.markstrom.skynet.skynetremote.apitask.GetCamerasXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventImageTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
@@ -38,6 +39,7 @@ import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
+import se.markstrom.skynet.skynetremote.xmlparser.CamerasXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.Event;
 import se.markstrom.skynet.skynetremote.xmlparser.EventsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.LogXmlParser;
@@ -63,10 +65,12 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionArmItem;
 	private MenuItem actionDisarmItem;
 	private MenuItem actionTempDisarmItem;
-	private MenuItem actionGetLogItem;
+	private MenuItem actionStreamItem;
 	private MenuItem actionTurnOnAllDevicesItem;
 	private MenuItem actionTurnOffAllDevicesItem;
+	private MenuItem actionGetLogItem;
 	private MenuItem helpAboutItem;
+	private Menu streamMenu;
 	
 	private TrayItem trayItem;
 	private Table eventsTable;
@@ -180,10 +184,13 @@ public class ApplicationWindow implements GUI {
 		actionTempDisarmItem.setText("Temporary disarm (5 min)");
 		actionTempDisarmItem.addSelectionListener(new ActionTemporaryDisarmItemListener());
 
-		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionGetLogItem.setText("Update log");
-		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
-
+		actionStreamItem = new MenuItem(actionMenu, SWT.CASCADE);
+		actionStreamItem.setText("Stream images from camera");
+		
+		// Action -> Stream images from camera menu
+		streamMenu = new Menu(shell, SWT.DROP_DOWN);
+		actionStreamItem.setMenu(streamMenu);
+		
 		actionTurnOnAllDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionTurnOnAllDevicesItem.setText("Turn on all devices");
 		actionTurnOnAllDevicesItem.addSelectionListener(new ActionTurnOnAllDevicesListener());
@@ -191,6 +198,10 @@ public class ApplicationWindow implements GUI {
 		actionTurnOffAllDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionTurnOffAllDevicesItem.setText("Turn off all devices");
 		actionTurnOffAllDevicesItem.addSelectionListener(new ActionTurnOffAllDevicesListener());
+
+		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionGetLogItem.setText("Update log");
+		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
 
 		// Help menu
 		MenuItem helpMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
@@ -237,9 +248,6 @@ public class ApplicationWindow implements GUI {
 	    eventImagesColumn.pack();
 	    eventsTab.setControl(eventsTable);
 
-	    TabItem streamingTab = new TabItem(tf, SWT.BORDER);
-	    streamingTab.setText("Live Streaming");
-
 	    TabItem controlTab = new TabItem(tf, SWT.BORDER);
 	    controlTab.setText("Control");
 
@@ -270,6 +278,7 @@ public class ApplicationWindow implements GUI {
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
 		actionTempDisarmItem.setEnabled(connected);
+		actionStreamItem.setEnabled(connected);
 		
 		switch (connectedState) {
 		case DISCONNECTING:
@@ -491,6 +500,8 @@ public class ApplicationWindow implements GUI {
 				updateConnectedMenuItems(state);
 				switch (state) {
 				case CONNECTED:
+					apiThread.runTask(new GetCamerasXmlTask());
+					
 					if (settings.getNewEvents) {
 						apiThread.runTask(new GetEventsXmlTask());
 					}
@@ -499,6 +510,26 @@ public class ApplicationWindow implements GUI {
 						display.timerExec(settings.summaryPollInterval, getSummaryXmlRunnable);
 					}
 				default:
+				}
+			}
+		});
+	}
+	
+	@Override
+	public void updateCamerasXml(String xml) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("Received cameras: " + xml);
+				
+				CamerasXmlParser parser = new CamerasXmlParser(xml);
+				if (parser.isValid()) {
+					for (Integer cameraIndex : parser.getCameraIndexes()) {
+						MenuItem cameraMenuItem = new MenuItem(streamMenu, SWT.PUSH);
+						cameraMenuItem.setText("Camera " + (cameraIndex+1));
+						// TODO:
+						//fileConnectItem.addSelectionListener(new FileConnectItemListener());
+					}
 				}
 			}
 		});

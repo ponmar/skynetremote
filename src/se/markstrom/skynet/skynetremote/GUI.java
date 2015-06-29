@@ -16,6 +16,7 @@ public interface GUI {
 	
 	void updateConnectedState(CONNECTED_STATE state);
 
+	void updateCamerasXml(String xml);
 	void updateEventsXml(String xml);
 	void updateLogXml(String xml);
 	void updateSummaryXml(String xml);
