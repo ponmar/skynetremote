@@ -1,21 +1,18 @@
 package se.markstrom.skynet.skynetremote;
 
 public class Settings {
+	public static final String FILENAME = "settings.xml";
+	
 	public boolean getNewEvents;
 	public boolean pollSummary;
 	public int summaryPollInterval;
 	public int cameraImagePollInterval;
 	public String host;
 	public int port;
+	public boolean showEventNotification;
 	
 	public Settings() {
 		resetDefaults();
-		// TODO: read settings from file
-	}
-	
-	public boolean save() {
-		// TODO: save settings to file
-		return true;
 	}
 	
 	public void resetDefaults() {
@@ -25,5 +22,6 @@ public class Settings {
 		cameraImagePollInterval = 1000;
 		host = "";
 		port = 22;
+		showEventNotification = true;
 	}
 }

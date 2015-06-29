@@ -34,10 +34,12 @@ import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
-import se.markstrom.skynet.skynetremote.xmlparsing.Event;
-import se.markstrom.skynet.skynetremote.xmlparsing.EventsXmlParser;
-import se.markstrom.skynet.skynetremote.xmlparsing.LogXmlParser;
-import se.markstrom.skynet.skynetremote.xmlparsing.SummaryXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparser.Event;
+import se.markstrom.skynet.skynetremote.xmlparser.EventsXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparser.LogXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparser.SettingsXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparser.SummaryXmlParser;
+import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
 
 public class ApplicationWindow implements GUI {
 	
@@ -46,7 +48,7 @@ public class ApplicationWindow implements GUI {
 	private static final int EVENT_ID_COLUMN = 0;
 	private static final int EVENT_IMAGES_COLUMN = 6;
 	
-	private Settings settings = new Settings();
+	private Settings settings;
 	
 	private Display display;
 	private Shell shell;
@@ -75,14 +77,33 @@ public class ApplicationWindow implements GUI {
 	};
 	
 	public ApplicationWindow() {
+		readSettings();
 		createGui();
 		apiThread.start();
 	}
 	
 	public void close() {
 		apiThread.close();
+		writeSettings();
 	}
 
+	private void readSettings() {
+		SettingsXmlParser parser = new SettingsXmlParser();
+		if (parser.isValid()) {
+			System.out.println("Using settings from file");
+			settings = parser.getSettings();
+		}
+		else {
+			System.out.println("Using default settings");
+			settings = new Settings();
+		}
+	}
+	
+	private void writeSettings() {
+		SettingsXmlWriter settingsWriter = new SettingsXmlWriter(settings);
+		settingsWriter.write();
+	}
+	
 	private void createGui() {
 		display = Display.getDefault();
 		shell = new Shell(display);
