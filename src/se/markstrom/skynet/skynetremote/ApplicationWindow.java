@@ -71,12 +71,13 @@ public class ApplicationWindow implements GUI {
 	private MenuItem fileSettingsItem;
 	private MenuItem actionArmItem;
 	private MenuItem actionDisarmItem;
-	private MenuItem actionTempDisarmItem;
+	private MenuItem actionTemporaryDisarmItem;
 	private MenuItem actionCameraSnapshotItem;
 	private MenuItem actionTurnOnAllDevicesItem;
 	private MenuItem actionTurnOffAllDevicesItem;
 	private MenuItem actionGetLogItem;
 	private MenuItem helpAboutItem;
+	private Menu actionTemporaryDisarmMenu;
 	private Menu cameraSnapshotMenu;
 	
 	private Image noneImage;
@@ -201,10 +202,9 @@ public class ApplicationWindow implements GUI {
 		actionDisarmItem.setText("Disarm");
 		actionDisarmItem.addSelectionListener(new ActionDisarmItemListener());
 
-		actionTempDisarmItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionTempDisarmItem.setText("Temporary disarm (5 min)");
-		actionTempDisarmItem.addSelectionListener(new ActionTemporaryDisarmItemListener());
-
+		actionTemporaryDisarmItem = new MenuItem(actionMenu, SWT.CASCADE);
+		actionTemporaryDisarmItem.setText("Temporary disarm");
+		
 		actionCameraSnapshotItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionCameraSnapshotItem.setText("Camera snapshots");
 		
@@ -212,6 +212,22 @@ public class ApplicationWindow implements GUI {
 		cameraSnapshotMenu = new Menu(shell, SWT.DROP_DOWN);
 		actionCameraSnapshotItem.setMenu(cameraSnapshotMenu);
 		
+		// Action -> Temporary disarm
+		actionTemporaryDisarmMenu = new Menu(shell, SWT.DROP_DOWN);
+		actionTemporaryDisarmItem.setMenu(actionTemporaryDisarmMenu);
+
+		MenuItem firstTempDisarm = new MenuItem(actionTemporaryDisarmMenu, SWT.PUSH);
+		firstTempDisarm.setText("1 minute");
+		firstTempDisarm.addSelectionListener(new ActionTemporaryDisarmItemListener(60));
+
+		MenuItem secondTempDisarm = new MenuItem(actionTemporaryDisarmMenu, SWT.PUSH);
+		secondTempDisarm.setText("5 minutes");
+		secondTempDisarm.addSelectionListener(new ActionTemporaryDisarmItemListener(300));
+
+		MenuItem thirdTempDisarm = new MenuItem(actionTemporaryDisarmMenu, SWT.PUSH);
+		thirdTempDisarm.setText("10 minutes");
+		thirdTempDisarm.addSelectionListener(new ActionTemporaryDisarmItemListener(600));
+
 		actionTurnOnAllDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionTurnOnAllDevicesItem.setText("Turn on all devices");
 		actionTurnOnAllDevicesItem.addSelectionListener(new ActionTurnOnAllDevicesListener());
@@ -298,7 +314,7 @@ public class ApplicationWindow implements GUI {
 		actionGetLogItem.setEnabled(connected);
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
-		actionTempDisarmItem.setEnabled(connected);
+		actionTemporaryDisarmItem.setEnabled(connected);
 		actionCameraSnapshotItem.setEnabled(connected);
 		
 		switch (connectedState) {
@@ -327,7 +343,7 @@ public class ApplicationWindow implements GUI {
 	private void updateArmMenuItems(boolean armedState) {
 		actionArmItem.setEnabled(!armedState);
 		actionDisarmItem.setEnabled(armedState);
-		actionTempDisarmItem.setEnabled(armedState);
+		actionTemporaryDisarmItem.setEnabled(armedState);
 	}
 
 	public void run() {
@@ -393,8 +409,14 @@ public class ApplicationWindow implements GUI {
 	}
 
 	private class ActionTemporaryDisarmItemListener implements SelectionListener {
+		private int seconds;
+		
+		public ActionTemporaryDisarmItemListener(int seconds) {
+			this.seconds = seconds;
+		}
+		
 		public void widgetSelected(SelectionEvent event) {
-			temporaryDisarm(300);
+			temporaryDisarm(seconds);
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
