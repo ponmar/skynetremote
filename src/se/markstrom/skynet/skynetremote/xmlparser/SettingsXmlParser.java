@@ -45,7 +45,7 @@ public class SettingsXmlParser extends XmlParser {
 			settings.cameraImagePollInterval = cameraImagePollInterval;
 			settings.host = host;
 			settings.port = port;
-			settings.showEventNotification = showEventNotification;
+			settings.notifyOnNewEvent = showEventNotification;
 			return true;
 		}
 		

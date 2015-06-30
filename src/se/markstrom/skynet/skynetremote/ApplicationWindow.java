@@ -583,16 +583,31 @@ public class ApplicationWindow implements GUI {
 					List<Event> events = parser.getEvents();
 					
 					if (!events.isEmpty()) {
-						if (settings.showEventNotification) {
-							new Notification(TITLE, "New events detected!");
-						}
-						
-						prevLatestEventId = events.get(events.size() - 1).id;
 						int highestSeverity = 0;
+
+						boolean newInfoEvent = false;
+						boolean newMinorEvent = false;
+						boolean newMajorEvent = false;
 						
 						ListIterator<Event> it = events.listIterator(events.size());
 						while (it.hasPrevious()) {
 							Event event = it.previous();
+							
+							if (event.id > prevLatestEventId) {
+								switch (event.severity) {
+								case Event.INFO:
+									newInfoEvent = true;
+									break;
+								case Event.MINOR:
+									newMinorEvent = true;
+									break;
+								case Event.MAJOR:
+									newMajorEvent = true;
+									break;
+								}
+								
+							}
+							
 							TableItem item = new TableItem(eventsTable, SWT.NULL);
 							item.setText(EVENT_ID_COLUMN, String.valueOf(event.id));
 							item.setText(EVENT_TIME_COLUMN, event.time);
@@ -628,6 +643,20 @@ public class ApplicationWindow implements GUI {
 							shell.setImage(majorImage);
 							break;
 						}
+						
+						if (settings.notifyOnNewEvent) {
+							if (newMajorEvent) {
+								new Notification(TITLE, "New event with major severity detected!");
+							}
+							else if (newMinorEvent) {
+								new Notification(TITLE, "New event with minor severity detected!");
+							}
+							else if (newInfoEvent) {
+								new Notification(TITLE, "New event with info severity detected!");
+							}
+						}
+						
+						prevLatestEventId = events.get(events.size() - 1).id;
 					}					
 				}
 			}

@@ -9,7 +9,7 @@ public class Settings {
 	public int cameraImagePollInterval;
 	public String host;
 	public int port;
-	public boolean showEventNotification;
+	public boolean notifyOnNewEvent;
 	
 	public Settings() {
 		resetDefaults();
@@ -22,6 +22,6 @@ public class Settings {
 		cameraImagePollInterval = 1000;
 		host = "";
 		port = 22;
-		showEventNotification = true;
+		notifyOnNewEvent = true;
 	}
 }

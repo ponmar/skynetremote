@@ -20,7 +20,7 @@ public class SettingsXmlWriter extends XmlWriter {
 		xml += "<cameraImagePollInterval>" + settings.cameraImagePollInterval + "</cameraImagePollInterval>";
 		xml += "<host>" + settings.host + "</host>";
 		xml += "<port>" + settings.port + "</port>";
-		xml += "<showEventNotification>" + settings.showEventNotification + "</showEventNotification>";
+		xml += "<showEventNotification>" + settings.notifyOnNewEvent + "</showEventNotification>";
 		xml += "</settings>";
 		return xml;
 	}
