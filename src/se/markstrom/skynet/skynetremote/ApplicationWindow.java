@@ -8,7 +8,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -106,6 +105,10 @@ public class ApplicationWindow implements GUI {
 	
 	public void close() {
 		apiThread.close();
+		
+		// Needed to get rid of the tray icon without hovering with the mouse cursor
+		trayItem.dispose();
+		
 		writeSettings();
 	}
 
