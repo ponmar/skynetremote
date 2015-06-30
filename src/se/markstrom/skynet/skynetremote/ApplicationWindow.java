@@ -89,7 +89,8 @@ public class ApplicationWindow implements GUI {
 	private Table eventsTable;
 	private Text logText;
 	
-	private long prevLatestEventId = -1;
+	private long prevPollEventId = -1;
+	private long latestFetchedEventId = -1;
 	
 	private ApiThread apiThread = new ApiThread(this);
 	
@@ -615,7 +616,7 @@ public class ApplicationWindow implements GUI {
 						while (it.hasPrevious()) {
 							Event event = it.previous();
 							
-							if (event.id > prevLatestEventId) {
+							if (event.id > latestFetchedEventId) {
 								switch (event.severity) {
 								case Event.INFO:
 									newInfoEvent = true;
@@ -678,7 +679,7 @@ public class ApplicationWindow implements GUI {
 							}
 						}
 						
-						prevLatestEventId = events.get(events.size() - 1).id;
+						latestFetchedEventId = events.get(events.size() - 1).id;
 					}					
 				}
 			}
@@ -709,8 +710,8 @@ public class ApplicationWindow implements GUI {
 					
 					updateArmMenuItems(summary.armed);
 					
-					if (prevLatestEventId != summary.latestEventId) {
-						prevLatestEventId = summary.latestEventId;
+					if (prevPollEventId != summary.latestEventId) {
+						prevPollEventId = summary.latestEventId;
 						
 						if (settings.getNewEvents) {
 							System.out.println("New event detected, requesting events");
