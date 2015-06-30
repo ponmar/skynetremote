@@ -11,22 +11,13 @@ import org.xml.sax.SAXException;
 
 public class SummaryXmlParser extends XmlParser {
 
-	private int majorApiVersion;
-	private int minorApiVersion;
-	private String site;
-	private boolean armed;
-	private double countdown;
-	private long latestEventId;
-	private int numInfoEvents;
-	private int numMinorEvents;
-	private int numMajorEvents;
-	private double logTimestamp;
-	private String time;
+	private Summary summary;
 
 	public SummaryXmlParser(String xml) {
 		super(xml);
 	}
 
+	/*
 	public long getLatestEventId() {
 		return latestEventId;
 	}
@@ -38,23 +29,31 @@ public class SummaryXmlParser extends XmlParser {
 	public boolean getArmedState() {
 		return armed;
 	}
+	*/
+	
+	public Summary getSummary() {
+		return summary;
+	}
 
 	@Override
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
+		
+		summary = new Summary();
+		
 		String value = getNodeValueAsString(xmlDoc, "majorapiversion");
 		if (value == null) {
 			return false;
 		}
-		majorApiVersion = Integer.parseInt(value);
+		summary.majorApiVersion = Integer.parseInt(value);
 
 		value = getNodeValueAsString(xmlDoc, "minorapiversion");
 		if (value == null) {
 			return false;
 		}
-		minorApiVersion = Integer.parseInt(value);
+		summary.minorApiVersion = Integer.parseInt(value);
 
-		site = getNodeValueAsString(xmlDoc, "site");
-		if (site == null) {
+		summary.site = getNodeValueAsString(xmlDoc, "site");
+		if (summary.site == null) {
 			return false;
 		}
 		
@@ -62,46 +61,46 @@ public class SummaryXmlParser extends XmlParser {
 		if (value == null) {
 			return false;
 		}
-		armed = Integer.parseInt(value) == 1;
+		summary.armed = Integer.parseInt(value) == 1;
 
 		value = getNodeValueAsString(xmlDoc, "countdown");
 		if (value == null) {
 			return false;
 		}
-		countdown = Double.parseDouble(value);
+		summary.countdown = Double.parseDouble(value);
 
 		value = getNodeValueAsString(xmlDoc, "latestid");
 		if (value == null) {
 			return false;
 		}
-		latestEventId = Long.parseLong(value);
+		summary.latestEventId = Long.parseLong(value);
 
 		value = getNodeValueAsString(xmlDoc, "info");
 		if (value == null) {
 			return false;
 		}
-		numInfoEvents = Integer.parseInt(value);
+		summary.numInfoEvents = Integer.parseInt(value);
 
 		value = getNodeValueAsString(xmlDoc, "minor");
 		if (value == null) {
 			return false;
 		}
-		numMinorEvents = Integer.parseInt(value);
+		summary.numMinorEvents = Integer.parseInt(value);
 		
 		value = getNodeValueAsString(xmlDoc, "major");
 		if (value == null) {
 			return false;
 		}
-		numMajorEvents = Integer.parseInt(value);
+		summary.numMajorEvents = Integer.parseInt(value);
 
 		value = getNodeValueAsString(xmlDoc, "logtimestamp");
 		if (value == null) {
 			return false;
 		}
-		logTimestamp = Double.parseDouble(value);
+		summary.logTimestamp = Double.parseDouble(value);
 		
-		time = getNodeValueAsString(xmlDoc, "time");
-		if (time == null) {
+		summary.time = getNodeValueAsString(xmlDoc, "time");
+		if (summary.time == null) {
 			return false;
 		}
 

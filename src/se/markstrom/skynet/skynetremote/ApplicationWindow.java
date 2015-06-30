@@ -45,6 +45,7 @@ import se.markstrom.skynet.skynetremote.xmlparser.Event;
 import se.markstrom.skynet.skynetremote.xmlparser.EventsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.LogXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SettingsXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparser.Summary;
 import se.markstrom.skynet.skynetremote.xmlparser.SummaryXmlParser;
 import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
 
@@ -653,11 +654,12 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				SummaryXmlParser parser = new SummaryXmlParser(xml);
 				if (parser.isValid()) {
+					Summary summary = parser.getSummary();
 					
-					updateArmMenuItems(parser.getArmedState());
+					updateArmMenuItems(summary.armed);
 					
-					if (prevLatestEventId != parser.getLatestEventId()) {
-						prevLatestEventId = parser.getLatestEventId();
+					if (prevLatestEventId != summary.latestEventId) {
+						prevLatestEventId = summary.latestEventId;
 						
 						if (settings.getNewEvents) {
 							System.out.println("New event detected, requesting events");
