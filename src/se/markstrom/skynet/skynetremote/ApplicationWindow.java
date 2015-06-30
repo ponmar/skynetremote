@@ -155,7 +155,6 @@ public class ApplicationWindow implements GUI {
 		if (tray != null) {
 			// Note: tray tool tip text is set in setTitle()
 			trayItem = new TrayItem(tray, SWT.NONE);
-			trayItem.setImage(noneImage);
 		}
 		else {
 			System.out.println("No system tray available");
@@ -316,6 +315,7 @@ public class ApplicationWindow implements GUI {
 		actionTemporaryDisarmItem.setEnabled(connected);
 		actionCameraSnapshotItem.setEnabled(connected);
 
+		trayItem.setImage(noneImage);
 		shell.setImage(noneImage);
 		
 		switch (connectedState) {
