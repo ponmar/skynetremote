@@ -31,6 +31,7 @@ import se.markstrom.skynet.skynetremote.apitask.ArmTask;
 import se.markstrom.skynet.skynetremote.apitask.ConnectTask;
 import se.markstrom.skynet.skynetremote.apitask.DisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.DisconnectTask;
+import se.markstrom.skynet.skynetremote.apitask.GetCameraImageTask;
 import se.markstrom.skynet.skynetremote.apitask.GetCamerasXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventImageTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventsXmlTask;
@@ -65,12 +66,12 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionArmItem;
 	private MenuItem actionDisarmItem;
 	private MenuItem actionTempDisarmItem;
-	private MenuItem actionStreamItem;
+	private MenuItem actionCameraSnapshotItem;
 	private MenuItem actionTurnOnAllDevicesItem;
 	private MenuItem actionTurnOffAllDevicesItem;
 	private MenuItem actionGetLogItem;
 	private MenuItem helpAboutItem;
-	private Menu streamMenu;
+	private Menu cameraSnapshotMenu;
 	
 	private TrayItem trayItem;
 	private Table eventsTable;
@@ -182,12 +183,12 @@ public class ApplicationWindow implements GUI {
 		actionTempDisarmItem.setText("Temporary disarm (5 min)");
 		actionTempDisarmItem.addSelectionListener(new ActionTemporaryDisarmItemListener());
 
-		actionStreamItem = new MenuItem(actionMenu, SWT.CASCADE);
-		actionStreamItem.setText("Stream images from camera");
+		actionCameraSnapshotItem = new MenuItem(actionMenu, SWT.CASCADE);
+		actionCameraSnapshotItem.setText("Camera snapshots");
 		
 		// Action -> Stream images from camera menu
-		streamMenu = new Menu(shell, SWT.DROP_DOWN);
-		actionStreamItem.setMenu(streamMenu);
+		cameraSnapshotMenu = new Menu(shell, SWT.DROP_DOWN);
+		actionCameraSnapshotItem.setMenu(cameraSnapshotMenu);
 		
 		actionTurnOnAllDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionTurnOnAllDevicesItem.setText("Turn on all devices");
@@ -276,7 +277,7 @@ public class ApplicationWindow implements GUI {
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
 		actionTempDisarmItem.setEnabled(connected);
-		actionStreamItem.setEnabled(connected);
+		actionCameraSnapshotItem.setEnabled(connected);
 		
 		switch (connectedState) {
 		case DISCONNECTING:
@@ -405,6 +406,22 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 	
+	private class ActionStreamItemListener implements SelectionListener {
+		private int cameraIndex;
+		
+		public ActionStreamItemListener(int cameraIndex) {
+			this.cameraIndex = cameraIndex;
+		}
+		
+		public void widgetSelected(SelectionEvent event) {
+			// TODO: keep track of which streams that have been started?
+			apiThread.runTask(new GetCameraImageTask(cameraIndex));
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+	
 	private class HelpAboutItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			System.out.println("Help!");;
@@ -514,15 +531,14 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Received cameras: " + xml);
+				System.out.println("Received cameras.xml");
 				
 				CamerasXmlParser parser = new CamerasXmlParser(xml);
 				if (parser.isValid()) {
 					for (Integer cameraIndex : parser.getCameraIndexes()) {
-						MenuItem cameraMenuItem = new MenuItem(streamMenu, SWT.PUSH);
+						MenuItem cameraMenuItem = new MenuItem(cameraSnapshotMenu, SWT.PUSH);
 						cameraMenuItem.setText("Camera " + (cameraIndex+1));
-						// TODO:
-						//fileConnectItem.addSelectionListener(new FileConnectItemListener());
+						cameraMenuItem.addSelectionListener(new ActionStreamItemListener(cameraIndex));
 					}
 				}
 			}
@@ -623,8 +639,7 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				String windowTitle = "Event " + eventId + " (image " + (imageIndex+1) + ")"; 
-				ImageWindow imageWindow = new ImageWindow(windowTitle, jpegData);
-				imageWindow.run();
+				new ImageWindow(windowTitle, jpegData);
 			}
 		});
 	}
@@ -634,8 +649,7 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				// TODO: update gui
-				System.out.println("Received new camera image");
+				new ImageWindow("Camera " + (cameraIndex+1) + " snapshot", jpegData);
 			}
 		});
 	}

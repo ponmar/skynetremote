@@ -32,12 +32,4 @@ public class ImageWindow {
 		shell.pack();
 		shell.open();		
 	}
-	
-	public void run() {
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
 }

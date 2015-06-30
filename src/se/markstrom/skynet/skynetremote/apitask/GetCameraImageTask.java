@@ -20,7 +20,7 @@ public class GetCameraImageTask implements ApiTask {
 		if (api != null) {
 			String base64Image = api.getImageFromCamera(cameraIndex, false);
 
-			// TODO: Some timing issue. Sometimes the prompt is included in the XML.
+			// TODO: Some timing issue. Sometimes the prompt is included in the response.
 			String PROMPT = ">> ";
 			if (base64Image.endsWith(PROMPT)) {
 				base64Image = base64Image.substring(0, base64Image.length() - PROMPT.length());
