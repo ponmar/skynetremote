@@ -1,4 +1,4 @@
-package se.markstrom.skynet.skynetremote.xmlparser;
+package se.markstrom.skynet.skynetremote.data;
 
 public class Summary {
 	public int majorApiVersion;

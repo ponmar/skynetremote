@@ -5,9 +5,9 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import se.markstrom.skynet.skynetremote.data.Summary;
 
 public class SummaryXmlParser extends XmlParser {
 
@@ -16,20 +16,6 @@ public class SummaryXmlParser extends XmlParser {
 	public SummaryXmlParser(String xml) {
 		super(xml);
 	}
-
-	/*
-	public long getLatestEventId() {
-		return latestEventId;
-	}
-	
-	public double getLogTimestamp() {
-		return logTimestamp;
-	}
-	
-	public boolean getArmedState() {
-		return armed;
-	}
-	*/
 	
 	public Summary getSummary() {
 		return summary;

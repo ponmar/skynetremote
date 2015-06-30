@@ -40,12 +40,12 @@ import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
+import se.markstrom.skynet.skynetremote.data.Event;
+import se.markstrom.skynet.skynetremote.data.Summary;
 import se.markstrom.skynet.skynetremote.xmlparser.CamerasXmlParser;
-import se.markstrom.skynet.skynetremote.xmlparser.Event;
 import se.markstrom.skynet.skynetremote.xmlparser.EventsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.LogXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SettingsXmlParser;
-import se.markstrom.skynet.skynetremote.xmlparser.Summary;
 import se.markstrom.skynet.skynetremote.xmlparser.SummaryXmlParser;
 import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
 
