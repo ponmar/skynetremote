@@ -145,6 +145,8 @@ public class ApplicationWindow implements GUI {
 		minorImage = createImage(16, 16, SWT.COLOR_YELLOW);
 		majorImage = createImage(16, 16, SWT.COLOR_RED);
 		
+		shell.setImage(noneImage);
+		
 		Tray tray = display.getSystemTray();
 		if (tray != null) {
 			// Note: tray tool tip text is set in setTitle()
@@ -611,12 +613,15 @@ public class ApplicationWindow implements GUI {
 						switch (highestSeverity) {
 						case Event.INFO:
 							trayItem.setImage(infoImage);
+							shell.setImage(infoImage);
 							break;
 						case Event.MINOR:
 							trayItem.setImage(minorImage);
+							shell.setImage(minorImage);
 							break;
 						case Event.MAJOR:
 							trayItem.setImage(majorImage);
+							shell.setImage(majorImage);
 							break;
 						}
 					}					
