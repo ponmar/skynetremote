@@ -8,6 +8,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -53,6 +54,11 @@ public class ApplicationWindow implements GUI {
 	private static final String TITLE = "Skynet Remote";
 	
 	private static final int EVENT_ID_COLUMN = 0;
+	private static final int EVENT_TIME_COLUMN = 1;
+	private static final int EVENT_SEVERITY_COLUMN = 2;
+	private static final int EVENT_MESSAGE_COLUMN = 3;
+	private static final int EVENT_SENSOR_COLUMN = 4;
+	private static final int EVENT_ARMED_COLUMN = 5;
 	private static final int EVENT_IMAGES_COLUMN = 6;
 	
 	private Settings settings;
@@ -72,6 +78,11 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionGetLogItem;
 	private MenuItem helpAboutItem;
 	private Menu cameraSnapshotMenu;
+	
+	private Image noneImage;
+	private Image infoImage;
+	private Image minorImage;
+	private Image majorImage;
 	
 	private TrayItem trayItem;
 	private Table eventsTable;
@@ -115,25 +126,30 @@ public class ApplicationWindow implements GUI {
 		settingsWriter.write();
 	}
 	
+	private Image createImage(int width, int height, int color) {
+		Image image = new Image(display, width, height);
+		GC gc = new GC(image);
+		gc.setBackground(display.getSystemColor(color));
+		gc.fillRectangle(image.getBounds());
+		gc.dispose();
+		return image;
+	}
+	
 	private void createGui() {
 		display = Display.getDefault();
 		shell = new Shell(display);
 		shell.setSize(1024, 768);
 		
+		noneImage = createImage(16, 16, SWT.COLOR_BLACK);
+		infoImage = createImage(16, 16, SWT.COLOR_GREEN);
+		minorImage = createImage(16, 16, SWT.COLOR_YELLOW);
+		majorImage = createImage(16, 16, SWT.COLOR_RED);
+		
 		Tray tray = display.getSystemTray();
 		if (tray != null) {
-			Image image = new Image(display, 16, 16);
-			Image image2 = new Image(display, 16, 16);
-			
-			GC gc = new GC(image2);
-			gc.setBackground(display.getSystemColor(SWT.COLOR_BLACK));
-			gc.fillRectangle(image2.getBounds());
-			gc.dispose();
-			
 			// Note: tray tool tip text is set in setTitle()
 			trayItem = new TrayItem(tray, SWT.NONE);
-			trayItem.setImage(image2);
-			trayItem.setHighlightImage(image);
+			trayItem.setImage(noneImage);
 		}
 		else {
 			System.out.println("No system tray available");
@@ -566,18 +582,23 @@ public class ApplicationWindow implements GUI {
 						}
 						
 						prevLatestEventId = events.get(events.size() - 1).id;
+						int highestSeverity = 0;
 						
 						ListIterator<Event> it = events.listIterator(events.size());
 						while (it.hasPrevious()) {
 							Event event = it.previous();
 							TableItem item = new TableItem(eventsTable, SWT.NULL);
 							item.setText(EVENT_ID_COLUMN, String.valueOf(event.id));
-							item.setText(1, event.time);
-							item.setText(2, event.getSeverityStr());
-							item.setText(3, event.message);
-							item.setText(4, event.sensor);
-							item.setText(5, event.getArmedStr());
+							item.setText(EVENT_TIME_COLUMN, event.time);
+							item.setText(EVENT_SEVERITY_COLUMN, event.getSeverityStr());
+							item.setText(EVENT_MESSAGE_COLUMN, event.message);
+							item.setText(EVENT_SENSOR_COLUMN, event.sensor);
+							item.setText(EVENT_ARMED_COLUMN, event.getArmedStr());
 							item.setText(EVENT_IMAGES_COLUMN, String.valueOf(event.images));
+							
+							if (event.severity > highestSeverity) {
+								highestSeverity = event.severity;
+							}
 						}
 						
 						for (int i=0; i<eventsTable.getColumnCount(); i++) {
@@ -586,6 +607,18 @@ public class ApplicationWindow implements GUI {
 						
 						eventsTable.setRedraw(true);
 						eventsTable.redraw();
+						
+						switch (highestSeverity) {
+						case Event.INFO:
+							trayItem.setImage(infoImage);
+							break;
+						case Event.MINOR:
+							trayItem.setImage(minorImage);
+							break;
+						case Event.MAJOR:
+							trayItem.setImage(majorImage);
+							break;
+						}
 					}					
 				}
 			}

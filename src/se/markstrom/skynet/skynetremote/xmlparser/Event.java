@@ -6,6 +6,10 @@ public class Event {
 	private static final String ARMED_STR = "Armed";
 	private static final String DISARMED_STR = "Disarmed";
 	
+	public static final int INFO = 0;
+	public static final int MINOR = 1;
+	public static final int MAJOR = 2;
+	
 	public long id;
 	public String time;
 	public String message;
