@@ -414,7 +414,6 @@ public class ApplicationWindow implements GUI {
 		}
 		
 		public void widgetSelected(SelectionEvent event) {
-			// TODO: keep track of which streams that have been started?
 			apiThread.runTask(new GetCameraImageTask(cameraIndex));
 		}
 
