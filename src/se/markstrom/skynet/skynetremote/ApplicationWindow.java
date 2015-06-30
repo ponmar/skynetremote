@@ -151,8 +151,6 @@ public class ApplicationWindow implements GUI {
 		minorImage = createImage(16, 16, SWT.COLOR_YELLOW);
 		majorImage = createImage(16, 16, SWT.COLOR_RED);
 		
-		shell.setImage(noneImage);
-		
 		Tray tray = display.getSystemTray();
 		if (tray != null) {
 			// Note: tray tool tip text is set in setTitle()
@@ -299,10 +297,10 @@ public class ApplicationWindow implements GUI {
 	    shell.setMenuBar(menuBar);
 		shell.open();
 		
-		updateConnectedMenuItems(CONNECTED_STATE.DISCONNECTED);
+		updateGui(CONNECTED_STATE.DISCONNECTED);
 	}
 	
-	private void updateConnectedMenuItems(CONNECTED_STATE connectedState) {
+	private void updateGui(CONNECTED_STATE connectedState) {
 		
 		boolean connected = connectedState == CONNECTED_STATE.CONNECTED;
 		
@@ -317,6 +315,8 @@ public class ApplicationWindow implements GUI {
 		actionTurnOffAllDevicesItem.setEnabled(connected);
 		actionTemporaryDisarmItem.setEnabled(connected);
 		actionCameraSnapshotItem.setEnabled(connected);
+
+		shell.setImage(noneImage);
 		
 		switch (connectedState) {
 		case DISCONNECTING:
@@ -552,7 +552,7 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				updateConnectedMenuItems(state);
+				updateGui(state);
 				switch (state) {
 				case CONNECTED:
 					apiThread.runTask(new GetCamerasXmlTask());
