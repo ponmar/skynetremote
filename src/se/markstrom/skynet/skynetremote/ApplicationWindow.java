@@ -578,7 +578,7 @@ public class ApplicationWindow implements GUI {
 					
 					if (!events.isEmpty()) {
 						if (settings.showEventNotification) {
-							new Notification("New events detected!");
+							new Notification(TITLE, "New events detected!");
 						}
 						
 						prevLatestEventId = events.get(events.size() - 1).id;
