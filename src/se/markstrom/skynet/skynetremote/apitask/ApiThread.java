@@ -48,6 +48,9 @@ public class ApiThread extends Thread {
 			gui.showApiError(e.getMessage());
 		}
 		
+		isWorking(false);
+		gui.updateConnectedState(GUI.CONNECTED_STATE.DISCONNECTED);
+		
 		disconnect();
     }
 	

@@ -129,10 +129,8 @@ public class ApplicationWindow implements GUI {
 			gc.fillRectangle(image2.getBounds());
 			gc.dispose();
 			
+			// Note: tray tool tip text is set in setTitle()
 			trayItem = new TrayItem(tray, SWT.NONE);
-			// TODO: set to program title
-			trayItem.setToolTipText("Skynet Remote");
-			
 			trayItem.setImage(image2);
 			trayItem.setHighlightImage(image);
 		}
@@ -315,18 +313,14 @@ public class ApplicationWindow implements GUI {
 				display.sleep();
 			}
 		}
-		display.dispose();
 	}
 	
 	private class FileExitItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			shell.close();
-			display.dispose();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
-			shell.close();
-			display.dispose();
 		}
 	}
 
