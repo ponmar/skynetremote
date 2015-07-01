@@ -19,13 +19,6 @@ public class GetCameraImageTask implements ApiTask {
 	public void run(ApiThread apiThread, SkynetAPI api, GUI gui) throws SkynetAPIClientError, SkynetAPIError {
 		if (api != null) {
 			String base64Image = api.getImageFromCamera(cameraIndex, false);
-
-			// TODO: Some timing issue. Sometimes the prompt is included in the response.
-			String PROMPT = ">> ";
-			if (base64Image.endsWith(PROMPT)) {
-				base64Image = base64Image.substring(0, base64Image.length() - PROMPT.length());
-			}
-			
 			try {
 				byte[] jpegData = Base64.getDecoder().decode(base64Image);
 				gui.updateCameraImage(cameraIndex, jpegData);

@@ -19,7 +19,6 @@ import org.xml.sax.SAXException;
 abstract class XmlParser {
 	
 	private boolean isValid = true;
-	private static final String PROMPT = ">> ";
 	
 	XmlParser(File filename) {
 		this(readFile(filename));
@@ -27,11 +26,6 @@ abstract class XmlParser {
 	
 	XmlParser(String xml) {
 		try {
-			// TODO: Some timing issue. Sometimes the prompt is included in the XML.
-			if (xml.endsWith(PROMPT)) {
-				xml = xml.substring(0, xml.length() - PROMPT.length());
-			}
-
 			//System.out.println("Pre parsing xml doc");
 			Document xmlDoc = loadXMLFromString(xml);
 			//System.out.println("Post parsing xml doc");
