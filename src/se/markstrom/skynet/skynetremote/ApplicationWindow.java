@@ -468,7 +468,7 @@ public class ApplicationWindow implements GUI {
 	
 	private class HelpAboutItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			System.out.println("Help!");;
+			new AboutWindow();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
