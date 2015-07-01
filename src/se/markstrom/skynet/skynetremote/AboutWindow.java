@@ -8,10 +8,12 @@ import org.eclipse.swt.widgets.Shell;
 
 public class AboutWindow {
 	
+	private Display display;
 	private Shell shell;
 	
 	public AboutWindow() {
-		shell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM);
+		display = Display.getDefault();
+		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("About");
 		
 		GridLayout layout = new GridLayout(1, true);
@@ -33,5 +35,13 @@ public class AboutWindow {
 
 		shell.pack();
 		shell.open();
+	}
+	
+	public void run() {
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
 	}
 }

@@ -33,7 +33,7 @@ public class ConnectWindow {
 	
 	private void createGui(String defaultHost, int defaultPort) {
 		display = Display.getDefault();
-		shell = new Shell(display, SWT.DIALOG_TRIM);
+		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("Connect");
 		shell.setLayout(new GridLayout(2, true));
 
