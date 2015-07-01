@@ -76,6 +76,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionTurnOnAllDevicesItem;
 	private MenuItem actionTurnOffAllDevicesItem;
 	private MenuItem actionGetLogItem;
+	private MenuItem actionGetEventsItem;
 	private MenuItem helpAboutItem;
 	private Menu actionTemporaryDisarmMenu;
 	private Menu cameraSnapshotMenu;
@@ -232,6 +233,10 @@ public class ApplicationWindow implements GUI {
 		actionTurnOffAllDevicesItem.setText("Turn off all devices");
 		actionTurnOffAllDevicesItem.addSelectionListener(new ActionTurnOffAllDevicesListener());
 
+		actionGetEventsItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionGetEventsItem.setText("Update events");
+		actionGetEventsItem.addSelectionListener(new ActionGetEventsItemListener());
+		
 		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionGetLogItem.setText("Update log");
 		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
@@ -303,11 +308,13 @@ public class ApplicationWindow implements GUI {
 		
 		fileConnectItem.setEnabled(!connected);
 		fileDisconnectItem.setEnabled(connected);
+		fileSettingsItem.setEnabled(!connected);
 		
 		// Note: the armed state is unknown until summary XML/JSON has been fetched
 		actionArmItem.setEnabled(connected);
 		actionDisarmItem.setEnabled(connected);
 		actionGetLogItem.setEnabled(connected);
+		actionGetEventsItem.setEnabled(connected && !settings.getNewEvents);
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
 		actionTemporaryDisarmItem.setEnabled(connected);
@@ -434,6 +441,15 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 
+	private class ActionGetEventsItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			updateEvents();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
 	private class ActionTurnOnAllDevicesListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			turnOnAllDevices();
@@ -534,6 +550,12 @@ public class ApplicationWindow implements GUI {
 
 	private void temporaryDisarm(int seconds) {
 		apiThread.runTask(new TemporaryDisarmTask(seconds));
+	}
+
+	private void updateEvents() {
+		if (!settings.getNewEvents) {
+			apiThread.runTask(new GetEventsXmlTask());
+		}
 	}
 
 	private void updateLog() {
