@@ -5,6 +5,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
@@ -35,7 +36,12 @@ public class ConnectWindow {
 		display = Display.getDefault();
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("Connect");
-		shell.setLayout(new GridLayout(2, true));
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginTop = 10;
+		layout.marginLeft = 10;
+		layout.marginRight = 10;
+		layout.marginBottom = 5;
+		shell.setLayout(layout);
 
 		Label hostLabel = new Label(shell, SWT.NONE);
 		hostLabel.setText("Host:");
@@ -48,6 +54,7 @@ public class ConnectWindow {
 		
 		portText = new Text(shell, SWT.BORDER);
 		portText.setText(new Integer(defaultPort).toString());
+		portText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label passwordLabel = new Label(shell, SWT.NONE);
 		passwordLabel.setText("Password:");
@@ -55,23 +62,20 @@ public class ConnectWindow {
 		passwordText = new Text(shell, SWT.BORDER);
 		passwordText.setEchoChar('*');
 		passwordText.setText("");
+		passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		if (!defaultHost.equals("")) {
 			passwordText.setFocus();
 		}
 		
 		// TODO: protocol radio buttons (or a checkbox)
 
-		Button cancelButton = new Button(shell, SWT.PUSH);
-		cancelButton.setText("Cancel");
-		cancelButton.addSelectionListener(new SelectionAdapter() {
-		    @Override
-		    public void widgetSelected(SelectionEvent e) {
-		    	shell.dispose();
-		    }
-		}); 
+		// Skip a column
+		new Label(shell, SWT.NONE);
 
 		Button connectButton = new Button(shell, SWT.PUSH);
 		connectButton.setText("Connect");
+		GridData connectButtonLayout = new GridData(GridData.FILL_HORIZONTAL);
+	    connectButton.setLayoutData(connectButtonLayout);
 		connectButton.addSelectionListener(new SelectionAdapter() {
 		    @Override
 		    public void widgetSelected(SelectionEvent e) {

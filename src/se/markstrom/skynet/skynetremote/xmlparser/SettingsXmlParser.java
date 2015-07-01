@@ -27,7 +27,6 @@ public class SettingsXmlParser extends XmlParser {
 		Boolean getNewEvents = getNodeValueAsBoolean(xmlDoc, "getNewEvents");
 		Boolean pollSummary = getNodeValueAsBoolean(xmlDoc, "pollSummary");
 		Integer summaryPollInterval = getNodeValueAsInteger(xmlDoc, "summaryPollInterval");
-		Integer cameraImagePollInterval = getNodeValueAsInteger(xmlDoc, "cameraImagePollInterval");
 		String host = getNodeValueAsString(xmlDoc, "host");
 		Integer port = getNodeValueAsInteger(xmlDoc, "port");
 		Boolean showEventNotification = getNodeValueAsBoolean(xmlDoc, "showEventNotification");
@@ -35,18 +34,16 @@ public class SettingsXmlParser extends XmlParser {
 		if (getNewEvents != null &&
 				pollSummary != null &&
 				summaryPollInterval != null &&
-				cameraImagePollInterval != null &&
 				port != null &&
 				showEventNotification != null) {
 			settings = new Settings();
 			settings.getNewEvents = getNewEvents;
 			settings.pollSummary = pollSummary;
 			settings.summaryPollInterval = summaryPollInterval;
-			settings.cameraImagePollInterval = cameraImagePollInterval;
 			settings.host = host;
 			settings.port = port;
 			settings.notifyOnNewEvent = showEventNotification;
-			return true;
+			return settings.validate();
 		}
 		
 		return false;

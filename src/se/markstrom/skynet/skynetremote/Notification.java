@@ -82,7 +82,7 @@ public class Notification {
 		}
 		shell.setLocation(position);
 		
-		// TODO: how to catch mouse events for labels? 
+		// TODO: how to catch mouse events for labels?
 		shell.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {

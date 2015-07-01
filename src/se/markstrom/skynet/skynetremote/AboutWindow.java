@@ -16,7 +16,7 @@ public class AboutWindow {
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("About");
 		
-		GridLayout layout = new GridLayout(1, true);
+		GridLayout layout = new GridLayout(1, false);
 		layout.marginTop = 30;
 		layout.marginLeft = 30;
 		layout.marginRight = 30;

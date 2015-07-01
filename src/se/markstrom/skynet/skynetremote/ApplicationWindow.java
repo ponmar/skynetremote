@@ -111,8 +111,6 @@ public class ApplicationWindow implements GUI {
 		
 		// Needed to get rid of the tray icon without hovering with the mouse cursor
 		trayItem.dispose();
-		
-		writeSettings();
 	}
 
 	private void readSettings() {
@@ -384,7 +382,10 @@ public class ApplicationWindow implements GUI {
 
 	private class FileSettingsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			System.out.println("Settings");
+			SettingsWindow settingsWindow = new SettingsWindow(settings);
+			settingsWindow.run();
+			settings = settingsWindow.getSettings();
+			writeSettings();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
