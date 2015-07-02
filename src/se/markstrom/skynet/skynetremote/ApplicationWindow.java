@@ -129,6 +129,7 @@ public class ApplicationWindow implements GUI {
 	private void writeSettings() {
 		SettingsXmlWriter settingsWriter = new SettingsXmlWriter(settings);
 		settingsWriter.write();
+		System.out.println("Settings written to file");
 	}
 	
 	private Image createImage(int width, int height, int color) {
@@ -531,6 +532,7 @@ public class ApplicationWindow implements GUI {
 
 			settings.host = host;
 			settings.port = port;
+			writeSettings();
 			
 			apiThread.runTask(new ConnectTask(host, port, protocol, password, debug));
 		}

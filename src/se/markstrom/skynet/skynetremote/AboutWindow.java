@@ -1,6 +1,8 @@
 package se.markstrom.skynet.skynetremote;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -33,6 +35,8 @@ public class AboutWindow {
 		
 		// TODO: add link to bitbucket project when it is public
 
+		shell.addTraverseListener(new KeyListener());
+		
 		shell.pack();
 		shell.open();
 	}
@@ -41,6 +45,17 @@ public class AboutWindow {
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
+			}
+		}
+	}
+	
+	private class KeyListener implements TraverseListener {
+		@Override
+		public void keyTraversed(TraverseEvent event) {
+			switch (event.detail) {
+			case SWT.TRAVERSE_ESCAPE:
+				shell.dispose();
+				break;
 			}
 		}
 	}

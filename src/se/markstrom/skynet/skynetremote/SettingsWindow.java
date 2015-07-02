@@ -3,6 +3,8 @@ package se.markstrom.skynet.skynetremote;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -85,6 +87,7 @@ public class SettingsWindow {
 		
 		updateFromSettings(settings);
 		
+		shell.addTraverseListener(new KeyListener());
 		shell.pack();
 		shell.open();
 	}
@@ -129,5 +132,16 @@ public class SettingsWindow {
 			return false;
 		}
 		return true;
+	}
+	
+	private class KeyListener implements TraverseListener {
+		@Override
+		public void keyTraversed(TraverseEvent event) {
+			switch (event.detail) {
+			case SWT.TRAVERSE_ESCAPE:
+				shell.dispose();
+				break;
+			}
+		}
 	}
 }

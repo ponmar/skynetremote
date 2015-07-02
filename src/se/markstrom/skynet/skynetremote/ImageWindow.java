@@ -3,6 +3,8 @@ package se.markstrom.skynet.skynetremote;
 import java.io.ByteArrayInputStream;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
@@ -29,7 +31,19 @@ public class ImageWindow {
 		label.setImage(image);
 		label.pack();
 		
+		shell.addTraverseListener(new KeyListener());
 		shell.pack();
 		shell.open();		
+	}
+	
+	private class KeyListener implements TraverseListener {
+		@Override
+		public void keyTraversed(TraverseEvent event) {
+			switch (event.detail) {
+			case SWT.TRAVERSE_ESCAPE:
+				shell.dispose();
+				break;
+			}
+		}
 	}
 }

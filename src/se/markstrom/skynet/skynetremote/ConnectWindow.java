@@ -23,10 +23,14 @@ public class ConnectWindow {
 	private Text hostText;
 	private Text portText;
 	private Text passwordText;
+	private Button savePasswordButton;
 	
 	private String host;
 	private int port;
 	private String password;
+	private boolean savePassword;
+	
+	static String savedPassword;
 	
 	public ConnectWindow(String defaultHost, int defaultPort) {
 		createGui(defaultHost, defaultPort);
@@ -48,6 +52,7 @@ public class ConnectWindow {
 		
 		hostText = new Text(shell, SWT.BORDER);
 		hostText.setText(defaultHost);
+		hostText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label portLabel = new Label(shell, SWT.NONE);
 		portLabel.setText("Port:");
@@ -61,14 +66,26 @@ public class ConnectWindow {
 		
 		passwordText = new Text(shell, SWT.BORDER);
 		passwordText.setEchoChar('*');
-		passwordText.setText("");
+		if (savedPassword != null) {
+			passwordText.setText(savedPassword);
+		}
+		else {
+			passwordText.setText("");			
+		}
 		passwordText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		if (!defaultHost.equals("")) {
 			passwordText.setFocus();
 		}
+
+		savePasswordButton = new Button(shell, SWT.CHECK);
+		savePasswordButton.setText("Save password until exit");
+		savePasswordButton.setSelection(savedPassword != null);
+		GridData savePasswordLayout = new GridData(GridData.FILL_HORIZONTAL);
+	    savePasswordLayout.horizontalSpan = 2;
+	    savePasswordButton.setLayoutData(savePasswordLayout);
 		
 		// TODO: protocol radio buttons (or a checkbox)
-
+		
 		// Skip a column
 		new Label(shell, SWT.NONE);
 
@@ -83,7 +100,7 @@ public class ConnectWindow {
 		    }
 		});
 		
-		shell.addTraverseListener(new EnterListener());
+		shell.addTraverseListener(new KeyListener());
 		
 		shell.pack();
 		shell.open();
@@ -99,7 +116,6 @@ public class ConnectWindow {
 	
 	private void connect() {
     	if (saveTextInput() && hasValidInput()) {
-    		// Only close window if the input is valid
     		shell.dispose();
     	}
 	}
@@ -113,6 +129,13 @@ public class ConnectWindow {
 			return false;
 		}
 		password = passwordText.getText();
+		savePassword = savePasswordButton.getSelection();
+		if (savePassword) {
+			savedPassword = password;
+		}
+		else {
+			savedPassword = null;
+		}
 		return true;
 	}
 	
@@ -139,11 +162,20 @@ public class ConnectWindow {
 		return password;
 	}
 	
-	private class EnterListener implements TraverseListener {
+	public boolean savePassword() {
+		return savePassword;
+	}
+	
+	private class KeyListener implements TraverseListener {
 		@Override
 		public void keyTraversed(TraverseEvent event) {
-			if (event.detail == SWT.TRAVERSE_RETURN) {
+			switch (event.detail) {
+			case SWT.TRAVERSE_RETURN:
 				connect();
+				break;
+			case SWT.TRAVERSE_ESCAPE:
+				shell.dispose();
+				break;
 			}
 		}
 	}
