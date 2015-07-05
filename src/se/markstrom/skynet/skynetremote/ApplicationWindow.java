@@ -602,6 +602,7 @@ public class ApplicationWindow implements GUI {
 				case CONNECTED:
 					apiThread.runTask(new GetCamerasXmlTask());
 					
+					// TODO: not needed because it will be fetched after receiving summary?
 					if (settings.getNewEvents) {
 						apiThread.runTask(new GetEventsXmlTask());
 					}

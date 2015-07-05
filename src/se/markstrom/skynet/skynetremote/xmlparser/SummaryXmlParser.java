@@ -85,6 +85,11 @@ public class SummaryXmlParser extends XmlParser {
 		}
 		summary.logTimestamp = Double.parseDouble(value);
 		
+		summary.controlChecksum = getNodeValueAsString(xmlDoc, "controlchecksum");
+		if (summary.controlChecksum == null) {
+			return false;
+		}
+		
 		summary.time = getNodeValueAsString(xmlDoc, "time");
 		if (summary.time == null) {
 			return false;

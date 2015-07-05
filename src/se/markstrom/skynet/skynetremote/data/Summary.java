@@ -11,5 +11,6 @@ public class Summary {
 	public int numMinorEvents;
 	public int numMajorEvents;
 	public double logTimestamp;
+	public String controlChecksum;
 	public String time;
 }
