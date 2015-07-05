@@ -33,6 +33,7 @@ import se.markstrom.skynet.skynetremote.apitask.DisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.DisconnectTask;
 import se.markstrom.skynet.skynetremote.apitask.GetCameraImageTask;
 import se.markstrom.skynet.skynetremote.apitask.GetCamerasXmlTask;
+import se.markstrom.skynet.skynetremote.apitask.GetControlXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventImageTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
@@ -76,6 +77,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionTurnOnAllDevicesItem;
 	private MenuItem actionTurnOffAllDevicesItem;
 	private MenuItem actionGetLogItem;
+	private MenuItem actionGetControlItem;
 	private MenuItem actionGetEventsItem;
 	private MenuItem helpAboutItem;
 	private Menu actionTemporaryDisarmMenu;
@@ -242,6 +244,10 @@ public class ApplicationWindow implements GUI {
 		actionGetLogItem.setText("Update log");
 		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
 
+		actionGetControlItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionGetControlItem.setText("Update control");
+		actionGetControlItem.addSelectionListener(new ActionGetControlItemListener());
+
 		// Help menu
 		MenuItem helpMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
 		helpMenuHeader.setText("&Help");
@@ -315,6 +321,7 @@ public class ApplicationWindow implements GUI {
 		actionArmItem.setEnabled(connected);
 		actionDisarmItem.setEnabled(connected);
 		actionGetLogItem.setEnabled(connected);
+		actionGetControlItem.setEnabled(connected);
 		actionGetEventsItem.setEnabled(connected && !settings.getNewEvents);
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
@@ -442,6 +449,15 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 
+	private class ActionGetControlItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			updateControl();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
 	private class ActionGetEventsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			updateEvents();
@@ -560,6 +576,10 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 
+	private void updateControl() {
+		apiThread.runTask(new GetControlXmlTask());
+	}
+	
 	private void updateLog() {
 		apiThread.runTask(new GetLogXmlTask());
 	}
@@ -610,6 +630,17 @@ public class ApplicationWindow implements GUI {
 						cameraMenuItem.addSelectionListener(new ActionStreamItemListener(cameraIndex));
 					}
 				}
+			}
+		});
+	}
+	
+	@Override
+	public void updateControlXml(String xml) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("Received control.xml");
+				// TODO: parse xml
 			}
 		});
 	}
