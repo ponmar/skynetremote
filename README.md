@@ -7,10 +7,14 @@ This project is a Java based GUI for supervision and control of a [Skynet][skyne
 ### How to build? ###
 This project can either be built and run from within Eclipse, or by exporting a JAR file to be executed outside Eclipse.
 
-How to export a JAR file:
+How to export a runnable JAR file:
 
 * Open the project in Eclipse
-* Double-click on SkynetRemote.jardesc and select Finish
+* Right click on project and select "Export..."
+* Select "Runnable JAR file" and press "Next"
+* Set the export destination to "SkynetRemote\SkynetRemote.jar"
+* Select "Extract required libraries into generated JAR"
+* Click "Finish"
 
 ### How to run? ###
 
