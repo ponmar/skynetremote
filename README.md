@@ -10,11 +10,7 @@ This project can either be built and run directory from within Eclipse, or by ex
 How to export a JAR file:
 
 * Open the project in Eclipse
-* Right-click on the project and select Export
-* Select Java->JAR file and press next
-* Remove non-java-files from resources to export, write a JAR file name and select next
-* Press next
-* Specify ApplicationWindow as the main class for the generated Manifest
+* Double-click on SkynetRemote.jardesc and select Finish
 
 ### How to run? ###
 
