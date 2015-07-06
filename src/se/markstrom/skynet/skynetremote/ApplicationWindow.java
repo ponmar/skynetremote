@@ -42,8 +42,10 @@ import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
 import se.markstrom.skynet.skynetremote.data.Event;
+import se.markstrom.skynet.skynetremote.data.HomeAutomationDevice;
 import se.markstrom.skynet.skynetremote.data.Summary;
 import se.markstrom.skynet.skynetremote.xmlparser.CamerasXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparser.ControlXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.EventsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.LogXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SettingsXmlParser;
@@ -61,6 +63,10 @@ public class ApplicationWindow implements GUI {
 	private static final int EVENT_SENSOR_COLUMN = 4;
 	private static final int EVENT_ARMED_COLUMN = 5;
 	private static final int EVENT_IMAGES_COLUMN = 6;
+
+	private static final int CONTROL_NAME_COLUMN = 0;
+	private static final int CONTROL_STATE_COLUMN = 1;
+	private static final int CONTROL_TIMELEFT_COLUMN = 2;
 	
 	private Settings settings;
 	
@@ -90,6 +96,7 @@ public class ApplicationWindow implements GUI {
 	
 	private TrayItem trayItem;
 	private Table eventsTable;
+	private Table controlTable;
 	private Text logText;
 	
 	private long prevPollEventId = -1;
@@ -264,6 +271,7 @@ public class ApplicationWindow implements GUI {
 		// Tabs
 		TabFolder tf = new TabFolder(shell, SWT.BORDER);
 		
+		// Tab: events
 	    TabItem eventsTab = new TabItem(tf, SWT.BORDER);
 	    eventsTab.setText("Events");
 	    eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -291,11 +299,29 @@ public class ApplicationWindow implements GUI {
 	    TableColumn eventImagesColumn = new TableColumn(eventsTable, SWT.NULL);
 	    eventImagesColumn.setText("Images");
 	    eventImagesColumn.pack();
+	    
 	    eventsTab.setControl(eventsTable);
+
+	    // Tab: control
+	    controlTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+	    controlTable.setHeaderVisible(true);
+	    controlTable.setLinesVisible(true);
 
 	    TabItem controlTab = new TabItem(tf, SWT.BORDER);
 	    controlTab.setText("Control");
+	    TableColumn nameColumn = new TableColumn(controlTable, SWT.NULL);
+	    nameColumn.setText("Device name");
+	    nameColumn.pack();
+	    TableColumn stateColumn = new TableColumn(controlTable, SWT.NULL);
+	    stateColumn.setText("State");
+	    stateColumn.pack();
+	    TableColumn timeLeftColumn = new TableColumn(controlTable, SWT.NULL);
+	    timeLeftColumn.setText("Time left");
+	    timeLeftColumn.pack();
+	    
+	    controlTab.setControl(controlTable);
 
+	    // Tab: log
 	    TabItem logTab = new TabItem(tf, SWT.BORDER);
 	    logTab.setText("Log");
 	    
@@ -641,7 +667,22 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				System.out.println("Received control.xml");
-				// TODO: parse xml
+				
+				ControlXmlParser parser = new ControlXmlParser(xml);
+				if (parser.isValid()) {
+					controlTable.setRedraw(false);
+					controlTable.removeAll();
+					for (HomeAutomationDevice device : parser.getDevices()) {
+						TableItem item = new TableItem(controlTable, SWT.NULL);
+						item.setText(CONTROL_NAME_COLUMN, device.name);
+						item.setText(CONTROL_STATE_COLUMN, String.valueOf(device.state));
+						item.setText(CONTROL_TIMELEFT_COLUMN, String.valueOf(device.timeLeft));
+					}
+					for (int i=0; i<controlTable.getColumnCount(); i++) {
+						controlTable.getColumn(i).pack();
+					}
+					controlTable.setRedraw(true);
+				}
 			}
 		});
 	}
