@@ -22,7 +22,7 @@ Either run from within Eclipse or build the JAR file and start it from command l
 
 ### Contribution guidelines ###
 
-* TODO
+You are welcome to send comments regarding Skynet, Skynet API or Skynet Remote to me.
 
 ### Who do I talk to? ###
 
