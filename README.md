@@ -4,6 +4,8 @@ This project is a Java based GUI for supervision and control of a [Skynet][skyne
 
 [Skynet][skynet_site] is a home security and home automation system.
 
+See downloads for an easy to run pre-built JAR file.
+
 ### How to build? ###
 This project can either be built and run from within Eclipse, or by exporting a JAR file to be executed outside Eclipse.
 
@@ -22,11 +24,10 @@ Either run from within Eclipse or build the JAR file and start it from command l
 
 ### Contribution guidelines ###
 
-* TODO
+This project is mostly a demonstration of how the latest Skynet API can be used. You are very welcome to fork this project and make your own customized GUI.
 
-### Who do I talk to? ###
-
-* Repo owner or admin
+You are welcome to send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_site] or [Skynet Remote][skynet_remote_site] (this project) to pontus.markstrom@gmail.com.
 
 [skynet_site]: http://pihack.no-ip.org/pontus/projects/skynet/
 [skynet_api_site]: http://pihack.no-ip.org/pontus/projects/skynet/#api
+[skynet_remote_site]: https://bitbucket.org/pontusmarkstrom/skynetremote/overview
