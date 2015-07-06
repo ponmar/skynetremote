@@ -675,7 +675,7 @@ public class ApplicationWindow implements GUI {
 					for (HomeAutomationDevice device : parser.getDevices()) {
 						TableItem item = new TableItem(controlTable, SWT.NULL);
 						item.setText(CONTROL_NAME_COLUMN, device.name);
-						item.setText(CONTROL_STATE_COLUMN, String.valueOf(device.state));
+						item.setText(CONTROL_STATE_COLUMN, device.getStateStr());
 						item.setText(CONTROL_TIMELEFT_COLUMN, String.valueOf(device.timeLeft));
 					}
 					for (int i=0; i<controlTable.getColumnCount(); i++) {
