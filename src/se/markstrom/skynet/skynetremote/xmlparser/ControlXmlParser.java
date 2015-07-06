@@ -12,17 +12,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import se.markstrom.skynet.skynetremote.data.HomeAutomationDevice;
+import se.markstrom.skynet.skynetremote.data.Device;
 
 public class ControlXmlParser extends XmlParser {
 	
-	private ArrayList<HomeAutomationDevice> devices;
+	private ArrayList<Device> devices;
 	
 	public ControlXmlParser(String xml) {
 		super(xml);
 	}
 	
-	public List<HomeAutomationDevice> getDevices() {
+	public List<Device> getDevices() {
 		return devices;
 	}
 	
@@ -30,9 +30,9 @@ public class ControlXmlParser extends XmlParser {
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
 		NodeList nl = xmlDoc.getElementsByTagName("device");
 		if (nl != null) {
-			devices = new ArrayList<HomeAutomationDevice>();
+			devices = new ArrayList<Device>();
 			for (int i=0; i<nl.getLength(); i++) {
-				HomeAutomationDevice device = new HomeAutomationDevice();
+				Device device = new Device();
 				Node deviceNode = nl.item(i);
 				NamedNodeMap attributes = deviceNode.getAttributes();
 				device.id = Integer.parseInt(attributes.getNamedItem("id").getFirstChild().getNodeValue());

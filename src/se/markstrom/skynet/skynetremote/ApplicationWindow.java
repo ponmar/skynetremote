@@ -42,7 +42,7 @@ import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
 import se.markstrom.skynet.skynetremote.data.Event;
-import se.markstrom.skynet.skynetremote.data.HomeAutomationDevice;
+import se.markstrom.skynet.skynetremote.data.Device;
 import se.markstrom.skynet.skynetremote.data.Summary;
 import se.markstrom.skynet.skynetremote.xmlparser.CamerasXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.ControlXmlParser;
@@ -672,7 +672,7 @@ public class ApplicationWindow implements GUI {
 				if (parser.isValid()) {
 					controlTable.setRedraw(false);
 					controlTable.removeAll();
-					for (HomeAutomationDevice device : parser.getDevices()) {
+					for (Device device : parser.getDevices()) {
 						TableItem item = new TableItem(controlTable, SWT.NULL);
 						item.setText(CONTROL_NAME_COLUMN, device.name);
 						item.setText(CONTROL_STATE_COLUMN, device.getStateStr());

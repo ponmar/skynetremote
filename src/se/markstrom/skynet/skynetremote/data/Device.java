@@ -1,6 +1,6 @@
 package se.markstrom.skynet.skynetremote.data;
 
-public class HomeAutomationDevice {
+public class Device {
 	
 	public static final String ON_STR = "On";
 	public static final String OFF_STR = "Off";
