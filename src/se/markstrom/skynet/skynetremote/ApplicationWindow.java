@@ -250,13 +250,13 @@ public class ApplicationWindow implements GUI {
 		actionGetEventsItem.setText("Update events");
 		actionGetEventsItem.addSelectionListener(new ActionGetEventsItemListener());
 		
-		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionGetLogItem.setText("Update log");
-		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
-
 		actionGetControlItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionGetControlItem.setText("Update control");
 		actionGetControlItem.addSelectionListener(new ActionGetControlItemListener());
+
+		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionGetLogItem.setText("Update log");
+		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
 
 		// Help menu
 		MenuItem helpMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
@@ -838,7 +838,7 @@ public class ApplicationWindow implements GUI {
 				}
 
 				if (settings.pollSummary) {
-					display.timerExec(settings.summaryPollInterval, getSummaryXmlRunnable);
+					display.timerExec(settings.summaryPollInterval*1000, getSummaryXmlRunnable);
 				}
 			}
 		});

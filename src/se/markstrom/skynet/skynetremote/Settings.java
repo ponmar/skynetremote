@@ -3,7 +3,7 @@ package se.markstrom.skynet.skynetremote;
 public class Settings {
 	public static final String FILENAME = "settings.xml";
 	
-	private static final int MIN_POLL_INTERVAL = 1000;
+	private static final int MIN_POLL_INTERVAL = 1;
 	
 	public boolean getNewEvents;
 	public boolean getNewControl;
@@ -23,7 +23,7 @@ public class Settings {
 		getNewControl = true;
 		getNewLog = false;
 		pollSummary = true;
-		summaryPollInterval = 30000;
+		summaryPollInterval = 10;
 		host = "";
 		port = 22;
 		notifyOnNewEvent = true;

@@ -72,7 +72,7 @@ public class SettingsWindow {
 		notifyOnNewEventButton.setLayoutData(gd3);
 
 		Label label = new Label(shell, SWT.NONE);
-		label.setText("Poll interval [ms]:");
+		label.setText("Poll interval (seconds):");
 		label.pack();
 		
 		summaryPollInterval = new Text(shell, SWT.BORDER);
