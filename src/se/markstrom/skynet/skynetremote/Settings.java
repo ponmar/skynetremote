@@ -6,6 +6,8 @@ public class Settings {
 	private static final int MIN_POLL_INTERVAL = 1000;
 	
 	public boolean getNewEvents;
+	public boolean getNewControl;
+	public boolean getNewLog;
 	public boolean pollSummary;
 	public int summaryPollInterval;
 	public String host;
@@ -18,6 +20,8 @@ public class Settings {
 	
 	public void resetDefaults() {
 		getNewEvents = true;
+		getNewControl = true;
+		getNewLog = false;
 		pollSummary = true;
 		summaryPollInterval = 30000;
 		host = "";

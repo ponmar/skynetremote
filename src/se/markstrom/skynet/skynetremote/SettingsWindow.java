@@ -21,6 +21,8 @@ public class SettingsWindow {
 	
 	private Button pollSummaryButton;
 	private Button updateEventsButton;
+	private Button updateControlButton;
+	private Button updateLogButton;
 	private Button notifyOnNewEventButton;
 	private Text summaryPollInterval;
 	
@@ -50,6 +52,18 @@ public class SettingsWindow {
 		GridData gd2 = new GridData();
 		gd2.horizontalSpan = 2;
 		updateEventsButton.setLayoutData(gd2);
+
+		updateControlButton = new Button(shell, SWT.CHECK);
+		updateControlButton.setText("Update control (triggered by summary)");
+		GridData controlGd = new GridData();
+		controlGd.horizontalSpan = 2;
+		updateControlButton.setLayoutData(controlGd);
+
+		updateLogButton = new Button(shell, SWT.CHECK);
+		updateLogButton.setText("Update log (triggered by summary)");
+		GridData logGd = new GridData();
+		logGd.horizontalSpan = 2;
+		updateLogButton.setLayoutData(logGd);
 
 		notifyOnNewEventButton = new Button(shell, SWT.CHECK);
 		notifyOnNewEventButton.setText("Notify on new event");
@@ -95,6 +109,8 @@ public class SettingsWindow {
 	private void updateFromSettings(Settings settings) {
 		pollSummaryButton.setSelection(settings.pollSummary);
 		updateEventsButton.setSelection(settings.getNewEvents);
+		updateControlButton.setSelection(settings.getNewControl);
+		updateLogButton.setSelection(settings.getNewLog);
 		notifyOnNewEventButton.setSelection(settings.notifyOnNewEvent);
 		summaryPollInterval.setText(new Integer(settings.summaryPollInterval).toString());
 	}
@@ -124,6 +140,8 @@ public class SettingsWindow {
 	private boolean saveTextInput() {
 		settings.pollSummary = pollSummaryButton.getSelection();
 		settings.getNewEvents = updateEventsButton.getSelection();
+		settings.getNewControl = updateControlButton.getSelection();
+		settings.getNewLog = updateLogButton.getSelection();
 		settings.notifyOnNewEvent = notifyOnNewEventButton.getSelection();
 		try {
 			Integer.parseInt(summaryPollInterval.getText());

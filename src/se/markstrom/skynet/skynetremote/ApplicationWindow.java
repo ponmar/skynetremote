@@ -100,6 +100,9 @@ public class ApplicationWindow implements GUI {
 	private Text logText;
 	
 	private long prevPollEventId = -1;
+	private String prevPollControlChecksum = "";
+	private double prevPollLogTimestamp = -1;
+	
 	private long latestFetchedEventId = -1;
 	
 	private ApiThread apiThread = new ApiThread(this);
@@ -626,17 +629,13 @@ public class ApplicationWindow implements GUI {
 				updateGui(state);
 				switch (state) {
 				case CONNECTED:
+					// Update cameras once to enable menu items
 					apiThread.runTask(new GetCamerasXmlTask());
 					
-					// TODO: not needed because it will be fetched after receiving summary?
-					if (settings.getNewEvents) {
-						apiThread.runTask(new GetEventsXmlTask());
-					}
+					getSummaryXmlRunnable.run();
 					
-					if (settings.pollSummary) {
-						display.timerExec(settings.summaryPollInterval, getSummaryXmlRunnable);
-					}
 				default:
+					break;
 				}
 			}
 		});
@@ -802,6 +801,8 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
+				System.out.println("Received summary.xml");
+				
 				SummaryXmlParser parser = new SummaryXmlParser(xml);
 				if (parser.isValid()) {
 					Summary summary = parser.getSummary();
@@ -814,6 +815,24 @@ public class ApplicationWindow implements GUI {
 						if (settings.getNewEvents) {
 							System.out.println("New event detected, requesting events");
 							apiThread.runTask(new GetEventsXmlTask());
+						}
+					}
+					
+					if (!prevPollControlChecksum.equals(summary.controlChecksum)) {
+						prevPollControlChecksum = summary.controlChecksum;
+						
+						if (settings.getNewControl) {
+							System.out.println("New control checksum detected, requesting control");
+							apiThread.runTask(new GetControlXmlTask());
+						}
+					}
+					
+					if (prevPollLogTimestamp != summary.logTimestamp) {
+						prevPollLogTimestamp = summary.logTimestamp;
+						
+						if (settings.getNewLog) {
+							System.out.println("New log timestamp detected, requesting log");
+							apiThread.runTask(new GetLogXmlTask());
 						}
 					}
 				}
