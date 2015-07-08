@@ -6,7 +6,7 @@ This project is a Java based GUI for supervision and control of a [Skynet][skyne
 
 ### Releases ###
 
-See downloads for an easy to run pre-built JAR file. If your Java version is too old to run this build you need to rebuild Skynet Remote, and possibly [Skynet API][skynet_api_site].
+See [downloads][skynetremote_downloads] for an easy to run pre-built JAR file. If your Java version is too old to run this build you need to rebuild Skynet Remote, and possibly [Skynet API][skynet_api_site].
 
 ### How to build? ###
 This project can either be built and run from within Eclipse, or by exporting a JAR file to be executed outside Eclipse.
@@ -22,13 +22,13 @@ How to export a runnable JAR file:
 
 ### How to run? ###
 
-Either download and run a release from downloads, or run from Eclipse (without a JAR-file).
+Either download and run a release from [downloads][skynetremote_downloads], or run from Eclipse (without a JAR-file).
 
 ### Contribution guidelines ###
 
 This project is mostly a demonstration of how the latest Skynet API can be used. You are very welcome to fork this project and make your own customized GUI.
 
-Please send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_site] and [Skynet Remote][skynet_remote_site] to pontus.markstrom@gmail.com.
+Please send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_site] and [Skynet Remote][skynetremote_site] to pontus.markstrom@gmail.com.
 
 ### Licenses ###
 
@@ -36,4 +36,5 @@ Licenses for included software is placed in the licenses directory.
 
 [skynet_site]: http://pihack.no-ip.org/pontus/projects/skynet/
 [skynet_api_site]: http://pihack.no-ip.org/pontus/projects/skynet/#api
-[skynet_remote_site]: https://bitbucket.org/pontusmarkstrom/skynetremote/overview
+[skynetremote_site]: https://bitbucket.org/pontusmarkstrom/skynetremote/overview
+[skynetremote_downloads]: https://bitbucket.org/pontusmarkstrom/skynetremote/downloads
