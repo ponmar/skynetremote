@@ -1,6 +1,6 @@
 # README #
 
-This project is a Java based GUI for supervision and control of a [Skynet][skynet_site] system. This is done by using the [Skynet API][skynet_api_site].
+Skynet Remote is a Java based GUI for supervision and control of a [Skynet][skynet_site] system. This is done by using the [Skynet API][skynet_api_site]. This project is mostly used as a demonstration for how the API can be used and is continuously updated for the latest API version.
 
 [Skynet][skynet_site] is a home security and home automation system.
 
@@ -26,7 +26,7 @@ Either download and run a release from [downloads][skynetremote_downloads], or r
 
 ### Contribution guidelines ###
 
-This project is mostly a demonstration of how the latest Skynet API can be used. You are very welcome to fork this project and make your own customized GUI.
+You are very welcome to fork this project and make your own customized GUI.
 
 Please send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_site] and [Skynet Remote][skynetremote_site] to pontus.markstrom@gmail.com.
 
