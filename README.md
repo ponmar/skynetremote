@@ -6,7 +6,7 @@ This project is a Java based GUI for supervision and control of a [Skynet][skyne
 
 ### Releases ###
 
-See [downloads][skynetremote_downloads] for an easy to run pre-built JAR file. If your Java version is too old to run this build you need to rebuild Skynet Remote, and possibly [Skynet API][skynet_api_site].
+See [downloads][skynetremote_downloads] for an easy to run pre-built JAR file. If your Java version is too old to run this build you need to rebuild Skynet Remote, and possibly [Skynet API][skynet_api_site], for your Java version.
 
 ### How to build? ###
 This project can either be built and run from within Eclipse, or by exporting a JAR file to be executed outside Eclipse.
