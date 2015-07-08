@@ -28,6 +28,10 @@ This project is mostly a demonstration of how the latest Skynet API can be used.
 
 Please send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_site] and [Skynet Remote][skynet_remote_site] to pontus.markstrom@gmail.com.
 
+### Licenses ###
+
+Licenses for included software is placed in the licenses directory.
+
 [skynet_site]: http://pihack.no-ip.org/pontus/projects/skynet/
 [skynet_api_site]: http://pihack.no-ip.org/pontus/projects/skynet/#api
 [skynet_remote_site]: https://bitbucket.org/pontusmarkstrom/skynetremote/overview
