@@ -20,13 +20,13 @@ How to export a runnable JAR file:
 
 ### How to run? ###
 
-Either run from within Eclipse or build the JAR file and start it from command line or double click.
+Either download an easy to run pre-built JAR file and start it, or run from Eclipse (without a jar-file).
 
 ### Contribution guidelines ###
 
 This project is mostly a demonstration of how the latest Skynet API can be used. You are very welcome to fork this project and make your own customized GUI.
 
-You are welcome to send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_site] or [Skynet Remote][skynet_remote_site] (this project) to pontus.markstrom@gmail.com.
+Please send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_site] and [Skynet Remote][skynet_remote_site] to pontus.markstrom@gmail.com.
 
 [skynet_site]: http://pihack.no-ip.org/pontus/projects/skynet/
 [skynet_api_site]: http://pihack.no-ip.org/pontus/projects/skynet/#api
