@@ -4,7 +4,9 @@ This project is a Java based GUI for supervision and control of a [Skynet][skyne
 
 [Skynet][skynet_site] is a home security and home automation system.
 
-See downloads for an easy to run pre-built JAR file.
+### Releases ###
+
+See downloads for an easy to run pre-built JAR file. If your Java version is too old to run this build you need to rebuild Skynet Remote, and possibly [Skynet API][skynet_api_site].
 
 ### How to build? ###
 This project can either be built and run from within Eclipse, or by exporting a JAR file to be executed outside Eclipse.
@@ -20,7 +22,7 @@ How to export a runnable JAR file:
 
 ### How to run? ###
 
-Either download an easy to run pre-built JAR file and start it, or run from Eclipse (without a jar-file).
+Either download and run a release from downloads, or run from Eclipse (without a JAR-file).
 
 ### Contribution guidelines ###
 
