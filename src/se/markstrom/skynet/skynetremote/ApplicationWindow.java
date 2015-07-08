@@ -426,7 +426,7 @@ public class ApplicationWindow implements GUI {
 
 	private class FileSettingsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			SettingsWindow settingsWindow = new SettingsWindow(settings);
+			SettingsWindow settingsWindow = new SettingsWindow(settings, shell);
 			settingsWindow.run();
 			settings = settingsWindow.getSettings();
 			writeSettings();
@@ -531,7 +531,7 @@ public class ApplicationWindow implements GUI {
 	
 	private class HelpAboutItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			new AboutWindow().run();
+			new AboutWindow(shell).run();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -565,7 +565,7 @@ public class ApplicationWindow implements GUI {
 	}
 
 	private void connect() {
-		ConnectWindow connectWindow = new ConnectWindow(settings.host, settings.port);
+		ConnectWindow connectWindow = new ConnectWindow(settings.host, settings.port, shell);
 		connectWindow.run();
 		
 		if (connectWindow.hasValidInput()) {

@@ -3,6 +3,7 @@ package se.markstrom.skynet.skynetremote;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -13,7 +14,7 @@ public class AboutWindow {
 	private Display display;
 	private Shell shell;
 	
-	public AboutWindow() {
+	public AboutWindow(Shell parentShell) {
 		display = Display.getDefault();
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("About");
@@ -38,6 +39,15 @@ public class AboutWindow {
 		shell.addTraverseListener(new KeyListener());
 		
 		shell.pack();
+		
+		// Center window
+		Point parentLocation = parentShell.getLocation();
+		Point parentSize = parentShell.getSize();
+		Point dialogSize = shell.getSize();
+		shell.setLocation(
+				parentLocation.x + (parentSize.x - dialogSize.x) / 2,
+				parentLocation.y + (parentSize.y - dialogSize.y) / 2);
+		
 		shell.open();
 	}
 	

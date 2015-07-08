@@ -5,6 +5,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -32,11 +33,11 @@ public class ConnectWindow {
 	
 	static String savedPassword;
 	
-	public ConnectWindow(String defaultHost, int defaultPort) {
-		createGui(defaultHost, defaultPort);
+	public ConnectWindow(String defaultHost, int defaultPort, Shell parentShell) {
+		createGui(defaultHost, defaultPort, parentShell);
 	}
 	
-	private void createGui(String defaultHost, int defaultPort) {
+	private void createGui(String defaultHost, int defaultPort, Shell parentShell) {
 		display = Display.getDefault();
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("Connect");
@@ -103,6 +104,14 @@ public class ConnectWindow {
 		shell.addTraverseListener(new KeyListener());
 		
 		shell.pack();
+		
+		// Center window
+		Point parentLocation = parentShell.getLocation();
+		Point parentSize = parentShell.getSize();
+		Point dialogSize = shell.getSize();
+		shell.setLocation(
+				parentLocation.x + (parentSize.x - dialogSize.x) / 2,
+				parentLocation.y + (parentSize.y - dialogSize.y) / 2);
 		shell.open();
 	}
 	

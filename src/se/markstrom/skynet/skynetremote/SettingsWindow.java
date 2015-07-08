@@ -5,6 +5,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -26,7 +27,7 @@ public class SettingsWindow {
 	private Button notifyOnNewEventButton;
 	private Text summaryPollInterval;
 	
-	public SettingsWindow(Settings settings) {
+	public SettingsWindow(Settings settings, Shell parentShell) {
 		this.settings.host = settings.host;
 		this.settings.port = settings.port;
 		
@@ -103,6 +104,15 @@ public class SettingsWindow {
 		
 		shell.addTraverseListener(new KeyListener());
 		shell.pack();
+		
+		// Center window
+		Point parentLocation = parentShell.getLocation();
+		Point parentSize = parentShell.getSize();
+		Point dialogSize = shell.getSize();
+		shell.setLocation(
+				parentLocation.x + (parentSize.x - dialogSize.x) / 2,
+				parentLocation.y + (parentSize.y - dialogSize.y) / 2);
+		
 		shell.open();
 	}
 	
