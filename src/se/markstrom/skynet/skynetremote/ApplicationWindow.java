@@ -70,6 +70,8 @@ public class ApplicationWindow implements GUI {
 	
 	private Settings settings;
 	
+	private FileCache fileCache = new FileCache();
+	
 	private Display display;
 	private Shell shell;
 	
@@ -550,7 +552,14 @@ public class ApplicationWindow implements GUI {
 				int numImages = Integer.parseInt(selection.getText(EVENT_IMAGES_COLUMN));
 				for (int imageIndex = 0; imageIndex < numImages; imageIndex++) {
 					long eventId = Long.parseLong(selection.getText(EVENT_ID_COLUMN));
-					apiThread.runTask(new GetEventImageTask(eventId, imageIndex));
+					byte [] jpegData = fileCache.getFileContent(Settings.createFilenameForEventImage(eventId, imageIndex)); 
+					if (jpegData != null) {
+						System.out.println("Found cached image!");
+						updateEventImage(eventId, imageIndex, jpegData);					
+					}
+					else {
+						apiThread.runTask(new GetEventImageTask(eventId, imageIndex));
+					}
 				}
 			}
 		}
@@ -851,6 +860,7 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				String windowTitle = "Event " + eventId + " (image " + (imageIndex+1) + ")"; 
 				new ImageWindow(windowTitle, jpegData);
+				fileCache.addFile(Settings.createFilenameForEventImage(eventId, imageIndex), jpegData);
 			}
 		});
 	}

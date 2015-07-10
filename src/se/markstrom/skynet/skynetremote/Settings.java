@@ -32,4 +32,8 @@ public class Settings {
 	public boolean validate() {
 		return summaryPollInterval >= MIN_POLL_INTERVAL;
 	}
+	
+	public static String createFilenameForEventImage(long eventId, int imageIndex) {
+		return "event_" + eventId + "_image_" + imageIndex;
+	}
 }
