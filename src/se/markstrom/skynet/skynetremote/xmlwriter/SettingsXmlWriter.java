@@ -1,5 +1,6 @@
 package se.markstrom.skynet.skynetremote.xmlwriter;
 
+import se.markstrom.skynet.api.SkynetAPI.Protocol;
 import se.markstrom.skynet.skynetremote.Settings;
 
 public class SettingsXmlWriter extends XmlWriter {
@@ -13,6 +14,14 @@ public class SettingsXmlWriter extends XmlWriter {
 	
 	@Override
 	protected String createXml() {
+		int protocol;
+		if (settings.protocol == Protocol.SSH) {
+			protocol = 0;
+		}
+		else {
+			protocol = 1;
+		}
+		
 		String xml = XML_HEADER + "<settings>";
 		xml += "<getNewEvents>" + settings.getNewEvents + "</getNewEvents>";
 		xml += "<getNewControl>" + settings.getNewControl + "</getNewControl>";
@@ -21,6 +30,7 @@ public class SettingsXmlWriter extends XmlWriter {
 		xml += "<summaryPollInterval>" + settings.summaryPollInterval + "</summaryPollInterval>";
 		xml += "<host>" + settings.host + "</host>";
 		xml += "<port>" + settings.port + "</port>";
+		xml += "<protocol>" + protocol + "</protocol>";
 		xml += "<showEventNotification>" + settings.notifyOnNewEvent + "</showEventNotification>";
 		xml += "</settings>";
 		return xml;

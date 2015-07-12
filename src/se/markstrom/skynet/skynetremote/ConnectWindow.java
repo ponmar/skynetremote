@@ -8,13 +8,16 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import se.markstrom.skynet.api.SkynetAPI;
+import se.markstrom.skynet.api.SkynetAPI.Protocol;
 
 public class ConnectWindow {
 	
@@ -23,21 +26,24 @@ public class ConnectWindow {
 	
 	private Text hostText;
 	private Text portText;
+	private Button sshButton;
+	private Button telnetButton;
 	private Text passwordText;
 	private Button savePasswordButton;
 	
 	private String host;
 	private int port;
+	private Protocol protocol;
 	private String password;
 	private boolean savePassword;
 	
 	static String savedPassword;
 	
-	public ConnectWindow(String defaultHost, int defaultPort, Shell parentShell) {
-		createGui(defaultHost, defaultPort, parentShell);
+	public ConnectWindow(String defaultHost, int defaultPort, Protocol defaultProtocol, Shell parentShell) {
+		createGui(defaultHost, defaultPort, defaultProtocol, parentShell);
 	}
 	
-	private void createGui(String defaultHost, int defaultPort, Shell parentShell) {
+	private void createGui(String defaultHost, int defaultPort, Protocol defaultProtocol, Shell parentShell) {
 		display = Display.getDefault();
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("Connect");
@@ -62,6 +68,20 @@ public class ConnectWindow {
 		portText.setText(new Integer(defaultPort).toString());
 		portText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+	    Group protocolGroup = new Group(shell, SWT.SHADOW_IN);
+	    protocolGroup.setText("API protocol");
+	    protocolGroup.setLayout(new RowLayout(SWT.VERTICAL));
+	    GridData protocolGroupLayout = new GridData(GridData.FILL_HORIZONTAL);
+	    protocolGroupLayout.horizontalSpan = 2;
+	    protocolGroup.setLayoutData(protocolGroupLayout);
+	    
+	    sshButton = new Button(protocolGroup, SWT.RADIO);
+	    sshButton.setText("Secure Shell (SSH)");
+	    sshButton.setSelection(defaultProtocol == Protocol.SSH);
+	    telnetButton = new Button(protocolGroup, SWT.RADIO);
+	    telnetButton.setText("Telnet");
+	    telnetButton.setSelection(defaultProtocol == Protocol.TELNET);
+	    
 		Label passwordLabel = new Label(shell, SWT.NONE);
 		passwordLabel.setText("Password:");
 		
@@ -79,14 +99,12 @@ public class ConnectWindow {
 		}
 
 		savePasswordButton = new Button(shell, SWT.CHECK);
-		savePasswordButton.setText("Save password until exit");
+		savePasswordButton.setText("Save password in memory until exit");
 		savePasswordButton.setSelection(savedPassword != null);
 		GridData savePasswordLayout = new GridData(GridData.FILL_HORIZONTAL);
 	    savePasswordLayout.horizontalSpan = 2;
 	    savePasswordButton.setLayoutData(savePasswordLayout);
-		
-		// TODO: protocol radio buttons (or a checkbox)
-		
+	    
 		// Skip a column
 		new Label(shell, SWT.NONE);
 
@@ -131,12 +149,24 @@ public class ConnectWindow {
 	
 	private boolean saveTextInput() {
 		host = hostText.getText();
+		
 		try {
 			port = Integer.parseInt(portText.getText());
 		}
 		catch (NumberFormatException e) {
 			return false;
 		}
+		
+		if (sshButton.getSelection()) {
+			protocol = Protocol.SSH;
+		}
+		else if (telnetButton.getSelection()) {
+			protocol = Protocol.TELNET;
+		}
+		else {
+			return false;
+		}
+		
 		password = passwordText.getText();
 		savePassword = savePasswordButton.getSelection();
 		if (savePassword) {
@@ -145,6 +175,7 @@ public class ConnectWindow {
 		else {
 			savedPassword = null;
 		}
+		
 		return true;
 	}
 	
@@ -163,8 +194,7 @@ public class ConnectWindow {
 	}
 	
 	public SkynetAPI.Protocol getProtocol() {
-		// TODO:
-		return SkynetAPI.Protocol.SSH;
+		return protocol;
 	}
 	
 	public String getPassword() {

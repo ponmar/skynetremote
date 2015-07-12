@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import se.markstrom.skynet.api.SkynetAPI.Protocol;
 import se.markstrom.skynet.skynetremote.Settings;
 
 public class SettingsXmlParser extends XmlParser {
@@ -31,11 +32,12 @@ public class SettingsXmlParser extends XmlParser {
 		Integer summaryPollInterval = getNodeValueAsInteger(xmlDoc, "summaryPollInterval");
 		String host = getNodeValueAsString(xmlDoc, "host");
 		Integer port = getNodeValueAsInteger(xmlDoc, "port");
+		Integer protocol = getNodeValueAsInteger(xmlDoc, "protocol");
 		Boolean showEventNotification = getNodeValueAsBoolean(xmlDoc, "showEventNotification");
 		
 		if (getNewEvents != null && getNewControl != null && getNewLog != null &&
 				pollSummary != null && summaryPollInterval != null &&
-				port != null && showEventNotification != null) {
+				port != null && protocol != null && showEventNotification != null) {
 			settings = new Settings();
 			settings.getNewEvents = getNewEvents;
 			settings.getNewControl = getNewControl;
@@ -44,6 +46,12 @@ public class SettingsXmlParser extends XmlParser {
 			settings.summaryPollInterval = summaryPollInterval;
 			settings.host = host;
 			settings.port = port;
+			if (protocol == 0) {
+				settings.protocol = Protocol.SSH;
+			}
+			else {
+				settings.protocol = Protocol.TELNET;
+			}
 			settings.notifyOnNewEvent = showEventNotification;
 			return settings.validate();
 		}

@@ -1,5 +1,7 @@
 package se.markstrom.skynet.skynetremote;
 
+import se.markstrom.skynet.api.SkynetAPI.Protocol;
+
 public class Settings {
 	public static final String FILENAME = "settings.xml";
 	
@@ -12,6 +14,7 @@ public class Settings {
 	public int summaryPollInterval;
 	public String host;
 	public int port;
+	public Protocol protocol;
 	public boolean notifyOnNewEvent;
 	
 	public Settings() {
@@ -26,6 +29,7 @@ public class Settings {
 		summaryPollInterval = 10;
 		host = "";
 		port = 22;
+		protocol = Protocol.SSH;
 		notifyOnNewEvent = true;
 	}
 

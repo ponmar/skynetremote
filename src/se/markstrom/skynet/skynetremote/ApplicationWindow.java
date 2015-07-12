@@ -600,7 +600,7 @@ public class ApplicationWindow implements GUI {
 	}
 
 	private void connect() {
-		ConnectWindow connectWindow = new ConnectWindow(settings.host, settings.port, shell);
+		ConnectWindow connectWindow = new ConnectWindow(settings.host, settings.port, settings.protocol, shell);
 		connectWindow.run();
 		
 		if (connectWindow.hasValidInput()) {
@@ -612,6 +612,9 @@ public class ApplicationWindow implements GUI {
 
 			settings.host = host;
 			settings.port = port;
+			settings.protocol = protocol;
+			
+			// Settings are written when a connection attempt has been done
 			writeSettings();
 			
 			apiThread.runTask(new ConnectTask(host, port, protocol, password, debug));
