@@ -13,4 +13,13 @@ public class Summary {
 	public double logTimestamp;
 	public String controlChecksum;
 	public String time;
+	
+	public String getArmedStr() {
+		if (armed) {
+			return "armed";
+		}
+		else {
+			return "disarmed";
+		}
+	}
 }

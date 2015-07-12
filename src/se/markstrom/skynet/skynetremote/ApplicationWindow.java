@@ -54,7 +54,7 @@ import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
 
 public class ApplicationWindow implements GUI {
 	
-	private static final String TITLE = "Skynet Remote";
+	private static final String NAME = "Skynet Remote";
 	
 	private static final int EVENT_ID_COLUMN = 0;
 	private static final int EVENT_TIME_COLUMN = 1;
@@ -108,6 +108,10 @@ public class ApplicationWindow implements GUI {
 	private long latestFetchedEventId = -1;
 	
 	private ApiThread apiThread = new ApiThread(this);
+
+	private boolean apiWorking = false;
+	private CONNECTED_STATE connectedState = CONNECTED_STATE.DISCONNECTED;
+	private Summary summary = null;
 	
 	private Runnable getSummaryXmlRunnable = new Runnable() {
 		public void run() {
@@ -337,10 +341,10 @@ public class ApplicationWindow implements GUI {
 	    shell.setMenuBar(menuBar);
 		shell.open();
 		
-		updateGui(CONNECTED_STATE.DISCONNECTED);
+		updateGui();
 	}
 	
-	private void updateGui(CONNECTED_STATE connectedState) {
+	private void updateGui() {
 		
 		boolean connected = connectedState == CONNECTED_STATE.CONNECTED;
 		
@@ -362,19 +366,41 @@ public class ApplicationWindow implements GUI {
 		trayItem.setImage(noneImage);
 		shell.setImage(noneImage);
 		
+		updateTitle();
+	}
+	
+	private void updateTitle() {
+		String connectedStr;
 		switch (connectedState) {
 		case DISCONNECTING:
-			setTitle(TITLE + " (disconnecting...)");
+			connectedStr = "disconnecting...";
 			break;
 		case DISCONNECTED:
-			setTitle(TITLE + " (disconnected)");
+			connectedStr = "disconnected";
 			break;
 		case CONNECTING:
-			setTitle(TITLE + " (connecting...)");
+			connectedStr = "connecting...";
 			break;
 		case CONNECTED:
-			setTitle(TITLE + " (connected)");
+			connectedStr = "connected";
 			break;
+		default:
+			connectedStr = "unknown";
+			break;
+		}
+		
+		if (summary != null) {
+			String apiWorkingStr;
+			if (apiWorking) {
+				apiWorkingStr = "working";
+			}
+			else {
+				apiWorkingStr = "idle";
+			}
+			setTitle(NAME + " (" + connectedStr + ", " + summary.site + " is " + summary.getArmedStr() + ", API-thread is " + apiWorkingStr + ")");
+		}
+		else {
+			setTitle(NAME + " (" + connectedStr + ")");
 		}
 	}
 	
@@ -385,10 +411,10 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 	
-	private void updateArmMenuItems(boolean armedState) {
-		actionArmItem.setEnabled(!armedState);
-		actionDisarmItem.setEnabled(armedState);
-		actionTemporaryDisarmItem.setEnabled(armedState);
+	private void updateArmMenuItems() {
+		actionArmItem.setEnabled(!summary.armed);
+		actionDisarmItem.setEnabled(summary.armed);
+		actionTemporaryDisarmItem.setEnabled(summary.armed);
 	}
 
 	public void run() {
@@ -635,7 +661,9 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				updateGui(state);
+				connectedState = state;
+				updateGui();
+				
 				switch (state) {
 				case CONNECTED:
 					// Update cameras once to enable menu items
@@ -644,6 +672,7 @@ public class ApplicationWindow implements GUI {
 					getSummaryXmlRunnable.run();
 					
 				default:
+					summary = null;
 					break;
 				}
 			}
@@ -775,13 +804,13 @@ public class ApplicationWindow implements GUI {
 						
 						if (settings.notifyOnNewEvent) {
 							if (newMajorEvent) {
-								new Notification(TITLE, "New event with major severity detected!");
+								new Notification(NAME, "New event with major severity detected!");
 							}
 							else if (newMinorEvent) {
-								new Notification(TITLE, "New event with minor severity detected!");
+								new Notification(NAME, "New event with minor severity detected!");
 							}
 							else if (newInfoEvent) {
-								new Notification(TITLE, "New event with info severity detected!");
+								new Notification(NAME, "New event with info severity detected!");
 							}
 						}
 						
@@ -814,9 +843,10 @@ public class ApplicationWindow implements GUI {
 				
 				SummaryXmlParser parser = new SummaryXmlParser(xml);
 				if (parser.isValid()) {
-					Summary summary = parser.getSummary();
-					
-					updateArmMenuItems(summary.armed);
+					summary = parser.getSummary();
+
+					updateTitle();
+					updateArmMenuItems();
 					
 					if (prevPollEventId != summary.latestEventId) {
 						prevPollEventId = summary.latestEventId;
@@ -880,8 +910,8 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				// TODO: update gui
-				System.out.println("Working: " + isWorking);
+				apiWorking = isWorking;
+				updateTitle();
 			}
 		});
 	}
