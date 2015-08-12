@@ -63,8 +63,8 @@ public class EventsXmlParser extends XmlParser {
 							event.areas = "";
 						}
 					}
-					else if (nodeName.equals("image")) {
-						event.images++;
+					else if (nodeName.equals("numimages")) {
+						event.images = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue());
 					}
 				}
 				events.add(event);
