@@ -19,4 +19,17 @@ public class Device {
 			return OFF_STR;
 		}
 	}
+	
+	public String getTypeStr() {
+		switch (type) {
+		case 0:
+			return "Tellstick";
+		case 1:
+			return "Simulated";
+		case 2:
+			return "GPIO";
+		default:
+			return "Unknown";
+		}
+	}
 }

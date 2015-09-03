@@ -69,6 +69,7 @@ public class ApplicationWindow implements GUI {
 	private static final int CONTROL_NAME_COLUMN = 0;
 	private static final int CONTROL_STATE_COLUMN = 1;
 	private static final int CONTROL_TIMELEFT_COLUMN = 2;
+	private static final int CONTROL_TYPE_COLUMN = 3;
 	
 	private Settings settings;
 	
@@ -329,6 +330,9 @@ public class ApplicationWindow implements GUI {
 	    TableColumn timeLeftColumn = new TableColumn(controlTable, SWT.NULL);
 	    timeLeftColumn.setText("Time left");
 	    timeLeftColumn.pack();
+	    TableColumn typeColumn = new TableColumn(controlTable, SWT.NULL);
+	    typeColumn.setText("Type");
+	    typeColumn.pack();
 	    
 	    controlTab.setControl(controlTable);
 
@@ -719,6 +723,7 @@ public class ApplicationWindow implements GUI {
 						item.setText(CONTROL_NAME_COLUMN, device.name);
 						item.setText(CONTROL_STATE_COLUMN, device.getStateStr());
 						item.setText(CONTROL_TIMELEFT_COLUMN, String.valueOf(device.timeLeft));
+						item.setText(CONTROL_TYPE_COLUMN, device.getTypeStr());
 					}
 					for (int i=0; i<controlTable.getColumnCount(); i++) {
 						controlTable.getColumn(i).pack();
