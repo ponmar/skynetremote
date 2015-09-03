@@ -17,7 +17,7 @@ How to export a runnable JAR file:
 * Right click on project and select "Export..."
 * Select "Runnable JAR file" and press "Next"
 * Set the export destination to "SkynetRemote\SkynetRemote.jar"
-* Select "Extract required libraries into generated JAR"
+* Select "Package required libraries into generated JAR"
 * Click "Finish"
 
 ### How to run? ###
