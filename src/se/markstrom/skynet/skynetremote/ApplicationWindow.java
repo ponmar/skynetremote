@@ -26,6 +26,8 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 
 import se.markstrom.skynet.api.SkynetAPI;
+import se.markstrom.skynet.skynetremote.apitask.AcceptEventTask;
+import se.markstrom.skynet.skynetremote.apitask.AcceptEventsTask;
 import se.markstrom.skynet.skynetremote.apitask.ApiThread;
 import se.markstrom.skynet.skynetremote.apitask.ArmTask;
 import se.markstrom.skynet.skynetremote.apitask.ConnectTask;
@@ -88,6 +90,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionGetLogItem;
 	private MenuItem actionGetControlItem;
 	private MenuItem actionGetEventsItem;
+	private MenuItem actionAcceptEventsItem;
 	private MenuItem helpAboutItem;
 	private Menu actionTemporaryDisarmMenu;
 	private Menu cameraSnapshotMenu;
@@ -225,6 +228,10 @@ public class ApplicationWindow implements GUI {
 		actionCameraSnapshotItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionCameraSnapshotItem.setText("Camera snapshots");
 		
+		// TODO: move to class when needed
+		actionAcceptEventsItem = new MenuItem(actionMenu, SWT.CASCADE);
+		actionAcceptEventsItem.setText("Accept events");
+		
 		// Action -> Stream images from camera menu
 		cameraSnapshotMenu = new Menu(shell, SWT.DROP_DOWN);
 		actionCameraSnapshotItem.setMenu(cameraSnapshotMenu);
@@ -264,7 +271,23 @@ public class ApplicationWindow implements GUI {
 		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionGetLogItem.setText("Update log");
 		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
+		
+		// Action -> Accept events
+		Menu actionAcceptEventsMenu = new Menu(shell, SWT.DROP_DOWN);
+		actionAcceptEventsItem.setMenu(actionAcceptEventsMenu);
+		
+		MenuItem actionAcceptMinorEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
+		actionAcceptMinorEventsItem.setText("All with minor severity");
+		actionAcceptMinorEventsItem.addSelectionListener(new ActionAcceptMinorEventsItemListener());
 
+		MenuItem actionAcceptMajorEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
+		actionAcceptMajorEventsItem.setText("All with major severity");
+		actionAcceptMajorEventsItem.addSelectionListener(new ActionAcceptMajorEventsItemListener());
+
+		MenuItem actionAcceptAllEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
+		actionAcceptAllEventsItem.setText("All");
+		actionAcceptAllEventsItem.addSelectionListener(new ActionAcceptAllEventsItemListener());
+		
 		// Help menu
 		MenuItem helpMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
 		helpMenuHeader.setText("&Help");
@@ -365,6 +388,7 @@ public class ApplicationWindow implements GUI {
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
 		actionTemporaryDisarmItem.setEnabled(connected);
+		actionAcceptEventsItem.setEnabled(connected);
 		actionCameraSnapshotItem.setEnabled(connected);
 
 		trayItem.setImage(noneImage);
@@ -546,6 +570,33 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 	
+	private class ActionAcceptMinorEventsItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			acceptEvents(AcceptEventsTask.EventGroup.ALL_MINOR);
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+	
+	private class ActionAcceptMajorEventsItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			acceptEvents(AcceptEventsTask.EventGroup.ALL_MINOR);
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+	
+	private class ActionAcceptAllEventsItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			acceptEvents(AcceptEventsTask.EventGroup.ALL_MINOR);
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+	
 	private class ActionStreamItemListener implements SelectionListener {
 		private int cameraIndex;
 		
@@ -663,6 +714,10 @@ public class ApplicationWindow implements GUI {
 		apiThread.runTask(new TurnOffAllDevicesTask());
 	}
 
+	private void acceptEvents(AcceptEventsTask.EventGroup eventGroup) {
+		apiThread.runTask(new AcceptEventsTask(eventGroup));
+	}
+	
 	@Override
 	public void updateConnectedState(CONNECTED_STATE state) {
 		display.asyncExec(new Runnable() {

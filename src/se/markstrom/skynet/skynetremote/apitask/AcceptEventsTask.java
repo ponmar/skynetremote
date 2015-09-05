@@ -5,13 +5,13 @@ import se.markstrom.skynet.api.SkynetAPIClientError;
 import se.markstrom.skynet.api.SkynetAPI.SkynetAPIError;
 import se.markstrom.skynet.skynetremote.GUI;
 
-public class AcceptEvents implements ApiTask {
+public class AcceptEventsTask implements ApiTask {
 	
 	public enum EventGroup { ALL_MINOR, ALL_MAJOR, ALL };
 	
 	private EventGroup eventGroup;
 	
-	public AcceptEvents(EventGroup eventGroup) {
+	public AcceptEventsTask(EventGroup eventGroup) {
 		this.eventGroup = eventGroup;
 	}
 

@@ -5,11 +5,11 @@ import se.markstrom.skynet.api.SkynetAPI.SkynetAPIError;
 import se.markstrom.skynet.api.SkynetAPIClientError;
 import se.markstrom.skynet.skynetremote.GUI;
 
-public class AcceptEvent implements ApiTask {
+public class AcceptEventTask implements ApiTask {
 
 	private long eventId;
 	
-	public AcceptEvent(long eventId) {
+	public AcceptEventTask(long eventId) {
 		this.eventId = eventId;
 	}
 	
