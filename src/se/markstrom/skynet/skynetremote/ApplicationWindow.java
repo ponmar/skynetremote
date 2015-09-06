@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 
 import se.markstrom.skynet.api.SkynetAPI;
-import se.markstrom.skynet.skynetremote.apitask.AcceptEventTask;
 import se.markstrom.skynet.skynetremote.apitask.AcceptEventsTask;
 import se.markstrom.skynet.skynetremote.apitask.ApiThread;
 import se.markstrom.skynet.skynetremote.apitask.ArmTask;
@@ -228,7 +227,6 @@ public class ApplicationWindow implements GUI {
 		actionCameraSnapshotItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionCameraSnapshotItem.setText("Camera snapshots");
 		
-		// TODO: move to class when needed
 		actionAcceptEventsItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionAcceptEventsItem.setText("Accept events");
 		
@@ -482,6 +480,7 @@ public class ApplicationWindow implements GUI {
 
 	private class FileSettingsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
+			// TODO: don't write settings to file if window closed with 'x'/escape.
 			SettingsWindow settingsWindow = new SettingsWindow(settings, shell);
 			settingsWindow.run();
 			settings = settingsWindow.getSettings();
