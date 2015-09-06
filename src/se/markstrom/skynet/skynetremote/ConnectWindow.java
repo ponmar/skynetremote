@@ -180,9 +180,11 @@ public class ConnectWindow {
 	}
 	
 	public boolean hasValidInput() {
+		// Note: password is only required when using SSH
 		return host != null && !host.equals("") &&
 				port > 0 && port <= 65535 &&
-				password != null && !password.equals("");
+				((protocol == Protocol.SSH && (password != null && !password.equals(""))) ||
+				protocol == Protocol.TELNET);
 	}
 	
 	public String getHost() {
