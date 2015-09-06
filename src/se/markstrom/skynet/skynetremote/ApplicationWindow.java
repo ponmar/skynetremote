@@ -90,6 +90,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionGetControlItem;
 	private MenuItem actionGetEventsItem;
 	private MenuItem actionAcceptEventsItem;
+	private MenuItem actionGetEventImagesItem;
 	private MenuItem helpAboutItem;
 	private Menu actionTemporaryDisarmMenu;
 	private Menu cameraSnapshotMenu;
@@ -229,6 +230,10 @@ public class ApplicationWindow implements GUI {
 		
 		actionAcceptEventsItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionAcceptEventsItem.setText("Accept events");
+		
+		actionGetEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
+		actionGetEventImagesItem.setText("Get event images");
+		actionGetEventImagesItem.addSelectionListener(new ActionGetEventImagesItemListener());
 		
 		// Action -> Stream images from camera menu
 		cameraSnapshotMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -388,6 +393,7 @@ public class ApplicationWindow implements GUI {
 		actionTemporaryDisarmItem.setEnabled(connected);
 		actionAcceptEventsItem.setEnabled(connected);
 		actionCameraSnapshotItem.setEnabled(connected);
+		actionGetEventImagesItem.setEnabled(connected);
 
 		trayItem.setImage(noneImage);
 		shell.setImage(noneImage);
@@ -596,6 +602,15 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 	
+	private class ActionGetEventImagesItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			getEventImages();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+	
 	private class ActionStreamItemListener implements SelectionListener {
 		private int cameraIndex;
 		
@@ -623,25 +638,7 @@ public class ApplicationWindow implements GUI {
 	private class EventSelectedListener implements MouseListener {
 		@Override
 		public void mouseDoubleClick(MouseEvent e) {
-			Table table = (Table)e.getSource();
-
-			// Note: currently only one selected event is supported 
-			if (table.getSelectionCount() > 0) {
-				TableItem selection = table.getSelection()[0];
-				System.out.println("Selected event id: " + selection.getText(EVENT_ID_COLUMN));
-				int numImages = Integer.parseInt(selection.getText(EVENT_IMAGES_COLUMN));
-				for (int imageIndex = 0; imageIndex < numImages; imageIndex++) {
-					long eventId = Long.parseLong(selection.getText(EVENT_ID_COLUMN));
-					byte [] jpegData = fileCache.getFileContent(Settings.createFilenameForEventImage(eventId, imageIndex)); 
-					if (jpegData != null) {
-						System.out.println("Found cached image!");
-						updateEventImage(eventId, imageIndex, jpegData);					
-					}
-					else {
-						apiThread.runTask(new GetEventImageTask(eventId, imageIndex));
-					}
-				}
-			}
+			getEventImages();
 		}
 
 		@Override
@@ -715,6 +712,24 @@ public class ApplicationWindow implements GUI {
 
 	private void acceptEvents(AcceptEventsTask.EventGroup eventGroup) {
 		apiThread.runTask(new AcceptEventsTask(eventGroup));
+	}
+	
+	private void getEventImages() {
+		for (TableItem selection : eventsTable.getSelection()) {
+			System.out.println("Selected event id: " + selection.getText(EVENT_ID_COLUMN));
+			int numImages = Integer.parseInt(selection.getText(EVENT_IMAGES_COLUMN));
+			for (int imageIndex = 0; imageIndex < numImages; imageIndex++) {
+				long eventId = Long.parseLong(selection.getText(EVENT_ID_COLUMN));
+				byte [] jpegData = fileCache.getFileContent(Settings.createFilenameForEventImage(eventId, imageIndex)); 
+				if (jpegData != null) {
+					System.out.println("Found cached image!");
+					updateEventImage(eventId, imageIndex, jpegData);					
+				}
+				else {
+					apiThread.runTask(new GetEventImageTask(eventId, imageIndex));
+				}
+			}
+		}
 	}
 	
 	@Override
