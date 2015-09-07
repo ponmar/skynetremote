@@ -395,7 +395,9 @@ public class ApplicationWindow implements GUI {
 		actionCameraSnapshotItem.setEnabled(connected);
 		actionGetEventImagesItem.setEnabled(connected);
 
-		trayItem.setImage(noneImage);
+		if (trayItem != null) {
+			trayItem.setImage(noneImage);
+		}
 		shell.setImage(noneImage);
 		
 		updateTitle();
@@ -586,7 +588,7 @@ public class ApplicationWindow implements GUI {
 	
 	private class ActionAcceptMajorEventsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			acceptEvents(AcceptEventsTask.EventGroup.ALL_MINOR);
+			acceptEvents(AcceptEventsTask.EventGroup.ALL_MAJOR);
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -595,7 +597,7 @@ public class ApplicationWindow implements GUI {
 	
 	private class ActionAcceptAllEventsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			acceptEvents(AcceptEventsTask.EventGroup.ALL_MINOR);
+			acceptEvents(AcceptEventsTask.EventGroup.ALL);
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -840,7 +842,6 @@ public class ApplicationWindow implements GUI {
 									newMajorEvent = true;
 									break;
 								}
-								
 							}
 							
 							TableItem item = new TableItem(eventsTable, SWT.NULL);
@@ -866,15 +867,21 @@ public class ApplicationWindow implements GUI {
 						
 						switch (highestSeverity) {
 						case Event.INFO:
-							trayItem.setImage(infoImage);
+							if (trayItem != null) {
+								trayItem.setImage(infoImage);
+							}
 							shell.setImage(infoImage);
 							break;
 						case Event.MINOR:
-							trayItem.setImage(minorImage);
+							if (trayItem != null) {
+								trayItem.setImage(minorImage);
+							}
 							shell.setImage(minorImage);
 							break;
 						case Event.MAJOR:
-							trayItem.setImage(majorImage);
+							if (trayItem != null) {
+								trayItem.setImage(majorImage);
+							}
 							shell.setImage(majorImage);
 							break;
 						}
