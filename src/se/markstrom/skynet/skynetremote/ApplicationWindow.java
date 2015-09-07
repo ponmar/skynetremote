@@ -105,11 +105,11 @@ public class ApplicationWindow implements GUI {
 	private Table controlTable;
 	private Text logText;
 	
-	private long prevPollEventId = -1;
-	private String prevPollControlChecksum = "";
-	private double prevPollLogTimestamp = -1;
+	private long prevPollEventId;
+	private String prevPollControlChecksum;
+	private double prevPollLogTimestamp;
 	
-	private long latestFetchedEventId = -1;
+	private long latestFetchedEventId;
 	
 	private ApiThread apiThread = new ApiThread(this);
 
@@ -125,6 +125,7 @@ public class ApplicationWindow implements GUI {
 	
 	public ApplicationWindow() {
 		readSettings();
+		resetData();
 		createGui();
 		apiThread.start();
 	}
@@ -148,6 +149,13 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 	
+	private void resetData() {
+		prevPollEventId = -1;
+		prevPollControlChecksum = "";
+		prevPollLogTimestamp = -1;
+		latestFetchedEventId = -1;
+	}
+	
 	private void writeSettings() {
 		SettingsXmlWriter settingsWriter = new SettingsXmlWriter(settings);
 		settingsWriter.write();
@@ -167,12 +175,23 @@ public class ApplicationWindow implements GUI {
 		display = Display.getDefault();
 		shell = new Shell(display);
 		shell.setSize(1024, 768);
+		shell.setLayout(new FillLayout());
 		
 		noneImage = createImage(16, 16, SWT.COLOR_BLACK);
 		infoImage = createImage(16, 16, SWT.COLOR_GREEN);
 		minorImage = createImage(16, 16, SWT.COLOR_YELLOW);
 		majorImage = createImage(16, 16, SWT.COLOR_RED);
+
+		createTray();
+		createMenuBar();
+		createTabs();
+	    
+		shell.open();
 		
+		updateGui();
+	}
+	
+	private void createTray() {
 		Tray tray = display.getSystemTray();
 		if (tray != null) {
 			// Note: tray tool tip text is set in setTitle()
@@ -181,7 +200,9 @@ public class ApplicationWindow implements GUI {
 		else {
 			System.out.println("No system tray available");
 		}
-		
+	}
+	
+	private void createMenuBar() {
 		Menu menuBar = new Menu(shell, SWT.BAR);
 		
 		// File menu
@@ -302,8 +323,10 @@ public class ApplicationWindow implements GUI {
 		helpAboutItem.setText("&About...");
 		helpAboutItem.addSelectionListener(new HelpAboutItemListener());
 		
-		shell.setLayout(new FillLayout());
-
+		shell.setMenuBar(menuBar);
+	}
+	
+	private void createTabs() {
 		// Tabs
 		TabFolder tf = new TabFolder(shell, SWT.BORDER);
 		
@@ -366,12 +389,7 @@ public class ApplicationWindow implements GUI {
 	    
 	    logText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 	    logText.setEditable(false);
-	    logTab.setControl(logText);	    
-	    
-	    shell.setMenuBar(menuBar);
-		shell.open();
-		
-		updateGui();
+	    logTab.setControl(logText);
 	}
 	
 	private void updateGui() {
@@ -395,12 +413,16 @@ public class ApplicationWindow implements GUI {
 		actionCameraSnapshotItem.setEnabled(connected);
 		actionGetEventImagesItem.setEnabled(connected);
 
-		if (trayItem != null) {
-			trayItem.setImage(noneImage);
-		}
-		shell.setImage(noneImage);
+		setIcon(noneImage);
 		
 		updateTitle();
+	}
+	
+	private void setIcon(Image image) {
+		if (trayItem != null) {
+			trayItem.setImage(image);
+		}
+		shell.setImage(image);
 	}
 	
 	private void updateTitle() {
@@ -749,6 +771,12 @@ public class ApplicationWindow implements GUI {
 					
 					getSummaryXmlRunnable.run();
 					
+				case DISCONNECTED:
+					// Fetched data might not be valid when connecting again (possibly to another host).
+					// Table data might however be useful for observation when disconnected.
+					resetData();
+					break;
+					
 				default:
 					summary = null;
 					break;
@@ -867,22 +895,13 @@ public class ApplicationWindow implements GUI {
 						
 						switch (highestSeverity) {
 						case Event.INFO:
-							if (trayItem != null) {
-								trayItem.setImage(infoImage);
-							}
-							shell.setImage(infoImage);
+							setIcon(infoImage);
 							break;
 						case Event.MINOR:
-							if (trayItem != null) {
-								trayItem.setImage(minorImage);
-							}
-							shell.setImage(minorImage);
+							setIcon(minorImage);
 							break;
 						case Event.MAJOR:
-							if (trayItem != null) {
-								trayItem.setImage(majorImage);
-							}
-							shell.setImage(majorImage);
+							setIcon(majorImage);
 							break;
 						}
 						
