@@ -14,6 +14,7 @@ This project can either be built and run from within Eclipse, or by exporting a 
 How to export a runnable JAR file:
 
 * Open the project in Eclipse
+* Add appropriate SWT jar file for your platform to the project in Eclipse
 * Right click on project and select "Export..."
 * Select "Runnable JAR file" and press "Next"
 * Set the export destination to "SkynetRemote\SkynetRemote-<version>.jar"
