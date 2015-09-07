@@ -1,4 +1,4 @@
-package se.markstrom.skynet.skynetremote;
+package se.markstrom.skynet.skynetremote.window;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -26,6 +26,9 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 
 import se.markstrom.skynet.api.SkynetAPI;
+import se.markstrom.skynet.skynetremote.FileCache;
+import se.markstrom.skynet.skynetremote.GUI;
+import se.markstrom.skynet.skynetremote.Settings;
 import se.markstrom.skynet.skynetremote.apitask.AcceptEventsTask;
 import se.markstrom.skynet.skynetremote.apitask.ApiThread;
 import se.markstrom.skynet.skynetremote.apitask.ArmTask;

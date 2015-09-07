@@ -1,4 +1,4 @@
-package se.markstrom.skynet.skynetremote;
+package se.markstrom.skynet.skynetremote.window;
 
 import java.io.ByteArrayInputStream;
 

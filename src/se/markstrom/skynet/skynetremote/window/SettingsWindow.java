@@ -1,4 +1,4 @@
-package se.markstrom.skynet.skynetremote;
+package se.markstrom.skynet.skynetremote.window;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -13,6 +13,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import se.markstrom.skynet.skynetremote.Settings;
 
 public class SettingsWindow {
 	
