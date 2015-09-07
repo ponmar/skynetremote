@@ -37,7 +37,7 @@ public class ControlXmlParser extends XmlParser {
 				NamedNodeMap attributes = deviceNode.getAttributes();
 				device.id = Integer.parseInt(attributes.getNamedItem("id").getFirstChild().getNodeValue());
 				device.name = attributes.getNamedItem("name").getFirstChild().getNodeValue();
-				device.state = Boolean.parseBoolean(attributes.getNamedItem("state").getFirstChild().getNodeValue());
+				device.state = attributes.getNamedItem("state").getFirstChild().getNodeValue().equals("1");
 				device.timeLeft = (int) Double.parseDouble(attributes.getNamedItem("timeleft").getFirstChild().getNodeValue());
 				device.type = Integer.parseInt(attributes.getNamedItem("type").getFirstChild().getNodeValue());
 				devices.add(device);
