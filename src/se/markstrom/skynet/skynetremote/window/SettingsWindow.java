@@ -156,7 +156,7 @@ public class SettingsWindow {
 		settings.getNewLog = updateLogButton.getSelection();
 		settings.notifyOnNewEvent = notifyOnNewEventButton.getSelection();
 		try {
-			Integer.parseInt(summaryPollInterval.getText());
+			settings.summaryPollInterval = Integer.parseInt(summaryPollInterval.getText());
 		}
 		catch (NumberFormatException e) {
 			return false;
