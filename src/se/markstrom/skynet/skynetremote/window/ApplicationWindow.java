@@ -180,11 +180,7 @@ public class ApplicationWindow implements GUI {
 		shell.setSize(1024, 768);
 		shell.setLayout(new FillLayout());
 		
-		noneImage = createImage(16, 16, SWT.COLOR_BLACK);
-		infoImage = createImage(16, 16, SWT.COLOR_GREEN);
-		minorImage = createImage(16, 16, SWT.COLOR_YELLOW);
-		majorImage = createImage(16, 16, SWT.COLOR_RED);
-
+		createIcons();
 		createTray();
 		createMenuBar();
 		createTabs();
@@ -192,6 +188,13 @@ public class ApplicationWindow implements GUI {
 		shell.open();
 		
 		updateGui();
+	}
+	
+	private void createIcons() {
+		noneImage = createImage(16, 16, SWT.COLOR_BLACK);
+		infoImage = createImage(16, 16, SWT.COLOR_GREEN);
+		minorImage = createImage(16, 16, SWT.COLOR_YELLOW);
+		majorImage = createImage(16, 16, SWT.COLOR_RED);
 	}
 	
 	private void createTray() {
@@ -222,6 +225,8 @@ public class ApplicationWindow implements GUI {
 		fileDisconnectItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileDisconnectItem.setText("&Disconnect");
 		fileDisconnectItem.addSelectionListener(new FileDisconnectItemListener());
+		
+		new MenuItem(fileMenu, SWT.SEPARATOR);
 
 		fileSettingsItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileSettingsItem.setText("&Settings...");
@@ -249,6 +254,8 @@ public class ApplicationWindow implements GUI {
 		actionTemporaryDisarmItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionTemporaryDisarmItem.setText("Temporary disarm");
 		
+		new MenuItem(actionMenu, SWT.SEPARATOR);
+		
 		actionCameraSnapshotItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionCameraSnapshotItem.setText("Camera snapshots");
 		
@@ -258,6 +265,8 @@ public class ApplicationWindow implements GUI {
 		actionGetEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionGetEventImagesItem.setText("Get event images");
 		actionGetEventImagesItem.addSelectionListener(new ActionGetEventImagesItemListener());
+		
+		new MenuItem(actionMenu, SWT.SEPARATOR);
 		
 		// Action -> Stream images from camera menu
 		cameraSnapshotMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -287,6 +296,8 @@ public class ApplicationWindow implements GUI {
 		actionTurnOffAllDevicesItem.setText("Turn off all devices");
 		actionTurnOffAllDevicesItem.addSelectionListener(new ActionTurnOffAllDevicesListener());
 
+		new MenuItem(actionMenu, SWT.SEPARATOR);
+		
 		actionGetEventsItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionGetEventsItem.setText("Update events");
 		actionGetEventsItem.addSelectionListener(new ActionGetEventsItemListener());
