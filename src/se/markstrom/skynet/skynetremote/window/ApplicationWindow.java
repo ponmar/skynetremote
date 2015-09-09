@@ -44,7 +44,9 @@ import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
+import se.markstrom.skynet.skynetremote.apitask.TurnOffDeviceTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
+import se.markstrom.skynet.skynetremote.apitask.TurnOnDeviceTask;
 import se.markstrom.skynet.skynetremote.data.Event;
 import se.markstrom.skynet.skynetremote.data.Device;
 import se.markstrom.skynet.skynetremote.data.Summary;
@@ -89,6 +91,8 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionCameraSnapshotItem;
 	private MenuItem actionTurnOnAllDevicesItem;
 	private MenuItem actionTurnOffAllDevicesItem;
+	private MenuItem actionTurnOnDevicesItem;
+	private MenuItem actionTurnOffDevicesItem;
 	private MenuItem actionGetLogItem;
 	private MenuItem actionGetControlItem;
 	private MenuItem actionGetEventsItem;
@@ -296,6 +300,14 @@ public class ApplicationWindow implements GUI {
 		actionTurnOffAllDevicesItem.setText("Turn off all devices");
 		actionTurnOffAllDevicesItem.addSelectionListener(new ActionTurnOffAllDevicesListener());
 
+		actionTurnOnDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionTurnOnDevicesItem.setText("Turn on devices");
+		actionTurnOnDevicesItem.addSelectionListener(new ActionTurnOnDevicesListener());
+		
+		actionTurnOffDevicesItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionTurnOffDevicesItem.setText("Turn off devices");
+		actionTurnOffDevicesItem.addSelectionListener(new ActionTurnOffDevicesListener());
+
 		new MenuItem(actionMenu, SWT.SEPARATOR);
 		
 		actionGetEventsItem = new MenuItem(actionMenu, SWT.PUSH);
@@ -379,6 +391,7 @@ public class ApplicationWindow implements GUI {
 	    controlTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 	    controlTable.setHeaderVisible(true);
 	    controlTable.setLinesVisible(true);
+	    controlTable.addMouseListener(new DeviceSelectedListener());
 
 	    TabItem controlTab = new TabItem(tf, SWT.BORDER);
 	    controlTab.setText("Control");
@@ -422,6 +435,8 @@ public class ApplicationWindow implements GUI {
 		actionGetEventsItem.setEnabled(connected && !settings.getNewEvents);
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
+		actionTurnOnDevicesItem.setEnabled(connected);
+		actionTurnOffDevicesItem.setEnabled(connected);
 		actionTemporaryDisarmItem.setEnabled(connected);
 		actionAcceptEventsItem.setEnabled(connected);
 		actionCameraSnapshotItem.setEnabled(connected);
@@ -612,6 +627,24 @@ public class ApplicationWindow implements GUI {
 		public void widgetDefaultSelected(SelectionEvent event) {
 		}
 	}
+
+	private class ActionTurnOnDevicesListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			turnOnDevices();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
+	private class ActionTurnOffDevicesListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			turnOffDevices();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
 	
 	private class ActionAcceptMinorEventsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
@@ -688,6 +721,21 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 
+	private class DeviceSelectedListener implements MouseListener {
+		@Override
+		public void mouseDoubleClick(MouseEvent e) {
+			toggleDevicesState();
+		}
+
+		@Override
+		public void mouseDown(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseUp(MouseEvent e) {
+		}
+	}
+	
 	private void connect() {
 		ConnectWindow connectWindow = new ConnectWindow(settings.host, settings.port, settings.protocol, shell);
 		connectWindow.run();
@@ -754,18 +802,50 @@ public class ApplicationWindow implements GUI {
 	
 	private void getEventImages() {
 		for (TableItem selection : eventsTable.getSelection()) {
-			System.out.println("Selected event id: " + selection.getText(EVENT_ID_COLUMN));
-			int numImages = Integer.parseInt(selection.getText(EVENT_IMAGES_COLUMN));
-			for (int imageIndex = 0; imageIndex < numImages; imageIndex++) {
-				long eventId = Long.parseLong(selection.getText(EVENT_ID_COLUMN));
-				byte [] jpegData = fileCache.getFileContent(Settings.createFilenameForEventImage(eventId, imageIndex)); 
+			Event event = (Event)selection.getData();
+			for (int imageIndex = 0; imageIndex < event.images; imageIndex++) {
+				byte [] jpegData = fileCache.getFileContent(Settings.createFilenameForEventImage(event.id, imageIndex)); 
 				if (jpegData != null) {
 					System.out.println("Found cached image!");
-					updateEventImage(eventId, imageIndex, jpegData);					
+					updateEventImage(event.id, imageIndex, jpegData);					
 				}
 				else {
-					apiThread.runTask(new GetEventImageTask(eventId, imageIndex));
+					apiThread.runTask(new GetEventImageTask(event.id, imageIndex));
 				}
+			}
+		}
+	}
+	
+	private void turnOnDevices() {
+		setDevicesState(true);
+	}
+
+	private void turnOffDevices() {
+		setDevicesState(false);
+	}
+
+	private void setDevicesState(boolean state) {
+		for (TableItem selection : controlTable.getSelection()) {
+			Device device = (Device)selection.getData();
+			if (device.state != state) {
+				if (state) {
+					apiThread.runTask(new TurnOnDeviceTask(device.id));
+				}
+				else {
+					apiThread.runTask(new TurnOffDeviceTask(device.id));
+				}
+			}
+		}
+	}
+	
+	private void toggleDevicesState() {
+		for (TableItem selection : controlTable.getSelection()) {
+			Device device = (Device)selection.getData();
+			if (device.state) {
+				apiThread.runTask(new TurnOffDeviceTask(device.id));
+			}
+			else {
+				apiThread.runTask(new TurnOnDeviceTask(device.id));
 			}
 		}
 	}
@@ -835,6 +915,7 @@ public class ApplicationWindow implements GUI {
 						item.setText(CONTROL_STATE_COLUMN, device.getStateStr());
 						item.setText(CONTROL_TIMELEFT_COLUMN, String.valueOf(device.timeLeft));
 						item.setText(CONTROL_TYPE_COLUMN, device.getTypeStr());
+						item.setData(device);
 					}
 					for (int i=0; i<controlTable.getColumnCount(); i++) {
 						controlTable.getColumn(i).pack();
@@ -894,6 +975,7 @@ public class ApplicationWindow implements GUI {
 							item.setText(EVENT_SENSOR_COLUMN, event.sensor);
 							item.setText(EVENT_ARMED_COLUMN, event.getArmedStr());
 							item.setText(EVENT_IMAGES_COLUMN, String.valueOf(event.images));
+							item.setData(event);
 							
 							if (event.severity > highestSeverity) {
 								highestSeverity = event.severity;
