@@ -19,7 +19,7 @@ How to build in Eclipse:
 How to export a runnable JAR file:
 
 * Open the project in Eclipse
-* Add appropriate SWT jar file for the target platform to the project in Eclipse
+* Add appropriate SWT jar file for your target platform to the project in Eclipse (download [here][swt_site] if SWT for your target platform is not included in this repository)
 * Right click on project and select "Export..."
 * Select "Runnable JAR file" and press "Next"
 * Set the export destination to "SkynetRemote\SkynetRemote-<version>.jar"
@@ -48,3 +48,4 @@ Licenses for included software is placed in the licenses directory.
 [skynet_api_site]: http://pihack.no-ip.org/pontus/projects/skynet/#api
 [skynetremote_site]: https://bitbucket.org/pontusmarkstrom/skynet-remote/overview
 [skynetremote_downloads]: https://bitbucket.org/pontusmarkstrom/skynet-remote/downloads
+[swt_site]: https://www.eclipse.org/swt/
