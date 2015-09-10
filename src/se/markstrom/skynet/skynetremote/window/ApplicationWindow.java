@@ -1,5 +1,6 @@
 package se.markstrom.skynet.skynetremote.window;
 
+import java.io.File;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -11,6 +12,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -27,6 +29,7 @@ import org.eclipse.swt.widgets.TrayItem;
 
 import se.markstrom.skynet.api.SkynetAPI;
 import se.markstrom.skynet.skynetremote.FileCache;
+import se.markstrom.skynet.skynetremote.FileWriter;
 import se.markstrom.skynet.skynetremote.GUI;
 import se.markstrom.skynet.skynetremote.Settings;
 import se.markstrom.skynet.skynetremote.apitask.AcceptEventsTask;
@@ -98,6 +101,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionGetEventsItem;
 	private MenuItem actionAcceptEventsItem;
 	private MenuItem actionGetEventImagesItem;
+	private MenuItem actionSaveEventImagesItem;
 	private MenuItem helpAboutItem;
 	private Menu actionTemporaryDisarmMenu;
 	private Menu cameraSnapshotMenu;
@@ -123,6 +127,8 @@ public class ApplicationWindow implements GUI {
 	private boolean apiWorking = false;
 	private CONNECTED_STATE connectedState = CONNECTED_STATE.DISCONNECTED;
 	private Summary summary = null;
+	
+	private String imagesDirectory = null;
 	
 	private Runnable getSummaryXmlRunnable = new Runnable() {
 		public void run() {
@@ -269,6 +275,10 @@ public class ApplicationWindow implements GUI {
 		actionGetEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionGetEventImagesItem.setText("Get event images");
 		actionGetEventImagesItem.addSelectionListener(new ActionGetEventImagesItemListener());
+
+		actionSaveEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
+		actionSaveEventImagesItem.setText("Save event images...");
+		actionSaveEventImagesItem.addSelectionListener(new ActionSaveEventImagesItemListener());
 		
 		new MenuItem(actionMenu, SWT.SEPARATOR);
 		
@@ -441,6 +451,7 @@ public class ApplicationWindow implements GUI {
 		actionAcceptEventsItem.setEnabled(connected);
 		actionCameraSnapshotItem.setEnabled(connected);
 		actionGetEventImagesItem.setEnabled(connected);
+		actionSaveEventImagesItem.setEnabled(connected);
 
 		setIcon(noneImage);
 		
@@ -675,7 +686,16 @@ public class ApplicationWindow implements GUI {
 	
 	private class ActionGetEventImagesItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			getEventImages();
+			getEventImages(true, false);
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
+	private class ActionSaveEventImagesItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			getEventImages(false, true);
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -709,7 +729,7 @@ public class ApplicationWindow implements GUI {
 	private class EventSelectedListener implements MouseListener {
 		@Override
 		public void mouseDoubleClick(MouseEvent e) {
-			getEventImages();
+			getEventImages(true, false);
 		}
 
 		@Override
@@ -800,17 +820,28 @@ public class ApplicationWindow implements GUI {
 		apiThread.runTask(new AcceptEventsTask(eventGroup));
 	}
 	
-	private void getEventImages() {
+	private void getEventImages(boolean show, boolean save) {
+
+		if (save) {
+			DirectoryDialog dialog = new DirectoryDialog(shell);
+			imagesDirectory = dialog.open();
+		}
+
 		for (TableItem selection : eventsTable.getSelection()) {
 			Event event = (Event)selection.getData();
 			for (int imageIndex = 0; imageIndex < event.images; imageIndex++) {
 				byte [] jpegData = fileCache.getFileContent(Settings.createFilenameForEventImage(event.id, imageIndex)); 
 				if (jpegData != null) {
-					System.out.println("Found cached image!");
-					updateEventImage(event.id, imageIndex, jpegData);					
+					if (show) {
+						updateEventImage(event.id, imageIndex, jpegData, show, save);
+					}
+					if (save && imagesDirectory != null) {
+						String filename = imagesDirectory + File.separatorChar + Settings.createFilenameForEventImage(event.id, imageIndex);
+						FileWriter.saveFile(filename, jpegData);
+					}
 				}
 				else {
-					apiThread.runTask(new GetEventImageTask(event.id, imageIndex));
+					apiThread.runTask(new GetEventImageTask(event.id, imageIndex, show, save));
 				}
 			}
 		}
@@ -1083,13 +1114,22 @@ public class ApplicationWindow implements GUI {
 	}
 
 	@Override
-	public void updateEventImage(long eventId, int imageIndex, byte[] jpegData) {
+	public void updateEventImage(long eventId, int imageIndex, byte[] jpegData, boolean show, boolean save) {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				String windowTitle = "Event " + eventId + " (image " + (imageIndex+1) + ")"; 
-				new ImageWindow(windowTitle, jpegData);
+				
 				fileCache.addFile(Settings.createFilenameForEventImage(eventId, imageIndex), jpegData);
+				
+				if (show) {
+					String windowTitle = "Event " + eventId + " (image " + (imageIndex+1) + ")"; 
+					new ImageWindow(windowTitle, jpegData);
+				}
+				
+				if (save) {
+					String filename = imagesDirectory + File.separatorChar + Settings.createFilenameForEventImage(eventId, imageIndex);
+					FileWriter.saveFile(filename, jpegData);
+				}
 			}
 		});
 	}

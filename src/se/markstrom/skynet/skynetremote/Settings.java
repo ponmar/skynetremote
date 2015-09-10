@@ -38,6 +38,6 @@ public class Settings {
 	}
 	
 	public static String createFilenameForEventImage(long eventId, int imageIndex) {
-		return "event_" + eventId + "_image_" + imageIndex;
+		return "event_" + eventId + "_image_" + imageIndex + ".jpg";
 	}
 }

@@ -11,10 +11,14 @@ public class GetEventImageTask implements ApiTask {
 	
 	private long eventId;
 	private int imageIndex;
+	private boolean show;
+	private boolean save;
 	
-	public GetEventImageTask(long eventId, int imageIndex) {
+	public GetEventImageTask(long eventId, int imageIndex, boolean show, boolean save) {
 		this.eventId = eventId;
 		this.imageIndex = imageIndex;
+		this.show = show;
+		this.save = save;
 	}
 	
 	@Override
@@ -23,8 +27,7 @@ public class GetEventImageTask implements ApiTask {
 			String base64Image = api.getImageFromEvent(eventId, imageIndex, false);
 			try {
 				byte[] jpegData = Base64.getDecoder().decode(base64Image);
-				gui.updateEventImage(eventId, imageIndex, jpegData);
-				// TODO: write image to file if cache is enabled?
+				gui.updateEventImage(eventId, imageIndex, jpegData, show, save);
 			}
 			catch (IllegalArgumentException e) {
 				gui.showApiError("Received invalid Base64 image for event " + eventId + " image " + (imageIndex+1));

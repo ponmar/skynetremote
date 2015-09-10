@@ -22,7 +22,7 @@ public interface GUI {
 	void updateLogXml(String xml);
 	void updateSummaryXml(String xml);
 	
-	void updateEventImage(long eventId, int imageIndex, byte[] jpegData);
+	void updateEventImage(long eventId, int imageIndex, byte[] jpegData, boolean show, boolean save);
 	void updateCameraImage(int cameraIndex, byte[] jpegData);
 	
 	void updateApiWorkingState(boolean isWorking);
