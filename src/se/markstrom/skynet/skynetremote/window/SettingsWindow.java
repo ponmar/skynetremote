@@ -29,6 +29,8 @@ public class SettingsWindow {
 	private Button notifyOnNewEventButton;
 	private Text summaryPollInterval;
 	
+	private boolean savePressed = false;
+	
 	public SettingsWindow(Settings settings, Shell parentShell) {
 		this.settings.host = settings.host;
 		this.settings.port = settings.port;
@@ -136,11 +138,17 @@ public class SettingsWindow {
 	}
 	
 	public Settings getSettings() {
-		return settings;
+		if (savePressed) {
+			return settings;
+		}
+		else {
+			return null;
+		}
 	}
 	
 	private void save() {
 		if (saveTextInput() && settings.validate()) {
+			savePressed = true;
 			shell.dispose();
 		}
 	}

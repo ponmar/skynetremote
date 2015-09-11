@@ -550,11 +550,13 @@ public class ApplicationWindow implements GUI {
 
 	private class FileSettingsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			// TODO: don't write settings to file if window closed with 'x'/escape.
 			SettingsWindow settingsWindow = new SettingsWindow(settings, shell);
 			settingsWindow.run();
-			settings = settingsWindow.getSettings();
-			writeSettings();
+			Settings newSettings = settingsWindow.getSettings();
+			if (newSettings != null) {
+				settings = newSettings;
+				writeSettings();
+			}
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
