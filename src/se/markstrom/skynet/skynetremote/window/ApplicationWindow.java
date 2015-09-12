@@ -73,8 +73,6 @@ public class ApplicationWindow implements GUI {
 	private static final int CONTROL_TIMELEFT_COLUMN = 2;
 	private static final int CONTROL_TYPE_COLUMN = 3;
 	
-	//private Settings settings;
-	
 	private FileCache fileCache = new FileCache();
 	
 	private Display display;
@@ -127,7 +125,6 @@ public class ApplicationWindow implements GUI {
 	};
 	
 	public ApplicationWindow() {
-		//resetData();
 		createGui();
 		apiThread.start();
 	}
@@ -138,15 +135,6 @@ public class ApplicationWindow implements GUI {
 		// Needed to get rid of the tray icon without hovering with the mouse cursor
 		trayItem.dispose();
 	}
-
-	/*
-	private void resetData() {
-		prevPollEventId = -1;
-		prevPollControlChecksum = "";
-		prevPollLogTimestamp = -1;
-		latestFetchedEventId = -1;
-	}
-	*/
 	
 	private Image createImage(int width, int height, int color) {
 		Image image = new Image(display, width, height);
