@@ -9,15 +9,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import se.markstrom.skynet.skynetremote.model.Log;
+
 public class LogXmlParser extends XmlParser {
 
-	private String log;
+	private Log log;
 	
 	public LogXmlParser(String xml) {
 		super(xml);
 	}
 
-	public String getLogText() {
+	public Log getLog() {
 		return log;
 	}
 
@@ -25,14 +27,15 @@ public class LogXmlParser extends XmlParser {
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
 		NodeList nl = xmlDoc.getElementsByTagName("entry");
 		if (nl != null) {
-			log = "";
+			String text = "";
 			for (int i=0; i<nl.getLength(); i++) {
 				Node entryNode = nl.item(i);
 				Node entryDataNode = entryNode.getFirstChild();
 				if (entryDataNode != null) {
-					log += entryDataNode.getNodeValue() + "\n";
+					text += entryDataNode.getNodeValue() + "\n";
 				}
 			}
+			log = new Log(text);
 			return true;
 		}
 		return false;

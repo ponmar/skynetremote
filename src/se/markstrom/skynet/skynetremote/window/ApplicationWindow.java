@@ -54,9 +54,6 @@ import se.markstrom.skynet.skynetremote.model.Device;
 import se.markstrom.skynet.skynetremote.model.Event;
 import se.markstrom.skynet.skynetremote.model.Model;
 import se.markstrom.skynet.skynetremote.model.Summary;
-import se.markstrom.skynet.skynetremote.xmlparser.SettingsXmlParser;
-import se.markstrom.skynet.skynetremote.xmlparser.SummaryXmlParser;
-import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
 
 public class ApplicationWindow implements GUI {
 	
@@ -75,7 +72,7 @@ public class ApplicationWindow implements GUI {
 	private static final int CONTROL_TIMELEFT_COLUMN = 2;
 	private static final int CONTROL_TYPE_COLUMN = 3;
 	
-	private Settings settings;
+	//private Settings settings;
 	
 	private FileCache fileCache = new FileCache();
 	
@@ -113,17 +110,10 @@ public class ApplicationWindow implements GUI {
 	private Table controlTable;
 	private Text logText;
 	
-	private long prevPollEventId;
-	private String prevPollControlChecksum;
-	private double prevPollLogTimestamp;
-	
-	private long latestFetchedEventId;
-	
 	private ApiThread apiThread = new ApiThread(this);
 
 	private boolean apiWorking = false;
 	private CONNECTED_STATE connectedState = CONNECTED_STATE.DISCONNECTED;
-	private Summary summary = null;
 	
 	private String imagesDirectory = null;
 	
@@ -136,8 +126,7 @@ public class ApplicationWindow implements GUI {
 	};
 	
 	public ApplicationWindow() {
-		readSettings();
-		resetData();
+		//resetData();
 		createGui();
 		apiThread.start();
 	}
@@ -149,30 +138,14 @@ public class ApplicationWindow implements GUI {
 		trayItem.dispose();
 	}
 
-	private void readSettings() {
-		SettingsXmlParser parser = new SettingsXmlParser();
-		if (parser.isValid()) {
-			System.out.println("Using settings from file");
-			settings = parser.getSettings();
-		}
-		else {
-			System.out.println("Using default settings");
-			settings = new Settings();
-		}
-	}
-	
+	/*
 	private void resetData() {
 		prevPollEventId = -1;
 		prevPollControlChecksum = "";
 		prevPollLogTimestamp = -1;
 		latestFetchedEventId = -1;
 	}
-	
-	private void writeSettings() {
-		SettingsXmlWriter settingsWriter = new SettingsXmlWriter(settings);
-		settingsWriter.write();
-		System.out.println("Settings written to file");
-	}
+	*/
 	
 	private Image createImage(int width, int height, int color) {
 		Image image = new Image(display, width, height);
@@ -441,7 +414,7 @@ public class ApplicationWindow implements GUI {
 		actionDisarmItem.setEnabled(connected);
 		actionGetLogItem.setEnabled(connected);
 		actionGetControlItem.setEnabled(connected);
-		actionGetEventsItem.setEnabled(connected && !settings.getNewEvents);
+		actionGetEventsItem.setEnabled(connected && !model.getSettings().getNewEvents);
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
 		actionTurnOnDevicesItem.setEnabled(connected);
@@ -484,6 +457,7 @@ public class ApplicationWindow implements GUI {
 			break;
 		}
 		
+		Summary summary = model.getSummary();
 		if (summary != null) {
 			String apiWorkingStr;
 			if (apiWorking) {
@@ -507,6 +481,7 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	private void updateArmMenuItems() {
+		Summary summary = model.getSummary();
 		actionArmItem.setEnabled(!summary.armed);
 		actionDisarmItem.setEnabled(summary.armed);
 		actionTemporaryDisarmItem.setEnabled(summary.armed);
@@ -549,12 +524,11 @@ public class ApplicationWindow implements GUI {
 
 	private class FileSettingsItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			SettingsWindow settingsWindow = new SettingsWindow(settings, shell);
+			SettingsWindow settingsWindow = new SettingsWindow(model.getSettings(), shell);
 			settingsWindow.run();
 			Settings newSettings = settingsWindow.getSettings();
 			if (newSettings != null) {
-				settings = newSettings;
-				writeSettings();
+				model.updateSettings(newSettings);
 			}
 		}
 
@@ -758,7 +732,7 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	private void connect() {
-		ConnectWindow connectWindow = new ConnectWindow(settings.host, settings.port, settings.protocol, shell);
+		ConnectWindow connectWindow = new ConnectWindow(model.getSettings().host, model.getSettings().port, model.getSettings().protocol, shell);
 		connectWindow.run();
 		
 		if (connectWindow.hasValidInput()) {
@@ -768,12 +742,8 @@ public class ApplicationWindow implements GUI {
 			String password = connectWindow.getPassword();
 			boolean debug = false;
 
-			settings.host = host;
-			settings.port = port;
-			settings.protocol = protocol;
-			
-			// Settings are written when a connection attempt has been done
-			writeSettings();
+			// Note that settings are written when a connection attempt has been done
+			model.updateSettingsFromGui(host, port, protocol);
 			
 			apiThread.runTask(new ConnectTask(host, port, protocol, password, debug));
 		}
@@ -796,7 +766,7 @@ public class ApplicationWindow implements GUI {
 	}
 
 	private void updateEvents() {
-		if (!settings.getNewEvents) {
+		if (!model.getSettings().getNewEvents) {
 			apiThread.runTask(new GetEventsXmlTask());
 		}
 	}
@@ -892,25 +862,21 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				connectedState = state;
-				updateGui();
 				
-				switch (state) {
-				case CONNECTED:
+				if (state == CONNECTED_STATE.CONNECTED) {
+					// Reset old fetched data when connected, cause it might be invalid for this host.
+					model.reset();
+					
 					// Update cameras once to enable menu items
 					apiThread.runTask(new GetCamerasXmlTask());
 					
 					getSummaryXmlRunnable.run();
-					
-				case DISCONNECTED:
-					// Fetched data might not be valid when connecting again (possibly to another host).
-					// Table data might however be useful for observation when disconnected.
-					resetData();
-					break;
-					
-				default:
-					summary = null;
-					break;
 				}
+				
+				// TODO: the cameras menu should be updated (cleared), because the model has been reset.
+				//       otherwise it may show some incorrect cameras for a while when connected
+				
+				updateGui();
 			}
 		});
 	}
@@ -965,6 +931,7 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				System.out.println("New events.xml");
+				long prevLatestEventId = model.getLatestEventId();
 				if (model.updateEvents(xml)) {
 					System.out.println("Parsed events.xml");
 
@@ -984,7 +951,7 @@ public class ApplicationWindow implements GUI {
 						while (it.hasPrevious()) {
 							Event event = it.previous();
 							
-							if (event.id > latestFetchedEventId) {
+							if (event.id > prevLatestEventId) {
 								switch (event.severity) {
 								case Event.INFO:
 									newInfoEvent = true;
@@ -1032,7 +999,7 @@ public class ApplicationWindow implements GUI {
 							break;
 						}
 						
-						if (settings.notifyOnNewEvent) {
+						if (model.getSettings().notifyOnNewEvent) {
 							if (newMajorEvent) {
 								new Notification(NAME, "New event with major severity detected!");
 							}
@@ -1043,8 +1010,6 @@ public class ApplicationWindow implements GUI {
 								new Notification(NAME, "New event with info severity detected!");
 							}
 						}
-						
-						latestFetchedEventId = events.get(events.size() - 1).id;
 					}					
 				}
 			}
@@ -1057,7 +1022,7 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				if (model.updateLog(xml)) {
-					logText.setText(model.getLog());
+					logText.setText(model.getLog().text);
 				}
 			}
 		});
@@ -1070,43 +1035,40 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				System.out.println("Received summary.xml");
 				
-				SummaryXmlParser parser = new SummaryXmlParser(xml);
-				if (parser.isValid()) {
-					summary = parser.getSummary();
+				long prevPollEventId = model.getLatestEventIdFromSummary();
+				String prevPollControlChecksum = model.getControlChecksumFromSummary();
+				double prevPollLogTimestamp = model.getLogTimestampFromSummary();
+				
+				if (model.updateSummary(xml)) {
+					Summary summary = model.getSummary();
 
 					updateTitle();
 					updateArmMenuItems();
 					
 					if (prevPollEventId != summary.latestEventId) {
-						prevPollEventId = summary.latestEventId;
-						
-						if (settings.getNewEvents) {
+						if (model.getSettings().getNewEvents) {
 							System.out.println("New event detected, requesting events");
 							apiThread.runTask(new GetEventsXmlTask());
 						}
 					}
 					
 					if (!prevPollControlChecksum.equals(summary.controlChecksum)) {
-						prevPollControlChecksum = summary.controlChecksum;
-						
-						if (settings.getNewControl) {
+						if (model.getSettings().getNewControl) {
 							System.out.println("New control checksum detected, requesting control");
 							apiThread.runTask(new GetControlXmlTask());
 						}
 					}
 					
 					if (prevPollLogTimestamp != summary.logTimestamp) {
-						prevPollLogTimestamp = summary.logTimestamp;
-						
-						if (settings.getNewLog) {
+						if (model.getSettings().getNewLog) {
 							System.out.println("New log timestamp detected, requesting log");
 							apiThread.runTask(new GetLogXmlTask());
 						}
 					}
 				}
 
-				if (settings.pollSummary) {
-					display.timerExec(settings.summaryPollInterval*1000, getSummaryXmlRunnable);
+				if (model.getSettings().pollSummary) {
+					display.timerExec(model.getSettings().summaryPollInterval*1000, getSummaryXmlRunnable);
 				}
 			}
 		});
