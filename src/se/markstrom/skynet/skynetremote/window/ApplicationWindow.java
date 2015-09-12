@@ -50,6 +50,7 @@ import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffDeviceTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnDeviceTask;
+import se.markstrom.skynet.skynetremote.model.Camera;
 import se.markstrom.skynet.skynetremote.model.Device;
 import se.markstrom.skynet.skynetremote.model.Event;
 import se.markstrom.skynet.skynetremote.model.Model;
@@ -889,10 +890,10 @@ public class ApplicationWindow implements GUI {
 				System.out.println("Received cameras.xml");
 				
 				if (model.updateCameras(xml)) {
-					for (Integer cameraIndex : model.getCameras()) {
+					for (Camera camera : model.getCameras()) {
 						MenuItem cameraMenuItem = new MenuItem(cameraSnapshotMenu, SWT.PUSH);
-						cameraMenuItem.setText("Camera " + (cameraIndex+1));
-						cameraMenuItem.addSelectionListener(new ActionStreamItemListener(cameraIndex));
+						cameraMenuItem.setText("Camera " + (camera.index+1));
+						cameraMenuItem.addSelectionListener(new ActionStreamItemListener(camera.index));
 					}
 				}
 			}

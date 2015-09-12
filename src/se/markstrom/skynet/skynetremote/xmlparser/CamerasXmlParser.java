@@ -10,27 +10,29 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import se.markstrom.skynet.skynetremote.model.Camera;
+
 public class CamerasXmlParser extends XmlParser {
 	
-	private ArrayList<Integer> cameraIndexes;
+	private ArrayList<Camera> cameras;
 	
 	public CamerasXmlParser(String xml) {
 		super(xml);
 	}
 	
-	public ArrayList<Integer> getCameraIndexes() {
-		return cameraIndexes;
+	public ArrayList<Camera> getCameras() {
+		return cameras;
 	}
 
 	@Override
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
 		NodeList nl = xmlDoc.getElementsByTagName("index");
 		if (nl != null) {
-			cameraIndexes = new ArrayList<Integer>();
+			cameras = new ArrayList<Camera>();
 			for (int i=0; i<nl.getLength(); i++) {
 				Node indexNode = nl.item(i);
 				Node indexDataNode = indexNode.getFirstChild();
-				cameraIndexes.add(Integer.parseInt(indexDataNode.getNodeValue()));
+				cameras.add(new Camera(Integer.parseInt(indexDataNode.getNodeValue())));
 			}
 			return true;
 		}

@@ -18,7 +18,7 @@ public class Model {
 	private Summary summary;
 	private ArrayList<Event> events = new ArrayList<Event>();
 	private ArrayList<Device> devices = new ArrayList<Device>();
-	private ArrayList<Integer> cameraIndexes = new ArrayList<Integer>();
+	private ArrayList<Camera> cameras = new ArrayList<Camera>();
 	private Log log = new Log();
 	private Settings settings = null;
 
@@ -31,7 +31,7 @@ public class Model {
 		summary = null;
 		events.clear();
 		devices.clear();
-		cameraIndexes.clear();
+		cameras.clear();
 		log.reset();
 	}
 	
@@ -81,7 +81,7 @@ public class Model {
 	public boolean updateCameras(String camerasXml) {
 		CamerasXmlParser parser = new CamerasXmlParser(camerasXml);
 		if (parser.isValid()) {
-			cameraIndexes = parser.getCameraIndexes();
+			cameras = parser.getCameras();
 			return true;
 		}
 		return false;
@@ -149,8 +149,8 @@ public class Model {
 		return -1;
 	}
 
-	public List<Integer> getCameras() {
-		return cameraIndexes;
+	public List<Camera> getCameras() {
+		return cameras;
 	}
 	
 	public Log getLog() {
