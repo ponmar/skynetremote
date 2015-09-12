@@ -2,7 +2,6 @@ package se.markstrom.skynet.skynetremote.xmlparser;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -19,7 +18,7 @@ public class CamerasXmlParser extends XmlParser {
 		super(xml);
 	}
 	
-	public List<Integer> getCameraIndexes() {
+	public ArrayList<Integer> getCameraIndexes() {
 		return cameraIndexes;
 	}
 

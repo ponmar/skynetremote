@@ -7,7 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import se.markstrom.skynet.skynetremote.data.Summary;
+import se.markstrom.skynet.skynetremote.model.Summary;
 
 public class SummaryXmlParser extends XmlParser {
 

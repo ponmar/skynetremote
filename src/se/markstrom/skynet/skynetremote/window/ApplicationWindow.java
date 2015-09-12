@@ -50,13 +50,10 @@ import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffDeviceTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnDeviceTask;
-import se.markstrom.skynet.skynetremote.data.Event;
-import se.markstrom.skynet.skynetremote.data.Device;
-import se.markstrom.skynet.skynetremote.data.Summary;
-import se.markstrom.skynet.skynetremote.xmlparser.CamerasXmlParser;
-import se.markstrom.skynet.skynetremote.xmlparser.ControlXmlParser;
-import se.markstrom.skynet.skynetremote.xmlparser.EventsXmlParser;
-import se.markstrom.skynet.skynetremote.xmlparser.LogXmlParser;
+import se.markstrom.skynet.skynetremote.model.Device;
+import se.markstrom.skynet.skynetremote.model.Event;
+import se.markstrom.skynet.skynetremote.model.Model;
+import se.markstrom.skynet.skynetremote.model.Summary;
 import se.markstrom.skynet.skynetremote.xmlparser.SettingsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SummaryXmlParser;
 import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
@@ -129,6 +126,8 @@ public class ApplicationWindow implements GUI {
 	private Summary summary = null;
 	
 	private String imagesDirectory = null;
+	
+	private Model model = new Model();
 	
 	private Runnable getSummaryXmlRunnable = new Runnable() {
 		public void run() {
@@ -830,20 +829,23 @@ public class ApplicationWindow implements GUI {
 		}
 
 		for (TableItem selection : eventsTable.getSelection()) {
-			Event event = (Event)selection.getData();
-			for (int imageIndex = 0; imageIndex < event.images; imageIndex++) {
-				byte [] jpegData = fileCache.getFileContent(Settings.createFilenameForEventImage(event.id, imageIndex)); 
-				if (jpegData != null) {
-					if (show) {
-						updateEventImage(event.id, imageIndex, jpegData, show, save);
+			long eventId = (long)selection.getData();
+			Event event = model.getEvent(eventId);
+			if (event != null) {
+				for (int imageIndex = 0; imageIndex < event.images; imageIndex++) {
+					byte [] jpegData = fileCache.getFileContent(Settings.createFilenameForEventImage(event.id, imageIndex)); 
+					if (jpegData != null) {
+						if (show) {
+							updateEventImage(eventId, imageIndex, jpegData, show, save);
+						}
+						if (save && imagesDirectory != null) {
+							String filename = imagesDirectory + File.separatorChar + Settings.createFilenameForEventImage(event.id, imageIndex);
+							FileWriter.saveFile(filename, jpegData);
+						}
 					}
-					if (save && imagesDirectory != null) {
-						String filename = imagesDirectory + File.separatorChar + Settings.createFilenameForEventImage(event.id, imageIndex);
-						FileWriter.saveFile(filename, jpegData);
+					else {
+						apiThread.runTask(new GetEventImageTask(eventId, imageIndex, show, save));
 					}
-				}
-				else {
-					apiThread.runTask(new GetEventImageTask(event.id, imageIndex, show, save));
 				}
 			}
 		}
@@ -859,13 +861,14 @@ public class ApplicationWindow implements GUI {
 
 	private void setDevicesState(boolean state) {
 		for (TableItem selection : controlTable.getSelection()) {
-			Device device = (Device)selection.getData();
-			if (device.state != state) {
+			int deviceId = (int)selection.getData();
+			Device device = model.getDevice(deviceId);
+			if (device != null && device.state != state) {
 				if (state) {
-					apiThread.runTask(new TurnOnDeviceTask(device.id));
+					apiThread.runTask(new TurnOnDeviceTask(deviceId));
 				}
 				else {
-					apiThread.runTask(new TurnOffDeviceTask(device.id));
+					apiThread.runTask(new TurnOffDeviceTask(deviceId));
 				}
 			}
 		}
@@ -919,9 +922,8 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				System.out.println("Received cameras.xml");
 				
-				CamerasXmlParser parser = new CamerasXmlParser(xml);
-				if (parser.isValid()) {
-					for (Integer cameraIndex : parser.getCameraIndexes()) {
+				if (model.updateCameras(xml)) {
+					for (Integer cameraIndex : model.getCameras()) {
 						MenuItem cameraMenuItem = new MenuItem(cameraSnapshotMenu, SWT.PUSH);
 						cameraMenuItem.setText("Camera " + (cameraIndex+1));
 						cameraMenuItem.addSelectionListener(new ActionStreamItemListener(cameraIndex));
@@ -937,18 +939,16 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				System.out.println("Received control.xml");
-				
-				ControlXmlParser parser = new ControlXmlParser(xml);
-				if (parser.isValid()) {
+				if (model.updateDevices(xml)) {
 					controlTable.setRedraw(false);
 					controlTable.removeAll();
-					for (Device device : parser.getDevices()) {
+					for (Device device : model.getDevices()) {
 						TableItem item = new TableItem(controlTable, SWT.NULL);
 						item.setText(CONTROL_NAME_COLUMN, device.name);
 						item.setText(CONTROL_STATE_COLUMN, device.getStateStr());
 						item.setText(CONTROL_TIMELEFT_COLUMN, String.valueOf(device.timeLeft));
 						item.setText(CONTROL_TYPE_COLUMN, device.getTypeStr());
-						item.setData(device);
+						item.setData(device.id);
 					}
 					for (int i=0; i<controlTable.getColumnCount(); i++) {
 						controlTable.getColumn(i).pack();
@@ -965,15 +965,13 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				System.out.println("New events.xml");
-				
-				EventsXmlParser parser = new EventsXmlParser(xml);
-				if (parser.isValid()) {
+				if (model.updateEvents(xml)) {
 					System.out.println("Parsed events.xml");
 
 					eventsTable.setRedraw(false);
 					
 					eventsTable.removeAll();
-					List<Event> events = parser.getEvents();
+					List<Event> events = model.getEvents();
 					
 					if (!events.isEmpty()) {
 						int highestSeverity = 0;
@@ -1008,7 +1006,7 @@ public class ApplicationWindow implements GUI {
 							item.setText(EVENT_SENSOR_COLUMN, event.sensor);
 							item.setText(EVENT_ARMED_COLUMN, event.getArmedStr());
 							item.setText(EVENT_IMAGES_COLUMN, String.valueOf(event.images));
-							item.setData(event);
+							item.setData(event.id);
 							
 							if (event.severity > highestSeverity) {
 								highestSeverity = event.severity;
@@ -1058,9 +1056,8 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				LogXmlParser parser = new LogXmlParser(xml);
-				if (parser.isValid()) {
-					logText.setText(parser.getLogText());
+				if (model.updateLog(xml)) {
+					logText.setText(model.getLog());
 				}
 			}
 		});

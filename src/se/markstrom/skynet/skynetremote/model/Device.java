@@ -1,4 +1,4 @@
-package se.markstrom.skynet.skynetremote.data;
+package se.markstrom.skynet.skynetremote.model;
 
 public class Device {
 	

@@ -2,7 +2,6 @@ package se.markstrom.skynet.skynetremote.xmlparser;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -12,7 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import se.markstrom.skynet.skynetremote.data.Device;
+import se.markstrom.skynet.skynetremote.model.Device;
 
 public class ControlXmlParser extends XmlParser {
 	
@@ -22,7 +21,7 @@ public class ControlXmlParser extends XmlParser {
 		super(xml);
 	}
 	
-	public List<Device> getDevices() {
+	public ArrayList<Device> getDevices() {
 		return devices;
 	}
 	
