@@ -9,6 +9,7 @@ import se.markstrom.skynet.skynetremote.xmlparser.CamerasXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.ControlXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.EventsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.LogXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparser.SensorsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SettingsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SummaryXmlParser;
 import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
@@ -19,6 +20,7 @@ public class Model {
 	private ArrayList<Event> events = new ArrayList<Event>();
 	private ArrayList<Device> devices = new ArrayList<Device>();
 	private ArrayList<Camera> cameras = new ArrayList<Camera>();
+	private ArrayList<Sensor> sensors = new ArrayList<Sensor>();
 	private Log log = new Log();
 	private Settings settings = null;
 
@@ -32,6 +34,7 @@ public class Model {
 		events.clear();
 		devices.clear();
 		cameras.clear();
+		sensors.clear();
 		log.reset();
 	}
 	
@@ -64,6 +67,15 @@ public class Model {
 		EventsXmlParser parser = new EventsXmlParser(eventsXml);
 		if (parser.isValid()) {
 			events = parser.getEvents();
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean updateSensors(String sensorsXml) {
+		SensorsXmlParser parser = new SensorsXmlParser(sensorsXml);
+		if (parser.isValid()) {
+			sensors = parser.getSensors();
 			return true;
 		}
 		return false;
@@ -155,6 +167,10 @@ public class Model {
 	
 	public Log getLog() {
 		return log;
+	}
+	
+	public List<Sensor> getSensors() {
+		return sensors;
 	}
 	
 	private void writeSettings() {

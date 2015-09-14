@@ -44,6 +44,7 @@ import se.markstrom.skynet.skynetremote.apitask.GetControlXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventImageTask;
 import se.markstrom.skynet.skynetremote.apitask.GetEventsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
+import se.markstrom.skynet.skynetremote.apitask.GetSensorsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
@@ -54,24 +55,12 @@ import se.markstrom.skynet.skynetremote.model.Camera;
 import se.markstrom.skynet.skynetremote.model.Device;
 import se.markstrom.skynet.skynetremote.model.Event;
 import se.markstrom.skynet.skynetremote.model.Model;
+import se.markstrom.skynet.skynetremote.model.Sensor;
 import se.markstrom.skynet.skynetremote.model.Summary;
 
 public class ApplicationWindow implements GUI {
 	
 	private static final String NAME = "Skynet Remote";
-	
-	private static final int EVENT_ID_COLUMN = 0;
-	private static final int EVENT_TIME_COLUMN = 1;
-	private static final int EVENT_SEVERITY_COLUMN = 2;
-	private static final int EVENT_MESSAGE_COLUMN = 3;
-	private static final int EVENT_SENSOR_COLUMN = 4;
-	private static final int EVENT_ARMED_COLUMN = 5;
-	private static final int EVENT_IMAGES_COLUMN = 6;
-
-	private static final int CONTROL_NAME_COLUMN = 0;
-	private static final int CONTROL_STATE_COLUMN = 1;
-	private static final int CONTROL_TIMELEFT_COLUMN = 2;
-	private static final int CONTROL_TYPE_COLUMN = 3;
 	
 	private FileCache fileCache = new FileCache();
 	
@@ -91,6 +80,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionTurnOffDevicesItem;
 	private MenuItem actionGetLogItem;
 	private MenuItem actionGetControlItem;
+	private MenuItem actionGetSensorsItem;
 	private MenuItem actionGetEventsItem;
 	private MenuItem actionAcceptEventsItem;
 	private MenuItem actionGetEventImagesItem;
@@ -298,6 +288,10 @@ public class ApplicationWindow implements GUI {
 		actionGetControlItem.setText("Update control");
 		actionGetControlItem.addSelectionListener(new ActionGetControlItemListener());
 
+		actionGetSensorsItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionGetSensorsItem.setText("Update sensors");
+		actionGetSensorsItem.addSelectionListener(new ActionGetSensorsItemListener());
+		
 		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionGetLogItem.setText("Update log");
 		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
@@ -468,6 +462,7 @@ public class ApplicationWindow implements GUI {
 		actionDisarmItem.setEnabled(connected);
 		actionGetLogItem.setEnabled(connected);
 		actionGetControlItem.setEnabled(connected);
+		actionGetSensorsItem.setEnabled(connected);
 		actionGetEventsItem.setEnabled(connected && !model.getSettings().getNewEvents);
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
@@ -637,6 +632,15 @@ public class ApplicationWindow implements GUI {
 	private class ActionGetControlItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
 			updateControl();
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
+	private class ActionGetSensorsItemListener implements SelectionListener {
+		public void widgetSelected(SelectionEvent event) {
+			updateSensors();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -830,7 +834,11 @@ public class ApplicationWindow implements GUI {
 	private void updateControl() {
 		apiThread.runTask(new GetControlXmlTask());
 	}
-	
+
+	private void updateSensors() {
+		apiThread.runTask(new GetSensorsXmlTask());
+	}
+
 	private void updateLog() {
 		apiThread.runTask(new GetLogXmlTask());
 	}
@@ -972,16 +980,17 @@ public class ApplicationWindow implements GUI {
 					controlTable.removeAll();
 					for (Device device : model.getDevices()) {
 						TableItem item = new TableItem(controlTable, SWT.NULL);
-						item.setText(CONTROL_NAME_COLUMN, device.name);
-						item.setText(CONTROL_STATE_COLUMN, device.getStateStr());
-						item.setText(CONTROL_TIMELEFT_COLUMN, String.valueOf(device.timeLeft));
-						item.setText(CONTROL_TYPE_COLUMN, device.getTypeStr());
+						item.setText(0, device.name);
+						item.setText(1, device.getStateStr());
+						item.setText(2, String.valueOf(device.timeLeft));
+						item.setText(3, device.getTypeStr());
 						item.setData(device.id);
 					}
 					for (int i=0; i<controlTable.getColumnCount(); i++) {
 						controlTable.getColumn(i).pack();
 					}
 					controlTable.setRedraw(true);
+					controlTable.redraw();
 				}
 			}
 		});
@@ -998,8 +1007,8 @@ public class ApplicationWindow implements GUI {
 					System.out.println("Parsed events.xml");
 
 					eventsTable.setRedraw(false);
-					
 					eventsTable.removeAll();
+					
 					List<Event> events = model.getEvents();
 					
 					if (!events.isEmpty()) {
@@ -1028,13 +1037,13 @@ public class ApplicationWindow implements GUI {
 							}
 							
 							TableItem item = new TableItem(eventsTable, SWT.NULL);
-							item.setText(EVENT_ID_COLUMN, String.valueOf(event.id));
-							item.setText(EVENT_TIME_COLUMN, event.time);
-							item.setText(EVENT_SEVERITY_COLUMN, event.getSeverityStr());
-							item.setText(EVENT_MESSAGE_COLUMN, event.message);
-							item.setText(EVENT_SENSOR_COLUMN, event.sensor);
-							item.setText(EVENT_ARMED_COLUMN, event.getArmedStr());
-							item.setText(EVENT_IMAGES_COLUMN, String.valueOf(event.images));
+							item.setText(0, String.valueOf(event.id));
+							item.setText(1, event.time);
+							item.setText(2, event.getSeverityStr());
+							item.setText(3, event.message);
+							item.setText(4, event.sensor);
+							item.setText(5, event.getArmedStr());
+							item.setText(6, String.valueOf(event.images));
 							item.setData(event.id);
 							
 							if (event.severity > highestSeverity) {
@@ -1045,9 +1054,6 @@ public class ApplicationWindow implements GUI {
 						for (int i=0; i<eventsTable.getColumnCount(); i++) {
 							eventsTable.getColumn(i).pack();
 						}
-						
-						eventsTable.setRedraw(true);
-						eventsTable.redraw();
 						
 						switch (highestSeverity) {
 						case Event.INFO:
@@ -1072,7 +1078,50 @@ public class ApplicationWindow implements GUI {
 								new Notification(NAME, "New event with info severity detected!");
 							}
 						}
-					}					
+					}
+					
+					eventsTable.setRedraw(true);
+					eventsTable.redraw();
+				}
+			}
+		});
+	}
+	
+	@Override
+	public void updateSensorsXml(String xml) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("New sensors.xml");
+				if (model.updateSensors(xml)) {
+					System.out.println("Parsed sensors.xml");
+					
+					sensorsTable.setRedraw(false);
+					sensorsTable.removeAll();
+					
+					List<Sensor> sensors = model.getSensors();
+					
+					if (!sensors.isEmpty()) {
+						for (Sensor sensor : sensors) {
+							TableItem item = new TableItem(sensorsTable, SWT.NULL);
+							item.setText(0, sensor.name);
+							item.setText(1, sensor.details);
+							item.setText(2, sensor.updateFilter);
+							item.setText(3, sensor.triggerFilter);
+							item.setText(4, String.valueOf(sensor.armedActions));
+							item.setText(5, String.valueOf(sensor.disarmedActions));
+							item.setText(6, String.valueOf(sensor.triggerCount));
+							item.setText(7, String.valueOf(sensor.muted));
+							item.setText(8, sensor.areas);
+						}
+					}
+					
+					for (int i=0; i<eventsTable.getColumnCount(); i++) {
+						eventsTable.getColumn(i).pack();
+					}
+					
+					sensorsTable.setRedraw(true);
+					eventsTable.redraw();
 				}
 			}
 		});

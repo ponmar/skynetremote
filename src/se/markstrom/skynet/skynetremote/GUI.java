@@ -21,6 +21,7 @@ public interface GUI {
 	void updateEventsXml(String xml);
 	void updateLogXml(String xml);
 	void updateSummaryXml(String xml);
+	void updateSensorsXml(String xml);
 	
 	void updateEventImage(long eventId, int imageIndex, byte[] jpegData, boolean show, boolean save);
 	void updateCameraImage(int cameraIndex, byte[] jpegData);
