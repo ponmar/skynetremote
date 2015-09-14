@@ -78,10 +78,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionTurnOffAllDevicesItem;
 	private MenuItem actionTurnOnDevicesItem;
 	private MenuItem actionTurnOffDevicesItem;
-	private MenuItem actionGetLogItem;
-	private MenuItem actionGetControlItem;
-	private MenuItem actionGetSensorsItem;
-	private MenuItem actionGetEventsItem;
+	private MenuItem actionGetDataItem;
 	private MenuItem actionAcceptEventsItem;
 	private MenuItem actionGetEventImagesItem;
 	private MenuItem actionSaveEventImagesItem;
@@ -112,6 +109,7 @@ public class ApplicationWindow implements GUI {
 	private Runnable getSummaryXmlRunnable = new Runnable() {
 		public void run() {
 			apiThread.runTask(new GetSummaryXmlTask());
+			apiThread.runTask(new GetSensorsXmlTask());
 		}
 	};
 	
@@ -280,21 +278,9 @@ public class ApplicationWindow implements GUI {
 
 		new MenuItem(actionMenu, SWT.SEPARATOR);
 		
-		actionGetEventsItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionGetEventsItem.setText("Update events");
-		actionGetEventsItem.addSelectionListener(new ActionGetEventsItemListener());
-		
-		actionGetControlItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionGetControlItem.setText("Update control");
-		actionGetControlItem.addSelectionListener(new ActionGetControlItemListener());
-
-		actionGetSensorsItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionGetSensorsItem.setText("Update sensors");
-		actionGetSensorsItem.addSelectionListener(new ActionGetSensorsItemListener());
-		
-		actionGetLogItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionGetLogItem.setText("Update log");
-		actionGetLogItem.addSelectionListener(new ActionGetLogItemListener());
+		actionGetDataItem = new MenuItem(actionMenu, SWT.PUSH);
+		actionGetDataItem.setText("Update data");
+		actionGetDataItem.addSelectionListener(new ActionGetDataItemListener());
 		
 		// Action -> Accept events
 		Menu actionAcceptEventsMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -460,10 +446,7 @@ public class ApplicationWindow implements GUI {
 		// Note: the armed state is unknown until summary XML/JSON has been fetched
 		actionArmItem.setEnabled(connected);
 		actionDisarmItem.setEnabled(connected);
-		actionGetLogItem.setEnabled(connected);
-		actionGetControlItem.setEnabled(connected);
-		actionGetSensorsItem.setEnabled(connected);
-		actionGetEventsItem.setEnabled(connected && !model.getSettings().getNewEvents);
+		actionGetDataItem.setEnabled(connected);
 		actionTurnOnAllDevicesItem.setEnabled(connected);
 		actionTurnOffAllDevicesItem.setEnabled(connected);
 		actionTurnOnDevicesItem.setEnabled(connected);
@@ -620,36 +603,9 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 
-	private class ActionGetLogItemListener implements SelectionListener {
+	private class ActionGetDataItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			updateLog();
-		}
-
-		public void widgetDefaultSelected(SelectionEvent event) {
-		}
-	}
-
-	private class ActionGetControlItemListener implements SelectionListener {
-		public void widgetSelected(SelectionEvent event) {
-			updateControl();
-		}
-
-		public void widgetDefaultSelected(SelectionEvent event) {
-		}
-	}
-
-	private class ActionGetSensorsItemListener implements SelectionListener {
-		public void widgetSelected(SelectionEvent event) {
-			updateSensors();
-		}
-
-		public void widgetDefaultSelected(SelectionEvent event) {
-		}
-	}
-
-	private class ActionGetEventsItemListener implements SelectionListener {
-		public void widgetSelected(SelectionEvent event) {
-			updateEvents();
+			updateData();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -825,22 +781,9 @@ public class ApplicationWindow implements GUI {
 		apiThread.runTask(new TemporaryDisarmTask(seconds));
 	}
 
-	private void updateEvents() {
-		if (!model.getSettings().getNewEvents) {
-			apiThread.runTask(new GetEventsXmlTask());
-		}
-	}
-
-	private void updateControl() {
-		apiThread.runTask(new GetControlXmlTask());
-	}
-
-	private void updateSensors() {
+	private void updateData() {
+		apiThread.runTask(new GetSummaryXmlTask());
 		apiThread.runTask(new GetSensorsXmlTask());
-	}
-
-	private void updateLog() {
-		apiThread.runTask(new GetLogXmlTask());
 	}
 	
 	private void turnOnAllDevices() {
