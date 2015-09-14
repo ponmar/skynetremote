@@ -331,41 +331,45 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	private void createTabs() {
-		// Tabs
 		TabFolder tf = new TabFolder(shell, SWT.BORDER);
-		
-		// Tab: events
-	    TabItem eventsTab = new TabItem(tf, SWT.BORDER);
-	    eventsTab.setText("Events");
-	    eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
-	    eventsTable.setHeaderVisible(true);
-	    eventsTable.setLinesVisible(true);
-	    eventsTable.addMouseListener(new EventSelectedListener());
-	    TableColumn eventIdColumn = new TableColumn(eventsTable, SWT.NULL);
-	    eventIdColumn.setText("Id");
-	    eventIdColumn.pack();
-	    TableColumn eventTimeColumn = new TableColumn(eventsTable, SWT.NULL);
-	    eventTimeColumn.setText("Time");
-	    eventTimeColumn.pack();
-	    TableColumn eventSeverityColumn = new TableColumn(eventsTable, SWT.NULL);
-	    eventSeverityColumn.setText("Severity");
-	    eventSeverityColumn.pack();
-	    TableColumn eventMessageColumn = new TableColumn(eventsTable, SWT.NULL);
-	    eventMessageColumn.setText("Message");
-	    eventMessageColumn.pack();
-	    TableColumn eventSensorColumn = new TableColumn(eventsTable, SWT.NULL);
-	    eventSensorColumn.setText("Sensor");
-	    eventSensorColumn.pack();
-	    TableColumn eventArmedColumn = new TableColumn(eventsTable, SWT.NULL);
-	    eventArmedColumn.setText("Armed");
-	    eventArmedColumn.pack();
-	    TableColumn eventImagesColumn = new TableColumn(eventsTable, SWT.NULL);
-	    eventImagesColumn.setText("Images");
-	    eventImagesColumn.pack();
-	    
-	    eventsTab.setControl(eventsTable);
+		createEventsTab(tf);
+	    createControlTab(tf);
+	    createLogTab(tf);
+	}
 
-	    // Tab: control
+	private void createEventsTab(TabFolder tf) {
+		TabItem eventsTab = new TabItem(tf, SWT.BORDER);
+		eventsTab.setText("Events");
+		eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+		eventsTable.setHeaderVisible(true);
+		eventsTable.setLinesVisible(true);
+		eventsTable.addMouseListener(new EventSelectedListener());
+		TableColumn eventIdColumn = new TableColumn(eventsTable, SWT.NULL);
+		eventIdColumn.setText("Id");
+		eventIdColumn.pack();
+		TableColumn eventTimeColumn = new TableColumn(eventsTable, SWT.NULL);
+		eventTimeColumn.setText("Time");
+		eventTimeColumn.pack();
+		TableColumn eventSeverityColumn = new TableColumn(eventsTable, SWT.NULL);
+		eventSeverityColumn.setText("Severity");
+		eventSeverityColumn.pack();
+		TableColumn eventMessageColumn = new TableColumn(eventsTable, SWT.NULL);
+		eventMessageColumn.setText("Message");
+		eventMessageColumn.pack();
+		TableColumn eventSensorColumn = new TableColumn(eventsTable, SWT.NULL);
+		eventSensorColumn.setText("Sensor");
+		eventSensorColumn.pack();
+		TableColumn eventArmedColumn = new TableColumn(eventsTable, SWT.NULL);
+		eventArmedColumn.setText("Armed");
+		eventArmedColumn.pack();
+		TableColumn eventImagesColumn = new TableColumn(eventsTable, SWT.NULL);
+		eventImagesColumn.setText("Images");
+		eventImagesColumn.pack();
+
+		eventsTab.setControl(eventsTable);
+	}
+
+	private void createControlTab(TabFolder tf) {
 	    controlTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 	    controlTable.setHeaderVisible(true);
 	    controlTable.setLinesVisible(true);
@@ -387,8 +391,9 @@ public class ApplicationWindow implements GUI {
 	    typeColumn.pack();
 	    
 	    controlTab.setControl(controlTable);
+	}
 
-	    // Tab: log
+	private void createLogTab(TabFolder tf) {
 	    TabItem logTab = new TabItem(tf, SWT.BORDER);
 	    logTab.setText("Log");
 	    
