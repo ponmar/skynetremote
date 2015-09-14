@@ -107,6 +107,7 @@ public class ApplicationWindow implements GUI {
 	private TrayItem trayItem;
 	private Table eventsTable;
 	private Table controlTable;
+	private Table sensorsTable;
 	private Text logText;
 	
 	private ApiThread apiThread = new ApiThread(this);
@@ -334,6 +335,7 @@ public class ApplicationWindow implements GUI {
 		TabFolder tf = new TabFolder(shell, SWT.BORDER);
 		createEventsTab(tf);
 	    createControlTab(tf);
+	    createSensorsTab(tf);
 	    createLogTab(tf);
 	}
 
@@ -377,20 +379,71 @@ public class ApplicationWindow implements GUI {
 
 	    TabItem controlTab = new TabItem(tf, SWT.BORDER);
 	    controlTab.setText("Control");
+	    
 	    TableColumn nameColumn = new TableColumn(controlTable, SWT.NULL);
 	    nameColumn.setText("Device name");
 	    nameColumn.pack();
+	    
 	    TableColumn stateColumn = new TableColumn(controlTable, SWT.NULL);
 	    stateColumn.setText("State");
 	    stateColumn.pack();
+	    
 	    TableColumn timeLeftColumn = new TableColumn(controlTable, SWT.NULL);
 	    timeLeftColumn.setText("Time left");
 	    timeLeftColumn.pack();
+	    
 	    TableColumn typeColumn = new TableColumn(controlTable, SWT.NULL);
 	    typeColumn.setText("Type");
 	    typeColumn.pack();
 	    
 	    controlTab.setControl(controlTable);
+	}
+	
+	private void createSensorsTab(TabFolder tf) {
+		sensorsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+		sensorsTable.setHeaderVisible(true);
+		sensorsTable.setLinesVisible(true);
+
+	    TabItem sensorsTab = new TabItem(tf, SWT.BORDER);
+	    sensorsTab.setText("Sensors");
+	    
+	    TableColumn nameColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    nameColumn.setText("Name");
+	    nameColumn.pack();
+	    
+	    TableColumn detailsColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    detailsColumn.setText("Details");
+	    detailsColumn.pack();
+	    
+	    TableColumn updateFilterColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    updateFilterColumn.setText("Update filter");
+	    updateFilterColumn.pack();
+
+	    TableColumn triggerFilterColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    triggerFilterColumn.setText("Trigger filter");
+	    triggerFilterColumn.pack();
+
+	    TableColumn armedActionsColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    armedActionsColumn.setText("Armed actions");
+	    armedActionsColumn.pack();
+
+	    TableColumn disarmedActionsColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    disarmedActionsColumn.setText("Disarmed actions");
+	    disarmedActionsColumn.pack();
+
+	    TableColumn triggerCounterColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    triggerCounterColumn.setText("Trigger counter");
+	    triggerCounterColumn.pack();
+
+	    TableColumn mutedColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    mutedColumn.setText("Muted");
+	    mutedColumn.pack();
+
+	    TableColumn areasColumn = new TableColumn(sensorsTable, SWT.NULL);
+	    areasColumn.setText("Areas");
+	    areasColumn.pack();
+
+	    sensorsTab.setControl(sensorsTable);
 	}
 
 	private void createLogTab(TabFolder tf) {
