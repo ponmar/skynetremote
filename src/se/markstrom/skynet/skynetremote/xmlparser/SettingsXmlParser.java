@@ -28,7 +28,6 @@ public class SettingsXmlParser extends XmlParser {
 		Boolean getNewEvents = getNodeValueAsBoolean(xmlDoc, "getNewEvents");
 		Boolean getNewControl = getNodeValueAsBoolean(xmlDoc, "getNewControl");
 		Boolean getNewLog = getNodeValueAsBoolean(xmlDoc, "getNewLog");
-		Boolean pollSummary = getNodeValueAsBoolean(xmlDoc, "pollSummary");
 		Integer summaryPollInterval = getNodeValueAsInteger(xmlDoc, "summaryPollInterval");
 		String host = getNodeValueAsString(xmlDoc, "host");
 		Integer port = getNodeValueAsInteger(xmlDoc, "port");
@@ -36,13 +35,12 @@ public class SettingsXmlParser extends XmlParser {
 		Boolean showEventNotification = getNodeValueAsBoolean(xmlDoc, "showEventNotification");
 		
 		if (getNewEvents != null && getNewControl != null && getNewLog != null &&
-				pollSummary != null && summaryPollInterval != null &&
-				port != null && protocol != null && showEventNotification != null) {
+				summaryPollInterval != null && port != null && protocol != null &&
+				showEventNotification != null) {
 			settings = new Settings();
 			settings.getNewEvents = getNewEvents;
 			settings.getNewControl = getNewControl;
 			settings.getNewLog = getNewLog;
-			settings.pollSummary = pollSummary;
 			settings.summaryPollInterval = summaryPollInterval;
 			settings.host = host;
 			settings.port = port;

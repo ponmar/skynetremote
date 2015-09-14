@@ -9,8 +9,8 @@ public class Settings {
 	
 	public boolean getNewEvents;
 	public boolean getNewControl;
+	public boolean getNewSensors;
 	public boolean getNewLog;
-	public boolean pollSummary;
 	public int summaryPollInterval;
 	public String host;
 	public int port;
@@ -24,9 +24,9 @@ public class Settings {
 	public void resetDefaults() {
 		getNewEvents = true;
 		getNewControl = true;
-		getNewLog = false;
-		pollSummary = true;
-		summaryPollInterval = 10;
+		getNewSensors = true;
+		getNewLog = true;
+		summaryPollInterval = 30;
 		host = "";
 		port = 22;
 		protocol = Protocol.SSH;

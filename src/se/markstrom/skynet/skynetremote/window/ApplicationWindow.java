@@ -109,7 +109,6 @@ public class ApplicationWindow implements GUI {
 	private Runnable getSummaryXmlRunnable = new Runnable() {
 		public void run() {
 			apiThread.runTask(new GetSummaryXmlTask());
-			apiThread.runTask(new GetSensorsXmlTask());
 		}
 	};
 	
@@ -231,7 +230,7 @@ public class ApplicationWindow implements GUI {
 		actionCameraSnapshotItem.setText("Camera snapshots");
 
 		actionGetEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
-		actionGetEventImagesItem.setText("Get event images");
+		actionGetEventImagesItem.setText("Show event images");
 		actionGetEventImagesItem.addSelectionListener(new ActionGetEventImagesItemListener());
 
 		actionSaveEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
@@ -280,7 +279,7 @@ public class ApplicationWindow implements GUI {
 		
 		actionGetDataItem = new MenuItem(actionMenu, SWT.PUSH);
 		actionGetDataItem.setText("Update data");
-		actionGetDataItem.addSelectionListener(new ActionGetDataItemListener());
+		actionGetDataItem.addSelectionListener(new ActionGetSummaryItemListener());
 		
 		// Action -> Accept events
 		Menu actionAcceptEventsMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -603,9 +602,9 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 
-	private class ActionGetDataItemListener implements SelectionListener {
+	private class ActionGetSummaryItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			updateData();
+			updateSummary();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -781,9 +780,8 @@ public class ApplicationWindow implements GUI {
 		apiThread.runTask(new TemporaryDisarmTask(seconds));
 	}
 
-	private void updateData() {
+	private void updateSummary() {
 		apiThread.runTask(new GetSummaryXmlTask());
-		apiThread.runTask(new GetSensorsXmlTask());
 	}
 	
 	private void turnOnAllDevices() {
@@ -1059,12 +1057,12 @@ public class ApplicationWindow implements GUI {
 						}
 					}
 					
-					for (int i=0; i<eventsTable.getColumnCount(); i++) {
-						eventsTable.getColumn(i).pack();
+					for (int i=0; i<sensorsTable.getColumnCount(); i++) {
+						sensorsTable.getColumn(i).pack();
 					}
 					
 					sensorsTable.setRedraw(true);
-					eventsTable.redraw();
+					sensorsTable.redraw();
 				}
 			}
 		});
@@ -1113,6 +1111,12 @@ public class ApplicationWindow implements GUI {
 						}
 					}
 					
+					// TODO: add total sensor trigger count to API
+					if (model.getSettings().getNewSensors) {
+						System.out.println("New sensor trigger sum detected, requesting sensors");
+						apiThread.runTask(new GetSensorsXmlTask());
+					}
+					
 					if (prevPollLogTimestamp != summary.logTimestamp) {
 						if (model.getSettings().getNewLog) {
 							System.out.println("New log timestamp detected, requesting log");
@@ -1121,9 +1125,7 @@ public class ApplicationWindow implements GUI {
 					}
 				}
 
-				if (model.getSettings().pollSummary) {
-					display.timerExec(model.getSettings().summaryPollInterval*1000, getSummaryXmlRunnable);
-				}
+				display.timerExec(model.getSettings().summaryPollInterval*1000, getSummaryXmlRunnable);
 			}
 		});
 	}

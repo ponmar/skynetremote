@@ -22,9 +22,9 @@ public class SettingsWindow {
 	private Shell shell;
 	private Settings settings = new Settings();
 	
-	private Button pollSummaryButton;
 	private Button updateEventsButton;
 	private Button updateControlButton;
+	private Button updateSensorsButton;
 	private Button updateLogButton;
 	private Button notifyOnNewEventButton;
 	private Text summaryPollInterval;
@@ -46,32 +46,32 @@ public class SettingsWindow {
 		layout.marginBottom = 10;
 		shell.setLayout(layout);
 
-		pollSummaryButton = new Button(shell, SWT.CHECK);
-		pollSummaryButton.setText("Poll summary");
-		GridData gd1 = new GridData();
-		gd1.horizontalSpan = 2;
-		pollSummaryButton.setLayoutData(gd1);
-
 		updateEventsButton = new Button(shell, SWT.CHECK);
-		updateEventsButton.setText("Update events (triggered by summary)");
+		updateEventsButton.setText("Download events when a new event is detected");
 		GridData gd2 = new GridData();
 		gd2.horizontalSpan = 2;
 		updateEventsButton.setLayoutData(gd2);
 
 		updateControlButton = new Button(shell, SWT.CHECK);
-		updateControlButton.setText("Update control (triggered by summary)");
+		updateControlButton.setText("Download devices when a new checksum is detected");
 		GridData controlGd = new GridData();
 		controlGd.horizontalSpan = 2;
 		updateControlButton.setLayoutData(controlGd);
 
+		updateSensorsButton = new Button(shell, SWT.CHECK);
+		updateSensorsButton.setText("Download sensors when a new trigger sum is detected");
+		GridData sensorsGd = new GridData();
+		sensorsGd.horizontalSpan = 2;
+		updateSensorsButton.setLayoutData(sensorsGd);
+
 		updateLogButton = new Button(shell, SWT.CHECK);
-		updateLogButton.setText("Update log (triggered by summary)");
+		updateLogButton.setText("Download log when a new timestamp is detected");
 		GridData logGd = new GridData();
 		logGd.horizontalSpan = 2;
 		updateLogButton.setLayoutData(logGd);
 
 		notifyOnNewEventButton = new Button(shell, SWT.CHECK);
-		notifyOnNewEventButton.setText("Notify on new event");
+		notifyOnNewEventButton.setText("Show notification at new event");
 		GridData gd3 = new GridData();
 		gd3.horizontalSpan = 2;
 		notifyOnNewEventButton.setLayoutData(gd3);
@@ -121,9 +121,9 @@ public class SettingsWindow {
 	}
 	
 	private void updateFromSettings(Settings settings) {
-		pollSummaryButton.setSelection(settings.pollSummary);
 		updateEventsButton.setSelection(settings.getNewEvents);
 		updateControlButton.setSelection(settings.getNewControl);
+		updateSensorsButton.setSelection(settings.getNewSensors);
 		updateLogButton.setSelection(settings.getNewLog);
 		notifyOnNewEventButton.setSelection(settings.notifyOnNewEvent);
 		summaryPollInterval.setText(new Integer(settings.summaryPollInterval).toString());
@@ -158,9 +158,9 @@ public class SettingsWindow {
 	}
 
 	private boolean saveTextInput() {
-		settings.pollSummary = pollSummaryButton.getSelection();
 		settings.getNewEvents = updateEventsButton.getSelection();
 		settings.getNewControl = updateControlButton.getSelection();
+		settings.getNewSensors = updateSensorsButton.getSelection();
 		settings.getNewLog = updateLogButton.getSelection();
 		settings.notifyOnNewEvent = notifyOnNewEventButton.getSelection();
 		try {
