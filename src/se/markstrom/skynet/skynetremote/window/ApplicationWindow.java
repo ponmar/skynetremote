@@ -864,9 +864,6 @@ public class ApplicationWindow implements GUI {
 					getSummaryXmlRunnable.run();
 				}
 				
-				// TODO: the cameras menu should be updated (cleared), because the model has been reset.
-				//       otherwise it may show some incorrect cameras for a while when connected
-				
 				updateGui();
 			}
 		});
