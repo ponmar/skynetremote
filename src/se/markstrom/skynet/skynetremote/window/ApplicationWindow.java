@@ -181,8 +181,15 @@ public class ApplicationWindow implements GUI {
 	
 	private void createMenuBar() {
 		Menu menuBar = new Menu(shell, SWT.BAR);
+
+		createFileMenu(menuBar);
+		createActionMenu(menuBar);
+		createHelpMenu(menuBar);
 		
-		// File menu
+		shell.setMenuBar(menuBar);
+	}
+	
+	private void createFileMenu(Menu menuBar) {
 		MenuItem fileMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
 		fileMenuHeader.setText("&File");
 		
@@ -206,8 +213,9 @@ public class ApplicationWindow implements GUI {
 		MenuItem fileExitItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileExitItem.setText("E&xit");
 		fileExitItem.addSelectionListener(new FileExitItemListener());
+	}
 
-		// Action menu
+	private void createActionMenu(Menu menuBar) {
 		MenuItem actionMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
 		actionMenuHeader.setText("&Action");
 		
@@ -225,14 +233,14 @@ public class ApplicationWindow implements GUI {
 		actionTemporaryDisarmItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionTemporaryDisarmItem.setText("Temporary disarm");
 		
+		actionAcceptEventsItem = new MenuItem(actionMenu, SWT.CASCADE);
+		actionAcceptEventsItem.setText("Accept events");
+		
 		new MenuItem(actionMenu, SWT.SEPARATOR);
 		
 		actionCameraSnapshotItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionCameraSnapshotItem.setText("Camera snapshots");
-		
-		actionAcceptEventsItem = new MenuItem(actionMenu, SWT.CASCADE);
-		actionAcceptEventsItem.setText("Accept events");
-		
+
 		actionGetEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionGetEventImagesItem.setText("Get event images");
 		actionGetEventImagesItem.addSelectionListener(new ActionGetEventImagesItemListener());
@@ -240,7 +248,7 @@ public class ApplicationWindow implements GUI {
 		actionSaveEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionSaveEventImagesItem.setText("Save event images...");
 		actionSaveEventImagesItem.addSelectionListener(new ActionSaveEventImagesItemListener());
-		
+
 		new MenuItem(actionMenu, SWT.SEPARATOR);
 		
 		// Action -> Stream images from camera menu
@@ -308,8 +316,9 @@ public class ApplicationWindow implements GUI {
 		MenuItem actionAcceptAllEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
 		actionAcceptAllEventsItem.setText("All");
 		actionAcceptAllEventsItem.addSelectionListener(new ActionAcceptAllEventsItemListener());
-		
-		// Help menu
+	}
+	
+	private void createHelpMenu(Menu menuBar) {
 		MenuItem helpMenuHeader = new MenuItem(menuBar, SWT.CASCADE);
 		helpMenuHeader.setText("&Help");
 		
@@ -319,8 +328,6 @@ public class ApplicationWindow implements GUI {
 		helpAboutItem = new MenuItem(helpMenu, SWT.PUSH);
 		helpAboutItem.setText("&About...");
 		helpAboutItem.addSelectionListener(new HelpAboutItemListener());
-		
-		shell.setMenuBar(menuBar);
 	}
 	
 	private void createTabs() {
