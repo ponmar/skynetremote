@@ -414,6 +414,8 @@ public class ApplicationWindow implements GUI {
 		actionGetEventImagesItem.setEnabled(connected);
 		actionSaveEventImagesItem.setEnabled(connected);
 
+		updateCameras();
+		
 		setIcon(noneImage);
 		
 		updateTitle();
@@ -878,14 +880,23 @@ public class ApplicationWindow implements GUI {
 				System.out.println("Received cameras.xml");
 				
 				if (model.updateCameras(xml)) {
-					for (Camera camera : model.getCameras()) {
-						MenuItem cameraMenuItem = new MenuItem(cameraSnapshotMenu, SWT.PUSH);
-						cameraMenuItem.setText("Camera " + (camera.index+1));
-						cameraMenuItem.addSelectionListener(new ActionStreamItemListener(camera.index));
-					}
+					updateCameras();
 				}
 			}
 		});
+	}
+	
+	private void updateCameras() {
+		MenuItem[] menuItems = cameraSnapshotMenu.getItems();
+		for (MenuItem item : menuItems) {
+		    item.dispose();
+		}
+		
+		for (Camera camera : model.getCameras()) {
+			MenuItem cameraMenuItem = new MenuItem(cameraSnapshotMenu, SWT.PUSH);
+			cameraMenuItem.setText("Camera " + (camera.index+1) + " [" + camera.width + "x" + camera.height + "]");
+			cameraMenuItem.addSelectionListener(new ActionStreamItemListener(camera.index));
+		}
 	}
 	
 	@Override
