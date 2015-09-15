@@ -357,7 +357,8 @@ public class ApplicationWindow implements GUI {
 	    controlTable.addMouseListener(new DeviceSelectedListener());
 
 	    TabItem controlTab = new TabItem(tf, SWT.BORDER);
-	    controlTab.setText("Control");
+	    controlTab.setText("Device Control");
+	    controlTab.setToolTipText("Home automation device control");
 	    
 	    TableColumn nameColumn = new TableColumn(controlTable, SWT.NULL);
 	    nameColumn.setText("Device name");
@@ -427,7 +428,7 @@ public class ApplicationWindow implements GUI {
 
 	private void createLogTab(TabFolder tf) {
 	    TabItem logTab = new TabItem(tf, SWT.BORDER);
-	    logTab.setText("Log");
+	    logTab.setText("Remote Log");
 	    
 	    logText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 	    logText.setEditable(false);
