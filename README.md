@@ -42,7 +42,7 @@ Licenses for included software is placed in the licenses directory.
 
 ### Screenshot ###
 
-![skynetremote_screenshot.png](https://bitbucket.org/repo/xxXqE8/images/3532958321-skynetremote_screenshot.png)
+![skynetremote_screenshot.png](https://bitbucket.org/repo/xxXqE8/images/1117963442-skynetremote_screenshot.png)
 
 [skynet_site]: http://pihack.no-ip.org/pontus/projects/skynet/
 [skynet_api_site]: http://pihack.no-ip.org/pontus/projects/skynet/#api
