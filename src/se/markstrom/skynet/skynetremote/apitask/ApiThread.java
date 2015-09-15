@@ -49,7 +49,7 @@ public class ApiThread extends Thread {
 		}
 		
 		isWorking(false);
-		gui.updateConnectedState(GUI.CONNECTED_STATE.DISCONNECTED);
+		gui.updateConnectedState(GUI.ConnectedState.DISCONNECTED);
 		
 		disconnect();
     }

@@ -1,6 +1,7 @@
 package se.markstrom.skynet.skynetremote.window;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -51,6 +52,7 @@ import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffDeviceTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnDeviceTask;
+import se.markstrom.skynet.skynetremote.apitask.GetCameraImageTask.ImageType;
 import se.markstrom.skynet.skynetremote.model.Camera;
 import se.markstrom.skynet.skynetremote.model.Device;
 import se.markstrom.skynet.skynetremote.model.Event;
@@ -74,6 +76,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem actionDisarmItem;
 	private MenuItem actionTemporaryDisarmItem;
 	private MenuItem actionCameraSnapshotItem;
+	private MenuItem actionCameraStreamItem;
 	private MenuItem actionTurnOnAllDevicesItem;
 	private MenuItem actionTurnOffAllDevicesItem;
 	private MenuItem actionTurnOnDevicesItem;
@@ -85,6 +88,7 @@ public class ApplicationWindow implements GUI {
 	private MenuItem helpAboutItem;
 	private Menu actionTemporaryDisarmMenu;
 	private Menu cameraSnapshotMenu;
+	private Menu cameraStreamMenu;
 	
 	private Image noneImage;
 	private Image infoImage;
@@ -100,11 +104,13 @@ public class ApplicationWindow implements GUI {
 	private ApiThread apiThread = new ApiThread(this);
 
 	private boolean apiWorking = false;
-	private CONNECTED_STATE connectedState = CONNECTED_STATE.DISCONNECTED;
+	private ConnectedState connectedState = ConnectedState.DISCONNECTED;
 	
 	private String imagesDirectory = null;
 	
 	private Model model = new Model();
+	
+	private ArrayList<CameraStreamWindow> streamWindows = new ArrayList<CameraStreamWindow>(); 
 	
 	private Runnable getSummaryXmlRunnable = new Runnable() {
 		public void run() {
@@ -229,6 +235,9 @@ public class ApplicationWindow implements GUI {
 		actionCameraSnapshotItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionCameraSnapshotItem.setText("Camera snapshots");
 
+		actionCameraStreamItem = new MenuItem(actionMenu, SWT.CASCADE);
+		actionCameraStreamItem.setText("Camera stream");
+		
 		actionGetEventImagesItem = new MenuItem(actionMenu, SWT.CASCADE);
 		actionGetEventImagesItem.setText("Show event images");
 		actionGetEventImagesItem.addSelectionListener(new ActionGetEventImagesItemListener());
@@ -239,9 +248,13 @@ public class ApplicationWindow implements GUI {
 
 		new MenuItem(actionMenu, SWT.SEPARATOR);
 		
-		// Action -> Stream images from camera menu
+		// Action -> Camera snapshot
 		cameraSnapshotMenu = new Menu(shell, SWT.DROP_DOWN);
 		actionCameraSnapshotItem.setMenu(cameraSnapshotMenu);
+		
+		// Action -> Camera stream
+		cameraStreamMenu = new Menu(shell, SWT.DROP_DOWN);
+		actionCameraStreamItem.setMenu(cameraStreamMenu);
 		
 		// Action -> Temporary disarm
 		actionTemporaryDisarmMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -437,7 +450,7 @@ public class ApplicationWindow implements GUI {
 	
 	private void updateGui() {
 		
-		boolean connected = connectedState == CONNECTED_STATE.CONNECTED;
+		boolean connected = connectedState == ConnectedState.CONNECTED;
 		
 		fileConnectItem.setEnabled(!connected);
 		fileDisconnectItem.setEnabled(connected);
@@ -454,6 +467,7 @@ public class ApplicationWindow implements GUI {
 		actionTemporaryDisarmItem.setEnabled(connected);
 		actionAcceptEventsItem.setEnabled(connected);
 		actionCameraSnapshotItem.setEnabled(connected);
+		actionCameraStreamItem.setEnabled(connected);
 		actionGetEventImagesItem.setEnabled(connected);
 		actionSaveEventImagesItem.setEnabled(connected);
 
@@ -693,15 +707,41 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 	
-	private class ActionStreamItemListener implements SelectionListener {
+	private class ActionCameraImageItemListener implements SelectionListener {
 		private int cameraIndex;
 		
-		public ActionStreamItemListener(int cameraIndex) {
+		public ActionCameraImageItemListener(int cameraIndex) {
 			this.cameraIndex = cameraIndex;
 		}
 		
 		public void widgetSelected(SelectionEvent event) {
-			apiThread.runTask(new GetCameraImageTask(cameraIndex));
+			apiThread.runTask(new GetCameraImageTask(cameraIndex, ImageType.SNAPSHOT));
+		}
+
+		public void widgetDefaultSelected(SelectionEvent event) {
+		}
+	}
+
+	private class ActionOpenStreamListener implements SelectionListener {
+		private int cameraIndex;
+		
+		public ActionOpenStreamListener(int cameraIndex) {
+			this.cameraIndex = cameraIndex;
+		}
+		
+		public void widgetSelected(SelectionEvent event) {
+			// Close and cleanup any existing stream window 
+			for (CameraStreamWindow streamWindow : streamWindows) {
+				if (streamWindow.getCameraIndex() == cameraIndex) {
+					streamWindow.close();
+					streamWindows.remove(streamWindow);
+					break;
+				}
+			}
+
+			// Open a new window and request the first image
+			streamWindows.add(new CameraStreamWindow(cameraIndex));
+			apiThread.runTask(new GetCameraImageTask(cameraIndex, ImageType.STREAM));
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -852,24 +892,27 @@ public class ApplicationWindow implements GUI {
 	
 	private void toggleDevicesState() {
 		for (TableItem selection : controlTable.getSelection()) {
-			Device device = (Device)selection.getData();
-			if (device.state) {
-				apiThread.runTask(new TurnOffDeviceTask(device.id));
-			}
-			else {
-				apiThread.runTask(new TurnOnDeviceTask(device.id));
+			int deviceId = (int)selection.getData();
+			Device device = model.getDevice(deviceId);
+			if (device != null) {
+				if (device.state) {
+					apiThread.runTask(new TurnOffDeviceTask(device.id));
+				}
+				else {
+					apiThread.runTask(new TurnOnDeviceTask(device.id));
+				}
 			}
 		}
 	}
 	
 	@Override
-	public void updateConnectedState(CONNECTED_STATE state) {
+	public void updateConnectedState(ConnectedState state) {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				connectedState = state;
 				
-				if (state == CONNECTED_STATE.CONNECTED) {
+				if (state == ConnectedState.CONNECTED) {
 					// Reset old fetched data when connected, cause it might be invalid for this host.
 					model.reset();
 					
@@ -899,15 +942,32 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	private void updateCameras() {
-		MenuItem[] menuItems = cameraSnapshotMenu.getItems();
-		for (MenuItem item : menuItems) {
+		MenuItem[] snapshotItems = cameraSnapshotMenu.getItems();
+		for (MenuItem item : snapshotItems) {
 		    item.dispose();
 		}
 		
+		MenuItem[] streamItems = cameraStreamMenu.getItems();
+		for (MenuItem item : streamItems) {
+		    item.dispose();
+		}
+		
+		for (CameraStreamWindow w : streamWindows) {
+			w.close();
+		}
+		streamWindows.clear();
+		
 		for (Camera camera : model.getCameras()) {
-			MenuItem cameraMenuItem = new MenuItem(cameraSnapshotMenu, SWT.PUSH);
-			cameraMenuItem.setText("Camera " + (camera.index+1) + " [" + camera.width + "x" + camera.height + "]");
-			cameraMenuItem.addSelectionListener(new ActionStreamItemListener(camera.index));
+			String cameraName = "Camera " + (camera.index+1) + " [" + camera.width + "x" + camera.height + "]";
+			
+			MenuItem snapshotMenuItem = new MenuItem(cameraSnapshotMenu, SWT.PUSH);
+			snapshotMenuItem.setText(cameraName);
+			snapshotMenuItem.addSelectionListener(new ActionCameraImageItemListener(camera.index));
+
+			MenuItem streamMenuItem = new MenuItem(cameraStreamMenu, SWT.PUSH);
+			streamMenuItem.setText(cameraName);
+			// TODO:
+			streamMenuItem.addSelectionListener(new ActionOpenStreamListener(camera.index));
 		}
 	}
 	
@@ -1075,7 +1135,7 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				if (model.updateLog(xml)) {
-					logText.setText(model.getLog().text);
+					logText.setText(model.getLog().getText());
 				}
 			}
 		});
@@ -1153,11 +1213,28 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	@Override
-	public void updateCameraImage(int cameraIndex, byte[] jpegData) {
+	public void updateCameraSnapshot(int cameraIndex, byte[] jpegData) {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				new ImageWindow("Camera " + (cameraIndex+1) + " snapshot", jpegData);
+			}
+		});
+	}
+
+	@Override
+	public void updateCameraStream(int cameraIndex, byte[] jpegData) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				for (CameraStreamWindow streamWindow : streamWindows) {
+					if (streamWindow.getCameraIndex() == cameraIndex) {
+						if (streamWindow.isOpen()) {
+							streamWindow.updateImage(jpegData);
+							apiThread.runTask(new GetCameraImageTask(cameraIndex, ImageType.STREAM));
+						}
+					}
+				}
 			}
 		});
 	}

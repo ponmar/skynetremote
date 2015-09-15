@@ -7,14 +7,14 @@ package se.markstrom.skynet.skynetremote;
  */
 public interface GUI {
 	
-	public enum CONNECTED_STATE {
+	public enum ConnectedState {
 		DISCONNECTING,
 		DISCONNECTED,
 		CONNECTING,
 		CONNECTED
 	}
 	
-	void updateConnectedState(CONNECTED_STATE state);
+	void updateConnectedState(ConnectedState state);
 
 	void updateCamerasXml(String xml);
 	void updateControlXml(String xml);
@@ -24,7 +24,8 @@ public interface GUI {
 	void updateSensorsXml(String xml);
 	
 	void updateEventImage(long eventId, int imageIndex, byte[] jpegData, boolean show, boolean save);
-	void updateCameraImage(int cameraIndex, byte[] jpegData);
+	void updateCameraSnapshot(int cameraIndex, byte[] jpegData);
+	void updateCameraStream(int cameraIndex, byte[] jpegData);
 	
 	void updateApiWorkingState(boolean isWorking);
 	

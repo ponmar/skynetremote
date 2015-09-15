@@ -27,15 +27,14 @@ public class LogXmlParser extends XmlParser {
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
 		NodeList nl = xmlDoc.getElementsByTagName("entry");
 		if (nl != null) {
-			String text = "";
+			log = new Log();
 			for (int i=0; i<nl.getLength(); i++) {
 				Node entryNode = nl.item(i);
 				Node entryDataNode = entryNode.getFirstChild();
 				if (entryDataNode != null) {
-					text += entryDataNode.getNodeValue() + "\n";
+					log.addItem(entryDataNode.getNodeValue());
 				}
 			}
-			log = new Log(text);
 			return true;
 		}
 		return false;

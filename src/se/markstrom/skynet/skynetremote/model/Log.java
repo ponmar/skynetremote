@@ -1,19 +1,29 @@
 package se.markstrom.skynet.skynetremote.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Log {
 
-	// TODO: store log messages in an ArrayList?
-	public String text;
-	
-	public Log() {
-		text = "";
-	}
-	
-	public Log(String text) {
-		this.text = text;
-	}
+	private ArrayList<String> items = new ArrayList<String>();
 	
 	public void reset() {
-		text = "";
+		items.clear();
+	}
+	
+	public void addItem(String item) {
+		items.add(item);
+	}
+	
+	public List<String> getItems() {
+		return items;
+	}
+	
+	public String getText() {
+		String text = "";
+		for (String item : items) {
+			text += item + "\n";
+		}
+		return text;
 	}
 }
