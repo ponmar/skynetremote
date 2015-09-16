@@ -9,34 +9,36 @@ import se.markstrom.skynet.api.SkynetAPIClientError;
 import se.markstrom.skynet.skynetremote.GUI;
 
 public class ApiThread extends Thread {
-	
+
 	private boolean run = true;
 	private SkynetAPI api = null;
 	private ConcurrentLinkedQueue<ApiTask> queue = new ConcurrentLinkedQueue<ApiTask>();
 	private GUI gui;
 	private boolean workingState = false;
-	
+
 	public ApiThread(GUI gui) {
 		this.gui = gui;
 	}
-	
+
 	public void run() {
 		try {
 			while (run) {
 				ApiTask task = queue.poll();
 				if (task != null) {
 					isWorking(true);
-					System.out.println("Pre task run");
+					//System.out.println("Pre task run");
 					task.run(this, api, gui);
-					System.out.println("Post task run");
-				}
-				else {
-					// Do not sleep when there are queued tasks
-					try {
-						isWorking(false);
-						sleep(250);
-					}
-					catch (InterruptedException e) {
+					//System.out.println("Post task run");
+					isWorking(false);
+
+					synchronized (this) {
+						if (queue.isEmpty()) {
+							try {
+								wait();
+							}
+							catch (InterruptedException e) {
+							}
+						}
 					}
 				}
 			}
@@ -47,35 +49,42 @@ public class ApiThread extends Thread {
 		catch (SkynetAPIError e) {
 			gui.showApiError(e.getMessage());
 		}
-		
+
 		isWorking(false);
 		gui.updateConnectedState(GUI.ConnectedState.DISCONNECTED);
-		
+
 		disconnect();
-    }
-	
+	}
+
 	private void isWorking(boolean state) {
 		if (state != workingState) {
 			workingState = state;
 			gui.updateApiWorkingState(workingState);
 		}
 	}
-	
+
 	/**
 	 * Call this method from the GUI thread to close the API connection
 	 * and wait for the API thread to stop.
 	 */
 	public void close() {
-		run = false;
+		synchronized (this) {
+			run = false;
+			notify();
+		}
+
 		try {
 			join();
 		}
 		catch (InterruptedException e) {
 		}
 	}
-	
+
 	public void runTask(ApiTask task) {
-		queue.add(task);
+		synchronized (this) {
+			queue.add(task);
+			notify();
+		}
 	}
 
 	void connect(String host, int port, Protocol protocol, String password, boolean debug) throws SkynetAPIError {
@@ -85,20 +94,12 @@ public class ApiThread extends Thread {
 			System.out.println("Connected");
 		}
 	}
-	
+
 	void disconnect() {
 		if (api != null) {
 			api.close();
 			api = null;
 			System.out.println("Disconnected");
 		}
-	}
-	
-	/**
-	 * A thread safe method for checking number of queued API tasks.
-	 * @return
-	 */
-	public int getNumQueuedTasks() {
-		return queue.size();
 	}
 }
