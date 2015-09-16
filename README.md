@@ -4,11 +4,21 @@ Skynet Remote is a Java based GUI for supervision and control of a [Skynet][skyn
 
 [Skynet][skynet_site] is a home security and home automation system.
 
+The Skynet Remote main features are:
+
+* Arm and disarm the remote Skynet system
+* Show notification for new events
+* Accept events (lower event severity to info)
+* Control home automation devices
+* Stream live camera images
+* Show event information and event images
+* Show Skynet system information
+
 ### Releases ###
 
 See [downloads][skynetremote_downloads] for an easy to run pre-built JAR file. If your Java version is too old to run this build you need to rebuild Skynet Remote, and possibly [Skynet API][skynet_api_site], for your Java version.
 
-### How to build? ###
+### How to build ###
 This project can either be built and run from within Eclipse, or by exporting a JAR file to be executed outside Eclipse.
 
 How to build in Eclipse:
@@ -26,7 +36,7 @@ How to export a runnable JAR file:
 * Select "Package required libraries into generated JAR"
 * Click "Finish"
 
-### How to run? ###
+### How to run ###
 
 Either download and run a release from [downloads][skynetremote_downloads], or run from Eclipse (without a JAR-file).
 
