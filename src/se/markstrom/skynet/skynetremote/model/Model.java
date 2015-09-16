@@ -2,9 +2,11 @@ package se.markstrom.skynet.skynetremote.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
 import se.markstrom.skynet.skynetremote.Settings;
+import se.markstrom.skynet.skynetremote.window.ApplicationWindow;
 import se.markstrom.skynet.skynetremote.xmlparser.CamerasXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.ControlXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.EventsXmlParser;
@@ -16,6 +18,8 @@ import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
 
 public class Model {
 
+	private static final Logger logger = Logger.getLogger(ApplicationWindow.class.getName());
+	
 	private Summary summary;
 	private ArrayList<Event> events = new ArrayList<Event>();
 	private ArrayList<Device> devices = new ArrayList<Device>();
@@ -41,11 +45,11 @@ public class Model {
 	private void readSettings() {
 		SettingsXmlParser parser = new SettingsXmlParser();
 		if (parser.isValid()) {
-			System.out.println("Using settings from file");
+			logger.info("Using settings from file");
 			settings = parser.getSettings();
 		}
 		else {
-			System.out.println("Using default settings");
+			logger.info("Using default settings");
 			settings = new Settings();
 		}
 	}
@@ -176,7 +180,7 @@ public class Model {
 	private void writeSettings() {
 		SettingsXmlWriter settingsWriter = new SettingsXmlWriter(settings);
 		settingsWriter.write();
-		System.out.println("Settings written to file");
+		logger.info("Settings written to file");
 	}
 	
 	public long getLatestEventIdFromSummary() {

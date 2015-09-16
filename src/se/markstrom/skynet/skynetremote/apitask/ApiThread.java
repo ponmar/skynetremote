@@ -1,6 +1,7 @@
 package se.markstrom.skynet.skynetremote.apitask;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Logger;
 
 import se.markstrom.skynet.api.SkynetAPI;
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
@@ -10,6 +11,8 @@ import se.markstrom.skynet.skynetremote.GUI;
 
 public class ApiThread extends Thread {
 
+	private static final Logger log = Logger.getLogger(ApiThread.class.getName());
+	
 	private boolean run = true;
 	private SkynetAPI api = null;
 	private ConcurrentLinkedQueue<ApiTask> queue = new ConcurrentLinkedQueue<ApiTask>();
@@ -26,9 +29,9 @@ public class ApiThread extends Thread {
 				ApiTask task = queue.poll();
 				if (task != null) {
 					isWorking(true);
-					//System.out.println("Pre task run");
+					log.fine("Pre task run");
 					task.run(this, api, gui);
-					//System.out.println("Post task run");
+					log.fine("Post task run");
 					isWorking(false);
 
 					synchronized (this) {
@@ -89,9 +92,9 @@ public class ApiThread extends Thread {
 
 	void connect(String host, int port, Protocol protocol, String password, boolean debug) throws SkynetAPIError {
 		if (api == null) {
-			System.out.println("Connecting to host " + host + "...");
+			log.info("Connecting to host " + host + "...");
 			api = new SkynetAPI(host, port, protocol, password, debug);
-			System.out.println("Connected");
+			log.info("Connected");
 		}
 	}
 
@@ -99,7 +102,7 @@ public class ApiThread extends Thread {
 		if (api != null) {
 			api.close();
 			api = null;
-			System.out.println("Disconnected");
+			log.info("Disconnected");
 		}
 	}
 }

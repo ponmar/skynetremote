@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -61,7 +62,8 @@ import se.markstrom.skynet.skynetremote.model.Sensor;
 import se.markstrom.skynet.skynetremote.model.Summary;
 
 public class ApplicationWindow implements GUI {
-	
+
+	private static final Logger log = Logger.getLogger(ApplicationWindow.class.getName());
 	private static final String NAME = "Skynet Remote";
 	
 	private FileCache fileCache = new FileCache();
@@ -169,7 +171,7 @@ public class ApplicationWindow implements GUI {
 			trayItem = new TrayItem(tray, SWT.NONE);
 		}
 		else {
-			System.out.println("No system tray available");
+			log.fine("No system tray available");
 		}
 	}
 	
@@ -932,7 +934,7 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Received cameras.xml");
+				log.info("Received cameras.xml");
 				
 				if (model.updateCameras(xml)) {
 					updateCameras();
@@ -976,7 +978,8 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Received control.xml");
+				log.info("Received control.xml");
+				
 				if (model.updateDevices(xml)) {
 					controlTable.setRedraw(false);
 					controlTable.removeAll();
@@ -1003,10 +1006,11 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("New events.xml");
+				log.info("Received events.xml");
+				
 				long prevLatestEventId = model.getLatestEventId();
 				if (model.updateEvents(xml)) {
-					System.out.println("Parsed events.xml");
+					log.fine("Parsed events.xml");
 
 					eventsTable.setRedraw(false);
 					eventsTable.removeAll();
@@ -1094,9 +1098,10 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("New sensors.xml");
+				log.info("Received sensors.xml");
+				
 				if (model.updateSensors(xml)) {
-					System.out.println("Parsed sensors.xml");
+					log.fine("Parsed cameras.xml");
 					
 					sensorsTable.setRedraw(false);
 					sensorsTable.removeAll();
@@ -1146,7 +1151,7 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Received summary.xml");
+				log.info("Received summary.xml");
 				
 				long prevPollEventId = model.getLatestEventIdFromSummary();
 				String prevPollControlChecksum = model.getControlChecksumFromSummary();
@@ -1160,27 +1165,27 @@ public class ApplicationWindow implements GUI {
 					
 					if (prevPollEventId != summary.latestEventId) {
 						if (model.getSettings().getNewEvents) {
-							System.out.println("New event detected, requesting events");
+							log.info("New event detected, requesting events");
 							apiThread.runTask(new GetEventsXmlTask());
 						}
 					}
 					
 					if (!prevPollControlChecksum.equals(summary.controlChecksum)) {
 						if (model.getSettings().getNewControl) {
-							System.out.println("New control checksum detected, requesting control");
+							log.info("New control checksum detected, requesting control");
 							apiThread.runTask(new GetControlXmlTask());
 						}
 					}
 					
 					// TODO: add total sensor trigger count to API
 					if (model.getSettings().getNewSensors) {
-						System.out.println("New sensor trigger sum detected, requesting sensors");
+						log.info("New sensor trigger sum detected, requesting sensors");
 						apiThread.runTask(new GetSensorsXmlTask());
 					}
 					
 					if (prevPollLogTimestamp != summary.logTimestamp) {
 						if (model.getSettings().getNewLog) {
-							System.out.println("New log timestamp detected, requesting log");
+							log.info("New log timestamp detected, requesting log");
 							apiThread.runTask(new GetLogXmlTask());
 						}
 					}
