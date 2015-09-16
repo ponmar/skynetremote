@@ -1,6 +1,7 @@
 package se.markstrom.skynet.skynetremote.apitask;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import se.markstrom.skynet.api.SkynetAPI;
@@ -21,6 +22,10 @@ public class ApiThread extends Thread {
 
 	public ApiThread(GUI gui) {
 		this.gui = gui;
+	}
+	
+	public void addLogHandler(Handler logHandler) {
+		log.addHandler(logHandler);
 	}
 
 	public void run() {

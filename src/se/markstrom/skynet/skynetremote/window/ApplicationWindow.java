@@ -34,6 +34,7 @@ import se.markstrom.skynet.skynetremote.FileCache;
 import se.markstrom.skynet.skynetremote.FileWriter;
 import se.markstrom.skynet.skynetremote.GUI;
 import se.markstrom.skynet.skynetremote.Settings;
+import se.markstrom.skynet.skynetremote.SwtLogHandler;
 import se.markstrom.skynet.skynetremote.apitask.AcceptEventsTask;
 import se.markstrom.skynet.skynetremote.apitask.ApiThread;
 import se.markstrom.skynet.skynetremote.apitask.ArmTask;
@@ -122,7 +123,19 @@ public class ApplicationWindow implements GUI {
 	
 	public ApplicationWindow() {
 		createGui();
+		
+		// The display is now set so it is possible to create the log handler
+		setupLoggers();
+		
 		apiThread.start();
+	}
+	
+	private void setupLoggers() {
+		SwtLogHandler logHandler = new SwtLogHandler(display);
+		
+		log.addHandler(logHandler);
+		model.addLogHandler(logHandler);
+		apiThread.addLogHandler(logHandler);
 	}
 	
 	public void close() {
@@ -968,7 +981,6 @@ public class ApplicationWindow implements GUI {
 
 			MenuItem streamMenuItem = new MenuItem(cameraStreamMenu, SWT.PUSH);
 			streamMenuItem.setText(cameraName);
-			// TODO:
 			streamMenuItem.addSelectionListener(new ActionOpenStreamListener(camera.index));
 		}
 	}
