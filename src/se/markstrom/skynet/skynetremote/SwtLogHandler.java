@@ -27,8 +27,7 @@ public class SwtLogHandler extends Handler {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				String text = textWidget.getText() + message;
-				textWidget.setText(text);
+				textWidget.append(message);
 			}
 		});
 	}
