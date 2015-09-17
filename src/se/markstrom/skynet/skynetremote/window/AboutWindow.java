@@ -26,15 +26,13 @@ public class AboutWindow {
 		layout.marginBottom = 30;
 		shell.setLayout(layout);
 
-		Label intro = new Label(shell, SWT.NONE);
-		intro.setText("This program implements many features available in the Skynet API.");
-		intro.pack();
-
 		Label author = new Label(shell, SWT.NONE);
 		author.setText("Author: pontus.markstrom@gmail.com");
 		author.pack();
-		
-		// TODO: add link to bitbucket project when it is public
+
+		Label site = new Label(shell, SWT.NONE);
+		site.setText("Site: https://bitbucket.org/pontusmarkstrom/skynet-remote/");
+		site.pack();
 
 		shell.addTraverseListener(new KeyListener());
 		
