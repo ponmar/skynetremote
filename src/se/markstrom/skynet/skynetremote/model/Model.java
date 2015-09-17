@@ -2,7 +2,6 @@ package se.markstrom.skynet.skynetremote.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
@@ -32,11 +31,6 @@ public class Model {
 	public Model() {
 		reset();
 		readSettings();
-	}
-	
-
-	public void addLogHandler(Handler logHandler) {
-		logger.addHandler(logHandler);
 	}
 
 	public void reset() {

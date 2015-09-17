@@ -124,18 +124,13 @@ public class ApplicationWindow implements GUI {
 	public ApplicationWindow() {
 		createGui();
 		
-		// The display is now set so it is possible to create the log handler
-		setupLoggers();
+		// The display is now set so it is possible to create the log handler.
+		// Add the new log handler to the level above all logging classes to
+		// intercept all log messages.
+		Logger commonLogger = Logger.getLogger("se.markstrom.skynet.skynetremote");
+		commonLogger.addHandler(new SwtLogHandler(display));
 		
 		apiThread.start();
-	}
-	
-	private void setupLoggers() {
-		SwtLogHandler logHandler = new SwtLogHandler(display);
-		
-		log.addHandler(logHandler);
-		model.addLogHandler(logHandler);
-		apiThread.addLogHandler(logHandler);
 	}
 	
 	public void close() {
