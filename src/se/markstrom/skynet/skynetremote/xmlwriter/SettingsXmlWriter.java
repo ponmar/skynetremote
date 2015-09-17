@@ -7,8 +7,8 @@ public class SettingsXmlWriter extends XmlWriter {
 	
 	private Settings settings;
 	
-	public SettingsXmlWriter(Settings settings) {
-		super(Settings.FILENAME);
+	public SettingsXmlWriter(Settings settings, String filename) {
+		super(filename);
 		this.settings = settings;
 	}
 	

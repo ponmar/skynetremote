@@ -3,8 +3,6 @@ package se.markstrom.skynet.skynetremote;
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
 
 public class Settings {
-	public static final String FILENAME = "settings.xml";
-	
 	private static final int MIN_POLL_INTERVAL = 1;
 	
 	public boolean getNewEvents;

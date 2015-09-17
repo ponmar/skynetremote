@@ -15,8 +15,8 @@ public class SettingsXmlParser extends XmlParser {
 	
 	private Settings settings;
 	
-	public SettingsXmlParser() {
-		super(new File(Settings.FILENAME));
+	public SettingsXmlParser(String filename) {
+		super(new File(filename));
 	}
 
 	public Settings getSettings() {

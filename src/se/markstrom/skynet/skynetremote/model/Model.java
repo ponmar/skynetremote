@@ -20,6 +20,8 @@ public class Model {
 
 	private static final Logger logger = Logger.getLogger(ApplicationWindow.class.getName());
 	
+	private static final String SETTINGS_FILENAME = "settings.xml";
+	
 	private Summary summary;
 	private ArrayList<Event> events = new ArrayList<Event>();
 	private ArrayList<Device> devices = new ArrayList<Device>();
@@ -43,9 +45,9 @@ public class Model {
 	}
 	
 	private void readSettings() {
-		SettingsXmlParser parser = new SettingsXmlParser();
+		SettingsXmlParser parser = new SettingsXmlParser(SETTINGS_FILENAME);
 		if (parser.isValid()) {
-			logger.info("Using settings from file");
+			logger.info("Using settings from " + SETTINGS_FILENAME);
 			settings = parser.getSettings();
 		}
 		else {
@@ -178,9 +180,9 @@ public class Model {
 	}
 	
 	private void writeSettings() {
-		SettingsXmlWriter settingsWriter = new SettingsXmlWriter(settings);
+		SettingsXmlWriter settingsWriter = new SettingsXmlWriter(settings, SETTINGS_FILENAME);
 		settingsWriter.write();
-		logger.info("Settings written to file");
+		logger.info("Settings written to " + SETTINGS_FILENAME);
 	}
 	
 	public long getLatestEventIdFromSummary() {

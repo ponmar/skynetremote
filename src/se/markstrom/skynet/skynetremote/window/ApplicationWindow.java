@@ -103,6 +103,7 @@ public class ApplicationWindow implements GUI {
 	private Table controlTable;
 	private Table sensorsTable;
 	private Text logText;
+	private Text remoteLogText;
 	
 	private ApiThread apiThread = new ApiThread(this);
 
@@ -123,12 +124,13 @@ public class ApplicationWindow implements GUI {
 	
 	public ApplicationWindow() {
 		createGui();
-		
-		// The display is now set so it is possible to create the log handler.
-		// Add the new log handler to the level above all logging classes to
+
+		// The GUI widgets for logging are now created. Setup the custom log handler!
+		// Add the new log handler to the package level above all logging classes to
 		// intercept all log messages.
 		Logger commonLogger = Logger.getLogger("se.markstrom.skynet.skynetremote");
-		commonLogger.addHandler(new SwtLogHandler(display));
+		SwtLogHandler logHandler = new SwtLogHandler(display, logText);
+		commonLogger.addHandler(logHandler);
 		
 		apiThread.start();
 	}
@@ -339,6 +341,7 @@ public class ApplicationWindow implements GUI {
 	    createControlTab(tf);
 	    createSensorsTab(tf);
 	    createLogTab(tf);
+	    createRemoteLogTab(tf);
 	}
 
 	private void createEventsTab(TabFolder tf) {
@@ -451,11 +454,20 @@ public class ApplicationWindow implements GUI {
 
 	private void createLogTab(TabFolder tf) {
 	    TabItem logTab = new TabItem(tf, SWT.BORDER);
-	    logTab.setText("Remote Log");
+	    logTab.setText("Log");
 	    
 	    logText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 	    logText.setEditable(false);
 	    logTab.setControl(logText);
+	}
+
+	private void createRemoteLogTab(TabFolder tf) {
+	    TabItem remoteLogTab = new TabItem(tf, SWT.BORDER);
+	    remoteLogTab.setText("Remote Log");
+	    
+	    remoteLogText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+	    remoteLogText.setEditable(false);
+	    remoteLogTab.setControl(remoteLogText);
 	}
 	
 	private void updateGui() {
@@ -1147,7 +1159,7 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				if (model.updateLog(xml)) {
-					logText.setText(model.getLog().getText());
+					remoteLogText.setText(model.getLog().getText());
 				}
 			}
 		});
