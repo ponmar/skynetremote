@@ -16,7 +16,7 @@ The Skynet Remote main features are:
 
 ### Releases ###
 
-See [downloads][skynetremote_downloads] for an easy to run pre-built JAR file. If your Java version is too old to run this build you need to rebuild Skynet Remote, and possibly [Skynet API][skynet_api_site], for your Java version.
+See [downloads][skynetremote_downloads] for an easy to run pre-built JAR file. If your Java Runtime Environment (JRE) is too old to run a release you need to rebuild Skynet Remote, and possibly [Skynet API][skynet_api_site], for your JRE (or simply update your JRE).
 
 ### How to build ###
 This project can either be built and run from within Eclipse, or by exporting a JAR file to be executed outside Eclipse.
