@@ -1,4 +1,4 @@
-package se.markstrom.skynet.skynetremote;
+package se.markstrom.skynet.skynetremote.model;
 
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
 

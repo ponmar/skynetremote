@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
-import se.markstrom.skynet.skynetremote.Settings;
 import se.markstrom.skynet.skynetremote.window.ApplicationWindow;
 import se.markstrom.skynet.skynetremote.xmlparser.CamerasXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.ControlXmlParser;
@@ -20,7 +19,7 @@ public class Model {
 
 	private static final Logger logger = Logger.getLogger(ApplicationWindow.class.getName());
 	
-	private static final String SETTINGS_FILENAME = "settings.xml";
+	private static final String SETTINGS_FILENAME = "SkynetRemote.xml";
 	
 	private Summary summary;
 	private ArrayList<Event> events = new ArrayList<Event>();

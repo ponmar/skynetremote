@@ -33,7 +33,6 @@ import se.markstrom.skynet.api.SkynetAPI;
 import se.markstrom.skynet.skynetremote.FileCache;
 import se.markstrom.skynet.skynetremote.FileWriter;
 import se.markstrom.skynet.skynetremote.GUI;
-import se.markstrom.skynet.skynetremote.Settings;
 import se.markstrom.skynet.skynetremote.SwtLogHandler;
 import se.markstrom.skynet.skynetremote.apitask.AcceptEventsTask;
 import se.markstrom.skynet.skynetremote.apitask.ApiThread;
@@ -60,6 +59,7 @@ import se.markstrom.skynet.skynetremote.model.Device;
 import se.markstrom.skynet.skynetremote.model.Event;
 import se.markstrom.skynet.skynetremote.model.Model;
 import se.markstrom.skynet.skynetremote.model.Sensor;
+import se.markstrom.skynet.skynetremote.model.Settings;
 import se.markstrom.skynet.skynetremote.model.Summary;
 
 public class ApplicationWindow implements GUI {

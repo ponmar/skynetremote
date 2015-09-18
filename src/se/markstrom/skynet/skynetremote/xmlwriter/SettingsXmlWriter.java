@@ -1,7 +1,7 @@
 package se.markstrom.skynet.skynetremote.xmlwriter;
 
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
-import se.markstrom.skynet.skynetremote.Settings;
+import se.markstrom.skynet.skynetremote.model.Settings;
 
 public class SettingsXmlWriter extends XmlWriter {
 	

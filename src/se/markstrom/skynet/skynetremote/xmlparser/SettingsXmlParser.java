@@ -9,7 +9,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
-import se.markstrom.skynet.skynetremote.Settings;
+import se.markstrom.skynet.skynetremote.model.Settings;
 
 public class SettingsXmlParser extends XmlParser {
 	

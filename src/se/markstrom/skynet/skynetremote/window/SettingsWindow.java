@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import se.markstrom.skynet.skynetremote.Settings;
+import se.markstrom.skynet.skynetremote.model.Settings;
 
 public class SettingsWindow {
 	
