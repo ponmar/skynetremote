@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 
 abstract class XmlParser {
 	
-	private boolean isValid = true;
+	private boolean isValid;
 	
 	XmlParser(File filename) {
 		this(readFile(filename));
@@ -26,13 +26,18 @@ abstract class XmlParser {
 	
 	XmlParser(String xml) {
 		try {
-			//System.out.println("Pre parsing xml doc");
-			Document xmlDoc = loadXMLFromString(xml);
-			//System.out.println("Post parsing xml doc");
-			
-			//System.out.println("Pre loading xml doc data");
-			isValid = parse(xmlDoc);
-			//System.out.println("Post loading xml doc data with result: " + isValid);
+			if (xml != null) {
+				//System.out.println("Pre parsing xml doc");
+				Document xmlDoc = loadXMLFromString(xml);
+				//System.out.println("Post parsing xml doc");
+				
+				//System.out.println("Pre loading xml doc data");
+				isValid = parse(xmlDoc);
+				//System.out.println("Post loading xml doc data with result: " + isValid);
+			}
+			else {
+				isValid = false;
+			}
 		}
 		catch (ParserConfigurationException | SAXException | IOException e) {
 			isValid = false;
@@ -102,7 +107,7 @@ abstract class XmlParser {
 	private static String readFile(File file) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
-			StringBuilder  stringBuilder = new StringBuilder();
+			StringBuilder stringBuilder = new StringBuilder();
 			String line = null;
 			String separator = System.getProperty("line.separator");
 
@@ -116,7 +121,7 @@ abstract class XmlParser {
 			return content;
 		}
 		catch (IOException e) {
-			return "";
+			return null;
 		}
 	}
 }
