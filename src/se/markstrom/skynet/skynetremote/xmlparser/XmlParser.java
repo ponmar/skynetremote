@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,6 +19,8 @@ import org.xml.sax.SAXException;
 
 abstract class XmlParser {
 	
+	private static final Logger log = Logger.getLogger(XmlParser.class.getName());
+	
 	private boolean isValid;
 	
 	XmlParser(File filename) {
@@ -27,19 +30,21 @@ abstract class XmlParser {
 	XmlParser(String xml) {
 		try {
 			if (xml != null) {
-				//System.out.println("Pre parsing xml doc");
+				log.finer("Pre parsing XML document");
 				Document xmlDoc = loadXMLFromString(xml);
-				//System.out.println("Post parsing xml doc");
+				log.finer("Post parsing XML document");
 				
-				//System.out.println("Pre loading xml doc data");
+				log.finer("Pre loading XML document data");
 				isValid = parse(xmlDoc);
-				//System.out.println("Post loading xml doc data with result: " + isValid);
+				log.finer("Post loading XML document data with result: " + isValid);
 			}
 			else {
+				log.finer("No XML data available");
 				isValid = false;
 			}
 		}
 		catch (ParserConfigurationException | SAXException | IOException e) {
+			log.finer("Exception while parsing XML data");
 			isValid = false;
 		}
 	}
