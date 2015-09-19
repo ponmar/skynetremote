@@ -48,30 +48,6 @@ public class SettingsWindow {
 		layout.marginBottom = 10;
 		shell.setLayout(layout);
 
-		updateEventsButton = new Button(shell, SWT.CHECK);
-		updateEventsButton.setText("Download events when a new event is detected");
-		GridData gd2 = new GridData();
-		gd2.horizontalSpan = 2;
-		updateEventsButton.setLayoutData(gd2);
-
-		updateControlButton = new Button(shell, SWT.CHECK);
-		updateControlButton.setText("Download devices when a new checksum is detected");
-		GridData controlGd = new GridData();
-		controlGd.horizontalSpan = 2;
-		updateControlButton.setLayoutData(controlGd);
-
-		updateSensorsButton = new Button(shell, SWT.CHECK);
-		updateSensorsButton.setText("Download sensors when a new trigger sum is detected");
-		GridData sensorsGd = new GridData();
-		sensorsGd.horizontalSpan = 2;
-		updateSensorsButton.setLayoutData(sensorsGd);
-
-		updateLogButton = new Button(shell, SWT.CHECK);
-		updateLogButton.setText("Download log when a new timestamp is detected");
-		GridData logGd = new GridData();
-		logGd.horizontalSpan = 2;
-		updateLogButton.setLayoutData(logGd);
-
 		notifyOnNewInfoEventButton = new Button(shell, SWT.CHECK);
 		notifyOnNewInfoEventButton.setText("Show notification at new event with info severity");
 		GridData gd3 = new GridData();
@@ -95,6 +71,30 @@ public class SettingsWindow {
 		label.pack();
 		
 		summaryPollInterval = new Text(shell, SWT.BORDER);
+		
+		updateEventsButton = new Button(shell, SWT.CHECK);
+		updateEventsButton.setText("Download events when a new event is detected");
+		GridData gd2 = new GridData();
+		gd2.horizontalSpan = 2;
+		updateEventsButton.setLayoutData(gd2);
+
+		updateControlButton = new Button(shell, SWT.CHECK);
+		updateControlButton.setText("Download devices when a new checksum is detected");
+		GridData controlGd = new GridData();
+		controlGd.horizontalSpan = 2;
+		updateControlButton.setLayoutData(controlGd);
+
+		updateSensorsButton = new Button(shell, SWT.CHECK);
+		updateSensorsButton.setText("Download sensors when a new trigger sum is detected");
+		GridData sensorsGd = new GridData();
+		sensorsGd.horizontalSpan = 2;
+		updateSensorsButton.setLayoutData(sensorsGd);
+
+		updateLogButton = new Button(shell, SWT.CHECK);
+		updateLogButton.setText("Download log when a new timestamp is detected");
+		GridData logGd = new GridData();
+		logGd.horizontalSpan = 2;
+		updateLogButton.setLayoutData(logGd);
 		
 		Button resetButton = new Button(shell, SWT.PUSH);
 		resetButton.setText("Reset to default");
