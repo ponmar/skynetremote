@@ -31,7 +31,9 @@ public class SettingsXmlWriter extends XmlWriter {
 		xml += "<host>" + settings.host + "</host>";
 		xml += "<port>" + settings.port + "</port>";
 		xml += "<protocol>" + protocol + "</protocol>";
-		xml += "<showEventNotification>" + settings.notifyOnNewEvent + "</showEventNotification>";
+		xml += "<showInfoEventNotification>" + settings.notifyOnNewInfoEvent + "</showInfoEventNotification>";
+		xml += "<showMinorEventNotification>" + settings.notifyOnNewMinorEvent + "</showMinorEventNotification>";
+		xml += "<showMajorEventNotification>" + settings.notifyOnNewMajorEvent + "</showMajorEventNotification>";
 		xml += "</settings>";
 		return xml;
 	}

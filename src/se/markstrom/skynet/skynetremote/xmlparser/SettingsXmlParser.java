@@ -32,11 +32,15 @@ public class SettingsXmlParser extends XmlParser {
 		String host = getNodeValueAsString(xmlDoc, "host");
 		Integer port = getNodeValueAsInteger(xmlDoc, "port");
 		Integer protocol = getNodeValueAsInteger(xmlDoc, "protocol");
-		Boolean showEventNotification = getNodeValueAsBoolean(xmlDoc, "showEventNotification");
+		Boolean showInfoEventNotification = getNodeValueAsBoolean(xmlDoc, "showInfoEventNotification");
+		Boolean showMinorEventNotification = getNodeValueAsBoolean(xmlDoc, "showMinorEventNotification");
+		Boolean showMajorEventNotification = getNodeValueAsBoolean(xmlDoc, "showMajorEventNotification");
 		
 		if (getNewEvents != null && getNewControl != null && getNewLog != null &&
 				summaryPollInterval != null && port != null && protocol != null &&
-				showEventNotification != null) {
+				showInfoEventNotification != null &&
+				showMinorEventNotification != null &&
+				showMajorEventNotification != null) {
 			settings = new Settings();
 			settings.getNewEvents = getNewEvents;
 			settings.getNewControl = getNewControl;
@@ -50,7 +54,9 @@ public class SettingsXmlParser extends XmlParser {
 			else {
 				settings.protocol = Protocol.TELNET;
 			}
-			settings.notifyOnNewEvent = showEventNotification;
+			settings.notifyOnNewInfoEvent = showInfoEventNotification;
+			settings.notifyOnNewMinorEvent = showMinorEventNotification;
+			settings.notifyOnNewMajorEvent = showMajorEventNotification;
 			return settings.validate();
 		}
 		

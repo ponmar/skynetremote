@@ -13,7 +13,9 @@ public class Settings {
 	public String host;
 	public int port;
 	public Protocol protocol;
-	public boolean notifyOnNewEvent;
+	public boolean notifyOnNewInfoEvent;
+	public boolean notifyOnNewMinorEvent;
+	public boolean notifyOnNewMajorEvent;
 	
 	public Settings() {
 		resetDefaults();
@@ -28,7 +30,9 @@ public class Settings {
 		host = "";
 		port = 22;
 		protocol = Protocol.SSH;
-		notifyOnNewEvent = true;
+		notifyOnNewInfoEvent = true;
+		notifyOnNewMinorEvent = true;
+		notifyOnNewMajorEvent = true;
 	}
 
 	public boolean validate() {

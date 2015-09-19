@@ -26,7 +26,9 @@ public class SettingsWindow {
 	private Button updateControlButton;
 	private Button updateSensorsButton;
 	private Button updateLogButton;
-	private Button notifyOnNewEventButton;
+	private Button notifyOnNewInfoEventButton;
+	private Button notifyOnNewMinorEventButton;
+	private Button notifyOnNewMajorEventButton;
 	private Text summaryPollInterval;
 	
 	private boolean savePressed = false;
@@ -70,12 +72,24 @@ public class SettingsWindow {
 		logGd.horizontalSpan = 2;
 		updateLogButton.setLayoutData(logGd);
 
-		notifyOnNewEventButton = new Button(shell, SWT.CHECK);
-		notifyOnNewEventButton.setText("Show notification at new event");
+		notifyOnNewInfoEventButton = new Button(shell, SWT.CHECK);
+		notifyOnNewInfoEventButton.setText("Show notification at new event with info severity");
 		GridData gd3 = new GridData();
 		gd3.horizontalSpan = 2;
-		notifyOnNewEventButton.setLayoutData(gd3);
+		notifyOnNewInfoEventButton.setLayoutData(gd3);
 
+		notifyOnNewMinorEventButton = new Button(shell, SWT.CHECK);
+		notifyOnNewMinorEventButton.setText("Show notification at new event with minor severity");
+		GridData gd4 = new GridData();
+		gd4.horizontalSpan = 2;
+		notifyOnNewMinorEventButton.setLayoutData(gd3);
+
+		notifyOnNewMajorEventButton = new Button(shell, SWT.CHECK);
+		notifyOnNewMajorEventButton.setText("Show notification at new event with major severity");
+		GridData gd5 = new GridData();
+		gd5.horizontalSpan = 2;
+		notifyOnNewMajorEventButton.setLayoutData(gd3);
+		
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Poll interval (seconds):");
 		label.pack();
@@ -125,7 +139,9 @@ public class SettingsWindow {
 		updateControlButton.setSelection(settings.getNewControl);
 		updateSensorsButton.setSelection(settings.getNewSensors);
 		updateLogButton.setSelection(settings.getNewLog);
-		notifyOnNewEventButton.setSelection(settings.notifyOnNewEvent);
+		notifyOnNewInfoEventButton.setSelection(settings.notifyOnNewInfoEvent);
+		notifyOnNewMinorEventButton.setSelection(settings.notifyOnNewMinorEvent);
+		notifyOnNewMajorEventButton.setSelection(settings.notifyOnNewMajorEvent);
 		summaryPollInterval.setText(new Integer(settings.summaryPollInterval).toString());
 	}
 	
@@ -162,7 +178,9 @@ public class SettingsWindow {
 		settings.getNewControl = updateControlButton.getSelection();
 		settings.getNewSensors = updateSensorsButton.getSelection();
 		settings.getNewLog = updateLogButton.getSelection();
-		settings.notifyOnNewEvent = notifyOnNewEventButton.getSelection();
+		settings.notifyOnNewInfoEvent = notifyOnNewInfoEventButton.getSelection();
+		settings.notifyOnNewMinorEvent = notifyOnNewMinorEventButton.getSelection();
+		settings.notifyOnNewMajorEvent = notifyOnNewMajorEventButton.getSelection();
 		try {
 			settings.summaryPollInterval = Integer.parseInt(summaryPollInterval.getText());
 		}
