@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -20,6 +21,9 @@ import org.xml.sax.SAXException;
 abstract class XmlParser {
 	
 	private static final Logger log = Logger.getLogger(XmlParser.class.getName());
+	static {
+		log.setLevel(Level.ALL);
+	}
 	
 	private boolean isValid;
 	

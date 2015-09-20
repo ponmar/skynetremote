@@ -1,6 +1,7 @@
 package se.markstrom.skynet.skynetremote.apitask;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import se.markstrom.skynet.api.SkynetAPI;
@@ -12,6 +13,9 @@ import se.markstrom.skynet.skynetremote.GUI;
 public class ApiThread extends Thread {
 
 	private static final Logger log = Logger.getLogger(ApiThread.class.getName());
+	static {
+		log.setLevel(Level.ALL);
+	}
 	
 	private boolean run = true;
 	private SkynetAPI api = null;

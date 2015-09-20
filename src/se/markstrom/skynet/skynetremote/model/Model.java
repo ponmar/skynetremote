@@ -2,6 +2,7 @@ package se.markstrom.skynet.skynetremote.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import se.markstrom.skynet.api.SkynetAPI.Protocol;
@@ -18,6 +19,9 @@ import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
 public class Model {
 
 	private static final Logger logger = Logger.getLogger(ApplicationWindow.class.getName());
+	static {
+		logger.setLevel(Level.ALL);
+	}
 	
 	private static final String SETTINGS_FILENAME = "SkynetRemote.xml";
 	

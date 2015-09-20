@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -33,7 +34,6 @@ import se.markstrom.skynet.api.SkynetAPI;
 import se.markstrom.skynet.skynetremote.FileCache;
 import se.markstrom.skynet.skynetremote.FileWriter;
 import se.markstrom.skynet.skynetremote.GUI;
-import se.markstrom.skynet.skynetremote.SwtLogHandler;
 import se.markstrom.skynet.skynetremote.apitask.AcceptEventsTask;
 import se.markstrom.skynet.skynetremote.apitask.ApiThread;
 import se.markstrom.skynet.skynetremote.apitask.ArmTask;
@@ -54,6 +54,8 @@ import se.markstrom.skynet.skynetremote.apitask.TurnOffDeviceTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOnDeviceTask;
 import se.markstrom.skynet.skynetremote.apitask.GetCameraImageTask.ImageType;
+import se.markstrom.skynet.skynetremote.logging.LogLevelFilter;
+import se.markstrom.skynet.skynetremote.logging.SwtLogHandler;
 import se.markstrom.skynet.skynetremote.model.Camera;
 import se.markstrom.skynet.skynetremote.model.Device;
 import se.markstrom.skynet.skynetremote.model.Event;
@@ -65,6 +67,10 @@ import se.markstrom.skynet.skynetremote.model.Summary;
 public class ApplicationWindow implements GUI {
 
 	private static final Logger log = Logger.getLogger(ApplicationWindow.class.getName());
+	static {
+		log.setLevel(Level.ALL);
+	}
+	
 	private static final String NAME = "Skynet Remote";
 	
 	private FileCache fileCache = new FileCache();
@@ -124,12 +130,14 @@ public class ApplicationWindow implements GUI {
 	
 	public ApplicationWindow() {
 		createGui();
-
+		
 		// The GUI widgets for logging are now created. Setup the custom log handler!
 		// Add the new log handler to the package level above all logging classes to
 		// intercept all log messages.
 		Logger commonLogger = Logger.getLogger("se.markstrom.skynet.skynetremote");
 		SwtLogHandler logHandler = new SwtLogHandler(display, logText);
+		// TODO: set filter from new setting?
+		logHandler.setFilter(new LogLevelFilter(Level.INFO));
 		commonLogger.addHandler(logHandler);
 		
 		apiThread.start();
