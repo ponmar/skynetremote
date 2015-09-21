@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
@@ -111,6 +112,8 @@ public class ApplicationWindow implements GUI {
 	private Text logText;
 	private Text remoteLogText;
 	
+	private TabFolder tabFolder;
+	
 	private ApiThread apiThread = new ApiThread(this);
 
 	private boolean apiWorking = false;
@@ -173,10 +176,24 @@ public class ApplicationWindow implements GUI {
 		createTray();
 		createMenuBar();
 		createTabs();
-	    
+		
 		shell.open();
 		
 		updateGui();
+		addKeyBindings();
+	}
+	
+	private void addKeyBindings() {
+		// 1-9 is used for selecting tabs
+		display.addFilter(SWT.KeyDown, new Listener() {
+			@Override
+		    public void handleEvent(org.eclipse.swt.widgets.Event e) {
+				int tab = e.character - '1';
+				if (tab >= 0 && tab <= 8) {
+					tabFolder.setSelection(tab);
+				}
+		    }
+		});
 	}
 	
 	private void createIcons() {
@@ -348,18 +365,18 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	private void createTabs() {
-		TabFolder tf = new TabFolder(shell, SWT.BORDER);
-		createEventsTab(tf);
-	    createControlTab(tf);
-	    createSensorsTab(tf);
-	    createLogTab(tf);
-	    createRemoteLogTab(tf);
+		tabFolder = new TabFolder(shell, SWT.BORDER);
+		createEventsTab();
+	    createControlTab();
+	    createSensorsTab();
+	    createLogTab();
+	    createRemoteLogTab();
 	}
 
-	private void createEventsTab(TabFolder tf) {
-		TabItem eventsTab = new TabItem(tf, SWT.BORDER);
+	private void createEventsTab() {
+		TabItem eventsTab = new TabItem(tabFolder, SWT.BORDER);
 		eventsTab.setText("Events");
-		eventsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+		eventsTable = new Table(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 		eventsTable.setHeaderVisible(true);
 		eventsTable.setLinesVisible(true);
 		eventsTable.addMouseListener(new EventSelectedListener());
@@ -388,13 +405,13 @@ public class ApplicationWindow implements GUI {
 		eventsTab.setControl(eventsTable);
 	}
 
-	private void createControlTab(TabFolder tf) {
-	    controlTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+	private void createControlTab() {
+	    controlTable = new Table(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 	    controlTable.setHeaderVisible(true);
 	    controlTable.setLinesVisible(true);
 	    controlTable.addMouseListener(new DeviceSelectedListener());
 
-	    TabItem controlTab = new TabItem(tf, SWT.BORDER);
+	    TabItem controlTab = new TabItem(tabFolder, SWT.BORDER);
 	    controlTab.setText("Device Control");
 	    controlTab.setToolTipText("Home automation device control");
 	    
@@ -417,12 +434,12 @@ public class ApplicationWindow implements GUI {
 	    controlTab.setControl(controlTable);
 	}
 	
-	private void createSensorsTab(TabFolder tf) {
-		sensorsTable = new Table(tf, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+	private void createSensorsTab() {
+		sensorsTable = new Table(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 		sensorsTable.setHeaderVisible(true);
 		sensorsTable.setLinesVisible(true);
 
-	    TabItem sensorsTab = new TabItem(tf, SWT.BORDER);
+	    TabItem sensorsTab = new TabItem(tabFolder, SWT.BORDER);
 	    sensorsTab.setText("Sensors");
 	    
 	    TableColumn nameColumn = new TableColumn(sensorsTable, SWT.NULL);
@@ -464,20 +481,20 @@ public class ApplicationWindow implements GUI {
 	    sensorsTab.setControl(sensorsTable);
 	}
 
-	private void createLogTab(TabFolder tf) {
-	    TabItem logTab = new TabItem(tf, SWT.BORDER);
+	private void createLogTab() {
+	    TabItem logTab = new TabItem(tabFolder, SWT.BORDER);
 	    logTab.setText("Log");
 	    
-	    logText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+	    logText = new Text(tabFolder, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 	    logText.setEditable(false);
 	    logTab.setControl(logText);
 	}
 
-	private void createRemoteLogTab(TabFolder tf) {
-	    TabItem remoteLogTab = new TabItem(tf, SWT.BORDER);
+	private void createRemoteLogTab() {
+	    TabItem remoteLogTab = new TabItem(tabFolder, SWT.BORDER);
 	    remoteLogTab.setText("Remote Log");
 	    
-	    remoteLogText = new Text(tf, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+	    remoteLogText = new Text(tabFolder, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 	    remoteLogText.setEditable(false);
 	    remoteLogTab.setControl(remoteLogText);
 	}

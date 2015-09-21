@@ -34,6 +34,10 @@ public class AboutWindow {
 		site.setText("Site: https://bitbucket.org/pontusmarkstrom/skynet-remote/");
 		site.pack();
 
+		Label tabSelection = new Label(shell, SWT.NONE);
+		tabSelection.setText("Select tab: 1-9");
+		tabSelection.pack();
+		
 		shell.addTraverseListener(new KeyListener());
 		
 		shell.pack();
