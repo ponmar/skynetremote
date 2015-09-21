@@ -136,8 +136,12 @@ public class ApplicationWindow implements GUI {
 		// intercept all log messages.
 		Logger commonLogger = Logger.getLogger("se.markstrom.skynet.skynetremote");
 		SwtLogHandler logHandler = new SwtLogHandler(display, logText);
-		// TODO: set filter from new setting?
-		logHandler.setFilter(new LogLevelFilter(Level.INFO));
+		if (model.getSettings().logDetails) {
+			logHandler.setFilter(new LogLevelFilter(Level.ALL));
+		}
+		else {
+			logHandler.setFilter(new LogLevelFilter(Level.INFO));
+		}
 		commonLogger.addHandler(logHandler);
 		
 		apiThread.start();

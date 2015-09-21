@@ -16,6 +16,7 @@ public class Settings {
 	public boolean notifyOnNewInfoEvent;
 	public boolean notifyOnNewMinorEvent;
 	public boolean notifyOnNewMajorEvent;
+	public boolean logDetails;
 	
 	public Settings() {
 		resetDefaults();
@@ -33,6 +34,7 @@ public class Settings {
 		notifyOnNewInfoEvent = true;
 		notifyOnNewMinorEvent = true;
 		notifyOnNewMajorEvent = true;
+		logDetails = false;
 	}
 
 	public boolean validate() {

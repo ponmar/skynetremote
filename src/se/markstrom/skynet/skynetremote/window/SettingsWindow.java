@@ -29,6 +29,7 @@ public class SettingsWindow {
 	private Button notifyOnNewInfoEventButton;
 	private Button notifyOnNewMinorEventButton;
 	private Button notifyOnNewMajorEventButton;
+	private Button logDetailsButton;
 	private Text summaryPollInterval;
 	
 	private boolean savePressed = false;
@@ -58,13 +59,19 @@ public class SettingsWindow {
 		notifyOnNewMinorEventButton.setText("Show notification at new event with minor severity");
 		GridData gd4 = new GridData();
 		gd4.horizontalSpan = 2;
-		notifyOnNewMinorEventButton.setLayoutData(gd3);
+		notifyOnNewMinorEventButton.setLayoutData(gd4);
 
 		notifyOnNewMajorEventButton = new Button(shell, SWT.CHECK);
 		notifyOnNewMajorEventButton.setText("Show notification at new event with major severity");
 		GridData gd5 = new GridData();
 		gd5.horizontalSpan = 2;
-		notifyOnNewMajorEventButton.setLayoutData(gd3);
+		notifyOnNewMajorEventButton.setLayoutData(gd5);
+
+		logDetailsButton = new Button(shell, SWT.CHECK);
+		logDetailsButton.setText("Enable detailed logging");
+		GridData gd6 = new GridData();
+		gd6.horizontalSpan = 2;
+		logDetailsButton.setLayoutData(gd6);
 		
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Poll interval (seconds):");
@@ -142,6 +149,7 @@ public class SettingsWindow {
 		notifyOnNewInfoEventButton.setSelection(settings.notifyOnNewInfoEvent);
 		notifyOnNewMinorEventButton.setSelection(settings.notifyOnNewMinorEvent);
 		notifyOnNewMajorEventButton.setSelection(settings.notifyOnNewMajorEvent);
+		logDetailsButton.setSelection(settings.logDetails);
 		summaryPollInterval.setText(new Integer(settings.summaryPollInterval).toString());
 	}
 	
@@ -181,6 +189,7 @@ public class SettingsWindow {
 		settings.notifyOnNewInfoEvent = notifyOnNewInfoEventButton.getSelection();
 		settings.notifyOnNewMinorEvent = notifyOnNewMinorEventButton.getSelection();
 		settings.notifyOnNewMajorEvent = notifyOnNewMajorEventButton.getSelection();
+		settings.logDetails = logDetailsButton.getSelection();
 		try {
 			settings.summaryPollInterval = Integer.parseInt(summaryPollInterval.getText());
 		}

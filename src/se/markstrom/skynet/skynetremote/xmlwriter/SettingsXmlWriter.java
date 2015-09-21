@@ -34,6 +34,7 @@ public class SettingsXmlWriter extends XmlWriter {
 		xml += "<showInfoEventNotification>" + settings.notifyOnNewInfoEvent + "</showInfoEventNotification>";
 		xml += "<showMinorEventNotification>" + settings.notifyOnNewMinorEvent + "</showMinorEventNotification>";
 		xml += "<showMajorEventNotification>" + settings.notifyOnNewMajorEvent + "</showMajorEventNotification>";
+		xml += "<logDetails>" + settings.logDetails + "</logDetails>";
 		xml += "</settings>";
 		return xml;
 	}

@@ -35,12 +35,14 @@ public class SettingsXmlParser extends XmlParser {
 		Boolean showInfoEventNotification = getNodeValueAsBoolean(xmlDoc, "showInfoEventNotification");
 		Boolean showMinorEventNotification = getNodeValueAsBoolean(xmlDoc, "showMinorEventNotification");
 		Boolean showMajorEventNotification = getNodeValueAsBoolean(xmlDoc, "showMajorEventNotification");
+		Boolean logDetails = getNodeValueAsBoolean(xmlDoc, "logDetails");
 		
 		if (getNewEvents != null && getNewControl != null && getNewLog != null &&
 				summaryPollInterval != null && port != null && protocol != null &&
 				showInfoEventNotification != null &&
 				showMinorEventNotification != null &&
-				showMajorEventNotification != null) {
+				showMajorEventNotification != null &&
+				logDetails != null) {
 			settings = new Settings();
 			settings.getNewEvents = getNewEvents;
 			settings.getNewControl = getNewControl;
@@ -57,6 +59,7 @@ public class SettingsXmlParser extends XmlParser {
 			settings.notifyOnNewInfoEvent = showInfoEventNotification;
 			settings.notifyOnNewMinorEvent = showMinorEventNotification;
 			settings.notifyOnNewMajorEvent = showMajorEventNotification;
+			settings.logDetails = logDetails;
 			return settings.validate();
 		}
 		
