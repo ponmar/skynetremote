@@ -40,9 +40,13 @@ public class CameraStreamWindow {
 		//       Did the API not return a correct image? Further testing is needed.
 		ImageData imageData = new ImageData(new ByteArrayInputStream(jpegData));
 		Image image = new Image(display, imageData);
+		Image oldImage = imageLabel.getImage();
 		imageLabel.setImage(image);
 		imageLabel.pack();
 		shell.pack();
+		if (oldImage != null) {
+			oldImage.dispose();
+		}
 	}
 	
 	public boolean isOpen() {
