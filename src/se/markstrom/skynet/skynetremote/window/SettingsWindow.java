@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -42,62 +43,70 @@ public class SettingsWindow {
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("Settings");
 		
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginTop = 10;
-		layout.marginLeft = 10;
-		layout.marginRight = 10;
-		layout.marginBottom = 10;
-		shell.setLayout(layout);
+		GridLayout shellLayout = new GridLayout(1, false);
+		shellLayout.marginTop = 5;
+		shellLayout.marginLeft = 5;
+		shellLayout.marginRight = 5;
+		shellLayout.marginBottom = 5;
+		shell.setLayout(shellLayout);
 
-		notifyOnNewInfoEventButton = new Button(shell, SWT.CHECK);
-		notifyOnNewInfoEventButton.setText("Show notification at new event with info severity");
-		GridData gd3 = new GridData();
-		gd3.horizontalSpan = 2;
-		notifyOnNewInfoEventButton.setLayoutData(gd3);
-
-		notifyOnNewMinorEventButton = new Button(shell, SWT.CHECK);
-		notifyOnNewMinorEventButton.setText("Show notification at new event with minor severity");
-		GridData gd4 = new GridData();
-		gd4.horizontalSpan = 2;
-		notifyOnNewMinorEventButton.setLayoutData(gd4);
-
-		notifyOnNewMajorEventButton = new Button(shell, SWT.CHECK);
-		notifyOnNewMajorEventButton.setText("Show notification at new event with major severity");
-		GridData gd5 = new GridData();
-		gd5.horizontalSpan = 2;
-		notifyOnNewMajorEventButton.setLayoutData(gd5);
-
-		logDetailsButton = new Button(shell, SWT.CHECK);
-		logDetailsButton.setText("Enable detailed logging");
-		GridData gd6 = new GridData();
-		gd6.horizontalSpan = 2;
-		logDetailsButton.setLayoutData(gd6);
+		Group graphicsGroup = new Group(shell, SWT.SHADOW_ETCHED_IN);
+	    graphicsGroup.setText("Graphics");
 		
-		Label label = new Label(shell, SWT.NONE);
+	    GridLayout graphicsGroupLayout = new GridLayout(1, false);
+		graphicsGroupLayout.marginTop = 5;
+		graphicsGroupLayout.marginLeft = 5;
+		graphicsGroupLayout.marginRight = 5;
+		graphicsGroupLayout.marginBottom = 5;
+		graphicsGroup.setLayout(graphicsGroupLayout);
+	    
+		notifyOnNewInfoEventButton = new Button(graphicsGroup, SWT.CHECK);
+		notifyOnNewInfoEventButton.setText("Show notification at new event with info severity");
+
+		notifyOnNewMinorEventButton = new Button(graphicsGroup, SWT.CHECK);
+		notifyOnNewMinorEventButton.setText("Show notification at new event with minor severity");
+
+		notifyOnNewMajorEventButton = new Button(graphicsGroup, SWT.CHECK);
+		notifyOnNewMajorEventButton.setText("Show notification at new event with major severity");
+
+		logDetailsButton = new Button(graphicsGroup, SWT.CHECK);
+		logDetailsButton.setText("Enable detailed logging");
+
+		Group pollGroup = new Group(shell, SWT.SHADOW_ETCHED_IN);
+	    pollGroup.setText("Skynet API data fetching");
+
+	    GridLayout pollGroupLayout = new GridLayout(2, false);
+	    pollGroupLayout.marginTop = 5;
+	    pollGroupLayout.marginLeft = 5;
+	    pollGroupLayout.marginRight = 5;
+	    pollGroupLayout.marginBottom = 5;
+		pollGroup.setLayout(pollGroupLayout);
+	    
+		Label label = new Label(pollGroup, SWT.NONE);
 		label.setText("Poll interval (seconds):");
 		label.pack();
 		
-		summaryPollInterval = new Text(shell, SWT.BORDER);
+		summaryPollInterval = new Text(pollGroup, SWT.BORDER);
 		
-		updateEventsButton = new Button(shell, SWT.CHECK);
+		updateEventsButton = new Button(pollGroup, SWT.CHECK);
 		updateEventsButton.setText("Download events when a new event is detected");
 		GridData gd2 = new GridData();
 		gd2.horizontalSpan = 2;
 		updateEventsButton.setLayoutData(gd2);
 
-		updateControlButton = new Button(shell, SWT.CHECK);
+		updateControlButton = new Button(pollGroup, SWT.CHECK);
 		updateControlButton.setText("Download devices when a new checksum is detected");
 		GridData controlGd = new GridData();
 		controlGd.horizontalSpan = 2;
 		updateControlButton.setLayoutData(controlGd);
 
-		updateSensorsButton = new Button(shell, SWT.CHECK);
+		updateSensorsButton = new Button(pollGroup, SWT.CHECK);
 		updateSensorsButton.setText("Download sensors when a new trigger sum is detected");
 		GridData sensorsGd = new GridData();
 		sensorsGd.horizontalSpan = 2;
 		updateSensorsButton.setLayoutData(sensorsGd);
 
-		updateLogButton = new Button(shell, SWT.CHECK);
+		updateLogButton = new Button(pollGroup, SWT.CHECK);
 		updateLogButton.setText("Download log when a new timestamp is detected");
 		GridData logGd = new GridData();
 		logGd.horizontalSpan = 2;
