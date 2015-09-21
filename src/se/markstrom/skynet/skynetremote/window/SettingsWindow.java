@@ -73,7 +73,7 @@ public class SettingsWindow {
 		logDetailsButton.setText("Enable detailed logging");
 
 		Group pollGroup = new Group(shell, SWT.SHADOW_ETCHED_IN);
-	    pollGroup.setText("Skynet API data fetching");
+	    pollGroup.setText("Network");
 
 	    GridLayout pollGroupLayout = new GridLayout(2, false);
 	    pollGroupLayout.marginTop = 5;
