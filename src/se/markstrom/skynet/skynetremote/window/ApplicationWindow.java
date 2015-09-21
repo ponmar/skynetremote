@@ -12,7 +12,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -158,15 +157,6 @@ public class ApplicationWindow implements GUI {
 		trayItem.dispose();
 	}
 	
-	private Image createImage(int width, int height, int color) {
-		Image image = new Image(display, width, height);
-		GC gc = new GC(image);
-		gc.setBackground(display.getSystemColor(color));
-		gc.fillRectangle(image.getBounds());
-		gc.dispose();
-		return image;
-	}
-	
 	private void createGui() {
 		display = Display.getDefault();
 		shell = new Shell(display);
@@ -198,10 +188,10 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	private void createIcons() {
-		noneImage = createImage(16, 16, SWT.COLOR_BLACK);
-		infoImage = createImage(16, 16, SWT.COLOR_GREEN);
-		minorImage = createImage(16, 16, SWT.COLOR_YELLOW);
-		majorImage = createImage(16, 16, SWT.COLOR_RED);
+		noneImage = Utils.createFadedImage(32, 32, display.getSystemColor(SWT.COLOR_BLACK), display.getSystemColor(SWT.COLOR_GRAY), 0);
+		infoImage = Utils.createFadedImage(32, 32, display.getSystemColor(SWT.COLOR_GREEN), display.getSystemColor(SWT.COLOR_GRAY), 0);
+		minorImage = Utils.createFadedImage(32, 32, display.getSystemColor(SWT.COLOR_YELLOW), display.getSystemColor(SWT.COLOR_GRAY), 0);
+		majorImage = Utils.createFadedImage(32, 32, display.getSystemColor(SWT.COLOR_RED), display.getSystemColor(SWT.COLOR_GRAY), 0);
 	}
 	
 	private void createTray() {

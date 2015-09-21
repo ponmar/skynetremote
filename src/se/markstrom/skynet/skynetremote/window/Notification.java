@@ -9,7 +9,6 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -45,10 +44,11 @@ public class Notification {
 			@Override
 			public void handleEvent(Event arg0) {
 				Rectangle rect = shell.getClientArea();
-				Image newImage = new Image(Display.getDefault(), Math.max(1, rect.width), rect.height);
-				GC gc = new GC(newImage);
+				
+				int width = Math.max(1, rect.width);
+				int height = rect.height;
+				int edgeWith = 2;
 
-				// Fill background 
 				Color fgColor = null;
 				switch (severity) {
 				case INFO:
@@ -62,16 +62,8 @@ public class Notification {
 					break;
 				}
 				Color bgColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
-		        gc.setForeground(fgColor); 
-		        gc.setBackground(bgColor);
-		        gc.fillGradientRectangle(rect.x, rect.y, rect.width, rect.height, true);
-		        
-		        // Draw shell edge 
-		        gc.setLineWidth(2);
-		        Color borderColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
-		        gc.setForeground(borderColor); 
-		        gc.drawRectangle(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2); 
-		        gc.dispose();
+				
+				Image newImage = Utils.createFadedImage(width, height, fgColor, bgColor, edgeWith);
 		        
 		        // now set the background image on the shell 
 		        shell.setBackgroundImage(newImage); 
