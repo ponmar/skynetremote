@@ -18,15 +18,15 @@ public class CameraStreamWindow {
 	private Shell shell;
 	private Label imageLabel;
 	
-	public CameraStreamWindow(int cameraIndex) {
+	public CameraStreamWindow(String site, int cameraIndex) {
 		this.cameraIndex = cameraIndex;
-		createGui();
+		createGui(site);
 	}
 	
-	private void createGui() {
+	private void createGui(String site) {
 		display = Display.getDefault();
 		shell = new Shell(display);
-		shell.setText("Camera " + (cameraIndex+1));
+		shell.setText(site + ": Camera " + (cameraIndex+1));
 
 		imageLabel = new Label(shell, SWT.BORDER);
 		

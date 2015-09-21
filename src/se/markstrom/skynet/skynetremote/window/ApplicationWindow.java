@@ -774,7 +774,7 @@ public class ApplicationWindow implements GUI {
 			}
 
 			// Open a new window and request the first image
-			streamWindows.add(new CameraStreamWindow(cameraIndex));
+			streamWindows.add(new CameraStreamWindow(model.getSummary().site, cameraIndex));
 			apiThread.runTask(new GetCameraImageTask(cameraIndex, ImageType.STREAM));
 		}
 
@@ -1234,7 +1234,7 @@ public class ApplicationWindow implements GUI {
 				fileCache.addFile(Settings.createFilenameForEventImage(eventId, imageIndex), jpegData);
 				
 				if (show) {
-					String windowTitle = "Event " + eventId + " (image " + (imageIndex+1) + ")"; 
+					String windowTitle = model.getSummary().site +  ": Event " + eventId + " (image " + (imageIndex+1) + ")"; 
 					new ImageWindow(windowTitle, jpegData);
 				}
 				
@@ -1251,7 +1251,8 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				new ImageWindow("Camera " + (cameraIndex+1) + " snapshot", jpegData);
+				String title = model.getSummary().site + ": Camera " + (cameraIndex+1) + " snapshot";
+				new ImageWindow(title, jpegData);
 			}
 		});
 	}
