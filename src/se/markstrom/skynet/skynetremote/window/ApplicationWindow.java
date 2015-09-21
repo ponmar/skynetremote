@@ -1105,13 +1105,13 @@ public class ApplicationWindow implements GUI {
 						}
 						
 						if (model.getSettings().notifyOnNewMajorEvent && newMajorEvent) {
-							new Notification(NAME, "New event with major severity detected!");
+							new Notification(model.getSummary().site, "New event with major severity detected!");
 						}
 						else if (model.getSettings().notifyOnNewMinorEvent && newMinorEvent) {
-							new Notification(NAME, "New event with minor severity detected!");
+							new Notification(model.getSummary().site, "New event with minor severity detected!");
 						}
 						else if (model.getSettings().notifyOnNewInfoEvent && newInfoEvent) {
-							new Notification(NAME, "New event with info severity detected!");
+							new Notification(model.getSummary().site, "New event with info severity detected!");
 						}
 					}
 					
