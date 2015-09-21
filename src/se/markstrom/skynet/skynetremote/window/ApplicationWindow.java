@@ -60,6 +60,7 @@ import se.markstrom.skynet.skynetremote.logging.SwtLogHandler;
 import se.markstrom.skynet.skynetremote.model.Camera;
 import se.markstrom.skynet.skynetremote.model.Device;
 import se.markstrom.skynet.skynetremote.model.Event;
+import se.markstrom.skynet.skynetremote.model.Event.Severity;
 import se.markstrom.skynet.skynetremote.model.Model;
 import se.markstrom.skynet.skynetremote.model.Sensor;
 import se.markstrom.skynet.skynetremote.model.Settings;
@@ -1066,7 +1067,7 @@ public class ApplicationWindow implements GUI {
 					List<Event> events = model.getEvents();
 					
 					if (!events.isEmpty()) {
-						int highestSeverity = 0;
+						Severity highestSeverity = Severity.INFO;
 
 						boolean newInfoEvent = false;
 						boolean newMinorEvent = false;
@@ -1078,13 +1079,13 @@ public class ApplicationWindow implements GUI {
 							
 							if (event.id > prevLatestEventId) {
 								switch (event.severity) {
-								case Event.INFO:
+								case INFO:
 									newInfoEvent = true;
 									break;
-								case Event.MINOR:
+								case MINOR:
 									newMinorEvent = true;
 									break;
-								case Event.MAJOR:
+								case MAJOR:
 									newMajorEvent = true;
 									break;
 								}
@@ -1100,7 +1101,7 @@ public class ApplicationWindow implements GUI {
 							item.setText(6, String.valueOf(event.images));
 							item.setData(event.id);
 							
-							if (event.severity > highestSeverity) {
+							if (event.severity.ordinal() > highestSeverity.ordinal()) {
 								highestSeverity = event.severity;
 							}
 						}
@@ -1110,25 +1111,25 @@ public class ApplicationWindow implements GUI {
 						}
 						
 						switch (highestSeverity) {
-						case Event.INFO:
+						case INFO:
 							setIcon(infoImage);
 							break;
-						case Event.MINOR:
+						case MINOR:
 							setIcon(minorImage);
 							break;
-						case Event.MAJOR:
+						case MAJOR:
 							setIcon(majorImage);
 							break;
 						}
 						
 						if (model.getSettings().notifyOnNewMajorEvent && newMajorEvent) {
-							new Notification(model.getSummary().site, "New event with major severity detected!");
+							new Notification(model.getSummary().site, "New event with major severity detected!", Severity.MAJOR);
 						}
 						else if (model.getSettings().notifyOnNewMinorEvent && newMinorEvent) {
-							new Notification(model.getSummary().site, "New event with minor severity detected!");
+							new Notification(model.getSummary().site, "New event with minor severity detected!", Severity.MINOR);
 						}
 						else if (model.getSettings().notifyOnNewInfoEvent && newInfoEvent) {
-							new Notification(model.getSummary().site, "New event with info severity detected!");
+							new Notification(model.getSummary().site, "New event with info severity detected!", Severity.INFO);
 						}
 					}
 					

@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class AboutWindow {
 	
+	private static final int MARGIN = 30;
 	private Display display;
 	private Shell shell;
 	
@@ -20,10 +21,10 @@ public class AboutWindow {
 		shell.setText("About");
 		
 		GridLayout layout = new GridLayout(1, false);
-		layout.marginTop = 30;
-		layout.marginLeft = 30;
-		layout.marginRight = 30;
-		layout.marginBottom = 30;
+		layout.marginTop = MARGIN;
+		layout.marginLeft = MARGIN;
+		layout.marginRight = MARGIN;
+		layout.marginBottom = MARGIN;
 		shell.setLayout(layout);
 
 		Label author = new Label(shell, SWT.NONE);

@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
+import se.markstrom.skynet.skynetremote.model.Event.Severity;
+
 public class Notification {
 
 	private static final int HEADING_FONT_SIZE = 14;
@@ -33,7 +35,7 @@ public class Notification {
 	
 	private static Point position = null;
 	
-	public Notification(String title, String message) {
+	public Notification(String title, String message, Severity severity) {
 		shell = new Shell(Display.getDefault(), SWT.NO_FOCUS | SWT.NO_TRIM | SWT.ON_TOP);
 		
 		// Make widgets have transparent background
@@ -47,7 +49,18 @@ public class Notification {
 				GC gc = new GC(newImage);
 
 				// Fill background 
-				Color fgColor = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
+				Color fgColor = null;
+				switch (severity) {
+				case INFO:
+					fgColor = Display.getDefault().getSystemColor(SWT.COLOR_GREEN);
+					break;
+				case MINOR:
+					fgColor = Display.getDefault().getSystemColor(SWT.COLOR_YELLOW);
+					break;
+				case MAJOR:
+					fgColor = Display.getDefault().getSystemColor(SWT.COLOR_RED);
+					break;
+				}
 				Color bgColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 		        gc.setForeground(fgColor); 
 		        gc.setBackground(bgColor);

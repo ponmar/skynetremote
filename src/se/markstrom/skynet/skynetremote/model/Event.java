@@ -2,25 +2,34 @@ package se.markstrom.skynet.skynetremote.model;
 
 public class Event {
 	
-	private static final String[] SEVERITIES = {"Info", "Minor", "Major"};
+	private static final String INFO_STR = "Info";
+	private static final String MINOR_STR = "Minor";
+	private static final String MAJOR_STR = "Major";
 	private static final String ARMED_STR = "Armed";
 	private static final String DISARMED_STR = "Disarmed";
 	
-	public static final int INFO = 0;
-	public static final int MINOR = 1;
-	public static final int MAJOR = 2;
+	public enum Severity { INFO, MINOR, MAJOR }
 	
 	public long id;
 	public String time;
 	public String message;
 	public String sensor;
 	public String areas;
-	public int severity;
+	public Severity severity;
 	public boolean armed;
 	public int images = 0;
 	
 	public String getSeverityStr() {
-		return SEVERITIES[severity];
+		switch (severity) {
+		case INFO:
+			return INFO_STR;
+		case MINOR:
+			return MINOR_STR;
+		case MAJOR:
+			return MAJOR_STR;
+		default:
+			return null;
+		}
 	}
 	
 	public String getArmedStr() {

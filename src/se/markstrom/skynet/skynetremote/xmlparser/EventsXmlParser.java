@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import se.markstrom.skynet.skynetremote.model.Event;
+import se.markstrom.skynet.skynetremote.model.Event.Severity;
 
 public class EventsXmlParser extends XmlParser {
 
@@ -39,7 +40,7 @@ public class EventsXmlParser extends XmlParser {
 						event.id = Long.parseLong(eventChildNode.getFirstChild().getNodeValue());
 					}
 					else if (nodeName.equals("severity")) {
-						event.severity = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue());
+						event.severity = Severity.values()[Integer.parseInt(eventChildNode.getFirstChild().getNodeValue())];
 					}
 					else if (nodeName.equals("armed")) {
 						event.armed = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue()) == 1;
