@@ -6,6 +6,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -31,6 +32,8 @@ public class Notification {
 
 	private int mouseDownX = -1;
 	private int mouseDownY = -1;
+	
+	private boolean mouseButtonDown = false;
 	
 	private static Point position = null;
 	
@@ -84,11 +87,14 @@ public class Notification {
 		}
 		shell.setLocation(position);
 		
+		NotificationMouseMoveListener mouseMoveListener = new NotificationMouseMoveListener(); 
 		NotificationMouseListener mouseListener = new NotificationMouseListener();
+		shell.addMouseMoveListener(mouseMoveListener);
 		shell.addMouseListener(mouseListener);
 
 		CLabel titleLabel = new CLabel(shell, SWT.NONE);
 		titleLabel.addMouseListener(mouseListener);
+		titleLabel.addMouseMoveListener(mouseMoveListener);
 		
 		FontData[] fontData = titleLabel.getFont().getFontData();
 		if (fontData.length > 0) {
@@ -109,6 +115,7 @@ public class Notification {
 		messageLabel.setText(message);
 		messageLabel.pack();
 		messageLabel.addMouseListener(mouseListener);
+		messageLabel.addMouseMoveListener(mouseMoveListener);
 
 		shell.pack();
 		shell.open();
@@ -132,18 +139,23 @@ public class Notification {
 		public void mouseDown(MouseEvent e) {
 			mouseDownX = e.x;
 			mouseDownY = e.y;
+			mouseButtonDown = true;
 		}
 
 		@Override
 		public void mouseUp(MouseEvent e) {
-			if (mouseDownX != -1 && mouseDownY != -1) {
-				int xMovement = e.x - mouseDownX;
-				int yMovement = e.y - mouseDownY;
-				position = new Point(shell.getLocation().x + xMovement, shell.getLocation().y + yMovement);
+			mouseButtonDown = false;
+		}
+	}
+	
+	private class NotificationMouseMoveListener implements MouseMoveListener {
+		@Override
+		public void mouseMove(MouseEvent e) {
+			if (mouseButtonDown) {
+				position.x = shell.getLocation().x + (e.x - mouseDownX); 
+				position.y = shell.getLocation().y + (e.y - mouseDownY);
 				shell.setLocation(position);
-				mouseDownX = -1;
-				mouseDownY = -1;
 			}
-		}		
+		}
 	}
 }
