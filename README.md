@@ -11,8 +11,9 @@ The Skynet Remote main features are:
 * Accept events (lower event severity to info)
 * Control home automation devices
 * Stream live camera images
-* Show event information and event images
-* Show Skynet system information
+* Show event information, event images, sensor details and the system log
+
+Run many instances of this program to control or supervise many sites.
 
 ### Releases ###
 
