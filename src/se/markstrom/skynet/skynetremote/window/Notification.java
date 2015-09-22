@@ -27,7 +27,7 @@ public class Notification {
 	
 	private Shell shell;
 	private Font headingFont = null;
-	private Image oldImage = null; 
+	private Image backgroundImage = null;
 
 	private int mouseDownX = -1;
 	private int mouseDownY = -1;
@@ -43,35 +43,32 @@ public class Notification {
 		shell.addListener(SWT.Resize, new Listener() {
 			@Override
 			public void handleEvent(Event arg0) {
-				Rectangle rect = shell.getClientArea();
-				
-				int width = Math.max(1, rect.width);
-				int height = rect.height;
-				int edgeWith = 2;
 
-				Color fgColor = null;
-				switch (severity) {
-				case INFO:
-					fgColor = Display.getDefault().getSystemColor(SWT.COLOR_GREEN);
-					break;
-				case MINOR:
-					fgColor = Display.getDefault().getSystemColor(SWT.COLOR_YELLOW);
-					break;
-				case MAJOR:
-					fgColor = Display.getDefault().getSystemColor(SWT.COLOR_RED);
-					break;
+				// Generate background at first resize
+				if (backgroundImage == null) {
+					Rectangle rect = shell.getClientArea();
+					
+					int width = Math.max(1, rect.width);
+					int height = rect.height;
+					int edgeWith = 2;
+	
+					Color fgColor = null;
+					switch (severity) {
+					case INFO:
+						fgColor = Display.getDefault().getSystemColor(SWT.COLOR_GREEN);
+						break;
+					case MINOR:
+						fgColor = Display.getDefault().getSystemColor(SWT.COLOR_YELLOW);
+						break;
+					case MAJOR:
+						fgColor = Display.getDefault().getSystemColor(SWT.COLOR_RED);
+						break;
+					}
+					Color bgColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+					
+					backgroundImage = Utils.createFadedImage(width, height, fgColor, bgColor, edgeWith);
+			        shell.setBackgroundImage(backgroundImage); 
 				}
-				Color bgColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
-				
-				Image newImage = Utils.createFadedImage(width, height, fgColor, bgColor, edgeWith);
-		        
-		        // now set the background image on the shell 
-		        shell.setBackgroundImage(newImage); 
-		 
-		        if (oldImage != null) { 
-		        	oldImage.dispose(); 
-		        } 
-		        oldImage = newImage;
 			}
 		});
 		
@@ -87,37 +84,16 @@ public class Notification {
 		}
 		shell.setLocation(position);
 		
-		// TODO: how to catch mouse events for labels?
-		shell.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-				hide();
-			}
-
-			@Override
-			public void mouseDown(MouseEvent e) {
-				mouseDownX = e.x;
-				mouseDownY = e.y;
-			}
-
-			@Override
-			public void mouseUp(MouseEvent e) {
-				if (mouseDownX != -1 && mouseDownY != -1) {
-					int xMovement = e.x - mouseDownX;
-					int yMovement = e.y - mouseDownY;
-					position = new Point(shell.getLocation().x + xMovement, shell.getLocation().y + yMovement);
-					shell.setLocation(position);
-					mouseDownX = -1;
-					mouseDownY = -1;
-				}
-			}
-		});
+		NotificationMouseListener mouseListener = new NotificationMouseListener();
+		shell.addMouseListener(mouseListener);
 
 		CLabel titleLabel = new CLabel(shell, SWT.NONE);
-		FontData[] fD = titleLabel.getFont().getFontData();
-		if (fD.length > 0) {
-			fD[0].setHeight(HEADING_FONT_SIZE);
-			headingFont = new Font(Display.getDefault(), fD[0]);
+		titleLabel.addMouseListener(mouseListener);
+		
+		FontData[] fontData = titleLabel.getFont().getFontData();
+		if (fontData.length > 0) {
+			fontData[0].setHeight(HEADING_FONT_SIZE);
+			headingFont = new Font(Display.getDefault(), fontData[0]);
 			titleLabel.setFont(headingFont);
 			titleLabel.addDisposeListener(new DisposeListener() {
 				@Override
@@ -128,10 +104,11 @@ public class Notification {
 		}
 		titleLabel.setText(title);
 		titleLabel.pack();
-				
+
 		Label messageLabel = new Label(shell, SWT.WRAP);
 		messageLabel.setText(message);
 		messageLabel.pack();
+		messageLabel.addMouseListener(mouseListener);
 
 		shell.pack();
 		shell.open();
@@ -140,5 +117,33 @@ public class Notification {
 	
 	private void hide() {
 		shell.close();
+		if (backgroundImage != null) {
+			backgroundImage.dispose();
+		}
+	}
+	
+	private class NotificationMouseListener implements MouseListener {
+		@Override
+		public void mouseDoubleClick(MouseEvent e) {
+			hide();
+		}
+
+		@Override
+		public void mouseDown(MouseEvent e) {
+			mouseDownX = e.x;
+			mouseDownY = e.y;
+		}
+
+		@Override
+		public void mouseUp(MouseEvent e) {
+			if (mouseDownX != -1 && mouseDownY != -1) {
+				int xMovement = e.x - mouseDownX;
+				int yMovement = e.y - mouseDownY;
+				position = new Point(shell.getLocation().x + xMovement, shell.getLocation().y + yMovement);
+				shell.setLocation(position);
+				mouseDownX = -1;
+				mouseDownY = -1;
+			}
+		}		
 	}
 }

@@ -3,6 +3,7 @@ package se.markstrom.skynet.skynetremote.window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
@@ -15,32 +16,75 @@ public class AboutWindow {
 	private Display display;
 	private Shell shell;
 	
-	public AboutWindow(Shell parentShell) {
+	public AboutWindow(Shell parentShell, Image noneIcon, Image infoIcon, Image minorIcon, Image majorIcon) {
 		display = Display.getDefault();
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("About");
 		
-		GridLayout layout = new GridLayout(1, false);
+		GridLayout layout = new GridLayout(2, false);
 		layout.marginTop = MARGIN;
 		layout.marginLeft = MARGIN;
 		layout.marginRight = MARGIN;
 		layout.marginBottom = MARGIN;
 		shell.setLayout(layout);
 
+		Label authorHeading = new Label(shell, SWT.NONE);
+		authorHeading.setText("Author:");
+		authorHeading.pack();
+
 		Label author = new Label(shell, SWT.NONE);
-		author.setText("Author: pontus.markstrom@gmail.com");
+		author.setText("pontus.markstrom@gmail.com");
 		author.pack();
 
+		Label siteHeading = new Label(shell, SWT.NONE);
+		siteHeading.setText("Site:");
+		siteHeading.pack();
+
 		Label site = new Label(shell, SWT.NONE);
-		site.setText("Site: https://bitbucket.org/pontusmarkstrom/skynet-remote/");
+		site.setText("https://bitbucket.org/pontusmarkstrom/skynet-remote/");
 		site.pack();
 
-		Label tabSelection = new Label(shell, SWT.NONE);
-		tabSelection.setText("Select tab: 1-9");
-		tabSelection.pack();
+		Label tabHeading = new Label(shell, SWT.NONE);
+		tabHeading.setText("Select tab:");
+		tabHeading.pack();
+
+		Label tab = new Label(shell, SWT.NONE);
+		tab.setText("CTRL + 1-9");
+		tab.pack();
+
+		Label closeHeading = new Label(shell, SWT.NONE);
+		closeHeading.setText("Close windows:");
+		closeHeading.pack();
+
+		Label close = new Label(shell, SWT.NONE);
+		close.setText("Escape");
+		close.pack();
+
+		Label noneIconLabel = new Label(shell, SWT.NONE);
+		noneIconLabel.setImage(noneIcon);
+
+		Label noneIconText = new Label(shell, SWT.NONE);
+		noneIconText.setText("The icon used when no event information has been fetched");
 		
-		shell.addTraverseListener(new KeyListener());
+		Label infoIconLabel = new Label(shell, SWT.NONE);
+		infoIconLabel.setImage(infoIcon);
+
+		Label infoIconText = new Label(shell, SWT.NONE);
+		infoIconText.setText("The icon used when there are only info events");
 		
+		Label minorIconLabel = new Label(shell, SWT.NONE);
+		minorIconLabel.setImage(minorIcon);
+
+		Label minorIconText = new Label(shell, SWT.NONE);
+		minorIconText.setText("The icon used when there are minor events");
+
+		Label majorIconLabel = new Label(shell, SWT.NONE);
+		majorIconLabel.setImage(majorIcon);
+
+		Label majorIconText = new Label(shell, SWT.NONE);
+		majorIconText.setText("The icon used when there are major events");
+
+		shell.addTraverseListener(new KeyListener());		
 		shell.pack();
 		
 		// Center window

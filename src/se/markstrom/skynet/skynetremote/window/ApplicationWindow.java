@@ -100,10 +100,10 @@ public class ApplicationWindow implements GUI {
 	private Menu cameraSnapshotMenu;
 	private Menu cameraStreamMenu;
 	
-	private Image noneImage;
-	private Image infoImage;
-	private Image minorImage;
-	private Image majorImage;
+	private Image noneIcon;
+	private Image infoIcon;
+	private Image minorIcon;
+	private Image majorIcon;
 	
 	private TrayItem trayItem;
 	private Table eventsTable;
@@ -163,7 +163,7 @@ public class ApplicationWindow implements GUI {
 		shell.setSize(1024, 768);
 		shell.setLayout(new FillLayout());
 		
-		createIcons();
+		createIcons(32);
 		createTray();
 		createMenuBar();
 		createTabs();
@@ -178,20 +178,23 @@ public class ApplicationWindow implements GUI {
 		// 1-9 is used for selecting tabs
 		display.addFilter(SWT.KeyDown, new Listener() {
 			@Override
-		    public void handleEvent(org.eclipse.swt.widgets.Event e) {
-				int tab = e.character - '1';
-				if (tab >= 0 && tab <= 8) {
-					tabFolder.setSelection(tab);
+		    public void handleEvent(org.eclipse.swt.widgets.Event e) {				
+				if ((e.stateMask & SWT.CTRL) != 0) {
+					int tab = e.character - '1';
+					if (tab >= 0 && tab <= 8) {
+						tabFolder.setSelection(tab);
+					}
 				}
 		    }
 		});
 	}
 	
-	private void createIcons() {
-		noneImage = Utils.createFadedImage(32, 32, display.getSystemColor(SWT.COLOR_BLACK), display.getSystemColor(SWT.COLOR_GRAY), 0);
-		infoImage = Utils.createFadedImage(32, 32, display.getSystemColor(SWT.COLOR_GREEN), display.getSystemColor(SWT.COLOR_GRAY), 0);
-		minorImage = Utils.createFadedImage(32, 32, display.getSystemColor(SWT.COLOR_YELLOW), display.getSystemColor(SWT.COLOR_GRAY), 0);
-		majorImage = Utils.createFadedImage(32, 32, display.getSystemColor(SWT.COLOR_RED), display.getSystemColor(SWT.COLOR_GRAY), 0);
+	private void createIcons(int size) {
+		int roundSize = size / 2;
+		noneIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_BLACK), roundSize);
+		infoIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_GREEN), roundSize);
+		minorIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_YELLOW), roundSize);
+		majorIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_RED), roundSize);
 	}
 	
 	private void createTray() {
@@ -323,7 +326,7 @@ public class ApplicationWindow implements GUI {
 		new MenuItem(actionMenu, SWT.SEPARATOR);
 		
 		actionGetDataItem = new MenuItem(actionMenu, SWT.PUSH);
-		actionGetDataItem.setText("Update data");
+		actionGetDataItem.setText("Manually poll data");
 		actionGetDataItem.addSelectionListener(new ActionGetSummaryItemListener());
 		
 		// Action -> Accept events
@@ -515,7 +518,7 @@ public class ApplicationWindow implements GUI {
 
 		updateCameras();
 		
-		setIcon(noneImage);
+		setIcon(noneIcon);
 		
 		updateTitle();
 	}
@@ -792,7 +795,7 @@ public class ApplicationWindow implements GUI {
 	
 	private class HelpAboutItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			new AboutWindow(shell).run();
+			new AboutWindow(shell, noneIcon, infoIcon, minorIcon, majorIcon).run();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -1102,13 +1105,13 @@ public class ApplicationWindow implements GUI {
 						
 						switch (highestSeverity) {
 						case INFO:
-							setIcon(infoImage);
+							setIcon(infoIcon);
 							break;
 						case MINOR:
-							setIcon(minorImage);
+							setIcon(minorIcon);
 							break;
 						case MAJOR:
-							setIcon(majorImage);
+							setIcon(majorIcon);
 							break;
 						}
 						

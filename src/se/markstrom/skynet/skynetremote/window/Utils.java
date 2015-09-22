@@ -30,7 +30,19 @@ public class Utils {
 		return image;
 	}
 	
-	static Image createImage(int width, int height, int color) {
+	static Image createFilledRoundRect(int width, int height, Color color, int roundWidth) {
+		Image image = new Image(Display.getDefault(), width, height);
+		GC gc = new GC(image);
+
+		gc.setAntialias(SWT.ON);
+        gc.setBackground(color);
+        gc.fillRoundRectangle(0, 0, width, height, roundWidth, roundWidth);
+        
+        gc.dispose();
+		return image;
+	}
+	
+	static Image createFilledImage(int width, int height, int color) {
 		Display display = Display.getDefault();
 		Image image = new Image(display, width, height);
 		GC gc = new GC(image);
