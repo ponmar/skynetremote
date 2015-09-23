@@ -40,15 +40,8 @@ public class ApiThread extends Thread {
 					task.run(this, api, gui);
 					log.fine("Post task run");
 				}
-				catch (SkynetAPIClientError e) {
-					disconnect();
-					gui.updateConnectedState(GUI.ConnectedState.DISCONNECTED);
-					gui.showApiError(e.getMessage());
-				}
-				catch (SkynetAPIError e) {
-					disconnect();
-					gui.updateConnectedState(GUI.ConnectedState.DISCONNECTED);
-					gui.showApiError(e.getMessage());
+				catch (SkynetAPIClientError | SkynetAPIError e) {
+					handleApiException(e);
 				}
 
 				isWorking(false);
@@ -67,6 +60,18 @@ public class ApiThread extends Thread {
 		
 		disconnect();
 		log.fine("Stopping API thread");
+	}
+	
+	private void handleApiException(Exception e) {
+		disconnect();
+		gui.updateConnectedState(GUI.ConnectedState.DISCONNECTED);
+		String message = e.getMessage();
+		Throwable cause = e.getCause();
+		if (cause != null) {
+			message += ": " + cause.getMessage();
+		}
+		gui.showApiError(message);
+		log.fine(message);
 	}
 
 	private void isWorking(boolean state) {
