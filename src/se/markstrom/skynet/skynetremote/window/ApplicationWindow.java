@@ -212,7 +212,13 @@ public class ApplicationWindow implements GUI {
 			MenuItem hideItem = new MenuItem(menu, SWT.PUSH);
 			hideItem.setText("Hide");
 			hideItem.addListener(SWT.Selection, new HideListener());
+
+			new MenuItem(menu, SWT.SEPARATOR);
 			
+			MenuItem exitItem = new MenuItem(menu, SWT.PUSH);
+			exitItem.setText("Exit");
+			exitItem.addListener(SWT.Selection, new ExitItemListener());
+
 			trayItem.addListener(SWT.MenuDetect, new Listener() {
 				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event arg0) {
@@ -268,7 +274,7 @@ public class ApplicationWindow implements GUI {
 		
 		MenuItem fileExitItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileExitItem.setText("E&xit");
-		fileExitItem.addSelectionListener(new FileExitItemListener());
+		fileExitItem.addListener(SWT.Selection, new ExitItemListener());
 	}
 
 	private void createActionMenu(Menu menuBar) {
@@ -615,12 +621,10 @@ public class ApplicationWindow implements GUI {
 		}
 	}
 	
-	private class FileExitItemListener implements SelectionListener {
-		public void widgetSelected(SelectionEvent event) {
+	private class ExitItemListener implements Listener {
+		@Override
+		public void handleEvent(org.eclipse.swt.widgets.Event arg0) {
 			shell.close();
-		}
-
-		public void widgetDefaultSelected(SelectionEvent event) {
 		}
 	}
 
