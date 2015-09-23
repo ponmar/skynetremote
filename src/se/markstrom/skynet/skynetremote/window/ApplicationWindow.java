@@ -200,8 +200,35 @@ public class ApplicationWindow implements GUI {
 	private void createTray() {
 		Tray tray = display.getSystemTray();
 		if (tray != null) {
-			// Note: tray tool tip text is set in setTitle()
 			trayItem = new TrayItem(tray, SWT.NONE);
+			// Note: tray tool tip text is set in setTitle()
+			
+			Menu menu = new Menu(shell, SWT.POP_UP);
+			
+			MenuItem showItem = new MenuItem(menu, SWT.PUSH);
+			showItem.setText("Show");
+			showItem.addListener(SWT.Selection, new ShowListener());
+
+			MenuItem hideItem = new MenuItem(menu, SWT.PUSH);
+			hideItem.setText("Hide");
+			hideItem.addListener(SWT.Selection, new HideListener());
+			
+			trayItem.addListener(SWT.MenuDetect, new Listener() {
+				@Override
+				public void handleEvent(org.eclipse.swt.widgets.Event arg0) {
+					menu.setVisible(true);
+				}
+			});
+			
+			/*
+			trayItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				}
+			});
+			*/
+			
+			trayItem.addListener(SWT.DefaultSelection, new ToggleVisibilityListener());
 		}
 		else {
 			log.fine("No system tray available");
@@ -831,6 +858,27 @@ public class ApplicationWindow implements GUI {
 		public void mouseUp(MouseEvent e) {
 		}
 	}
+
+	private class ShowListener implements Listener {
+		@Override
+		public void handleEvent(org.eclipse.swt.widgets.Event event) {
+			shell.setVisible(true);
+		}
+	}
+
+	private class HideListener implements Listener {
+		@Override
+		public void handleEvent(org.eclipse.swt.widgets.Event event) {
+			shell.setVisible(false);
+		}
+	}
+	
+	private class ToggleVisibilityListener implements Listener {
+		@Override
+		public void handleEvent(org.eclipse.swt.widgets.Event event) {
+			shell.setVisible(!shell.isVisible());
+		}
+	}
 	
 	private void connect() {
 		ConnectWindow connectWindow = new ConnectWindow(model.getSettings().host, model.getSettings().port, model.getSettings().protocol, shell);
@@ -847,6 +895,9 @@ public class ApplicationWindow implements GUI {
 			model.updateSettingsFromGui(host, port, protocol);
 			
 			apiThread.runTask(new ConnectTask(host, port, protocol, password, debug));
+		}
+		else {
+			log.fine("Connect window has invalid input");
 		}
 	}
 
