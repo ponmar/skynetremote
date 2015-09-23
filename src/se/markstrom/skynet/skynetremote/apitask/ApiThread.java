@@ -16,7 +16,7 @@ public class ApiThread extends Thread {
 	static {
 		log.setLevel(Level.ALL);
 	}
-	
+
 	private boolean run = true;
 	private SkynetAPI api = null;
 	private ConcurrentLinkedQueue<ApiTask> queue = new ConcurrentLinkedQueue<ApiTask>();
@@ -26,41 +26,47 @@ public class ApiThread extends Thread {
 	public ApiThread(GUI gui) {
 		this.gui = gui;
 	}
-	
+
 	public void run() {
-		try {
-			while (run) {
-				ApiTask task = queue.poll();
-				if (task != null) {
-					isWorking(true);
+		log.fine("API thread started");
+		
+		while (run) {
+			ApiTask task = queue.poll();
+			if (task != null) {
+				isWorking(true);
+
+				try {
 					log.fine("Pre task run");
 					task.run(this, api, gui);
 					log.fine("Post task run");
-					isWorking(false);
+				}
+				catch (SkynetAPIClientError e) {
+					disconnect();
+					gui.updateConnectedState(GUI.ConnectedState.DISCONNECTED);
+					gui.showApiError(e.getMessage());
+				}
+				catch (SkynetAPIError e) {
+					disconnect();
+					gui.updateConnectedState(GUI.ConnectedState.DISCONNECTED);
+					gui.showApiError(e.getMessage());
+				}
 
-					synchronized (this) {
-						if (queue.isEmpty()) {
-							try {
-								wait();
-							}
-							catch (InterruptedException e) {
-							}
+				isWorking(false);
+
+				synchronized (this) {
+					if (queue.isEmpty()) {
+						try {
+							wait();
+						}
+						catch (InterruptedException e) {
 						}
 					}
 				}
 			}
 		}
-		catch (SkynetAPIClientError e) {
-			gui.showApiError(e.getMessage());
-		}
-		catch (SkynetAPIError e) {
-			gui.showApiError(e.getMessage());
-		}
-
-		isWorking(false);
-		gui.updateConnectedState(GUI.ConnectedState.DISCONNECTED);
-
+		
 		disconnect();
+		log.fine("Stopping API thread");
 	}
 
 	private void isWorking(boolean state) {
