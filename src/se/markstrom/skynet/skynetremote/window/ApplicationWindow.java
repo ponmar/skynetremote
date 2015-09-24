@@ -1115,8 +1115,6 @@ public class ApplicationWindow implements GUI {
 					List<Event> events = model.getEvents();
 					
 					if (!events.isEmpty()) {
-						Severity highestSeverity = Severity.INFO;
-
 						boolean newInfoEvent = false;
 						boolean newMinorEvent = false;
 						boolean newMajorEvent = false;
@@ -1148,26 +1146,10 @@ public class ApplicationWindow implements GUI {
 							item.setText(5, event.getArmedStr());
 							item.setText(6, String.valueOf(event.images));
 							item.setData(event.id);
-							
-							if (event.severity.ordinal() > highestSeverity.ordinal()) {
-								highestSeverity = event.severity;
-							}
 						}
 						
 						for (int i=0; i<eventsTable.getColumnCount(); i++) {
 							eventsTable.getColumn(i).pack();
-						}
-						
-						switch (highestSeverity) {
-						case INFO:
-							setIcon(infoIcon);
-							break;
-						case MINOR:
-							setIcon(minorIcon);
-							break;
-						case MAJOR:
-							setIcon(majorIcon);
-							break;
 						}
 						
 						if (model.getSettings().notifyOnNewMajorEvent && newMajorEvent) {
@@ -1257,6 +1239,19 @@ public class ApplicationWindow implements GUI {
 
 					updateTitle();
 					updateArmMenuItems();
+					
+					if (summary.numMajorEvents > 0) {
+						setIcon(majorIcon);
+					}
+					else if (summary.numMinorEvents > 0) {
+						setIcon(minorIcon);
+					}
+					else if (summary.numInfoEvents > 0) {
+						setIcon(infoIcon);
+					}
+					else {
+						setIcon(noneIcon);
+					}
 					
 					if (prevPollEventId != summary.latestEventId) {
 						if (model.getSettings().getNewEvents) {
