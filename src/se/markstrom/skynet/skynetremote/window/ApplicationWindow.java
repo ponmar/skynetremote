@@ -1295,8 +1295,14 @@ public class ApplicationWindow implements GUI {
 				fileCache.addFile(Settings.createFilenameForEventImage(eventId, imageIndex), jpegData);
 				
 				if (show) {
-					String windowTitle = model.getSummary().site +  ": Event " + eventId + " (image " + (imageIndex+1) + ")"; 
-					new ImageWindow(windowTitle, jpegData);
+					String windowTitle = model.getSummary().site +  ": Event " + eventId + " (image " + (imageIndex+1) + ")";
+					Image image = Utils.createImageFromJpegData(jpegData);
+					if (image != null) {
+						new ImageWindow(windowTitle, image);
+					}
+					else {
+						// TODO: show error dialog
+					}
 				}
 				
 				if (save) {
@@ -1313,7 +1319,13 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				String title = model.getSummary().site + ": Camera " + (cameraIndex+1) + " snapshot";
-				new ImageWindow(title, jpegData);
+				Image image = Utils.createImageFromJpegData(jpegData);
+				if (image != null) {
+					new ImageWindow(title, image);
+				}
+				else {
+					// TODO: show error dialog
+				}
 			}
 		});
 	}

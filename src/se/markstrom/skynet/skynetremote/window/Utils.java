@@ -1,9 +1,13 @@
 package se.markstrom.skynet.skynetremote.window;
 
+import java.io.ByteArrayInputStream;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 
 public class Utils {
@@ -50,5 +54,15 @@ public class Utils {
 		gc.fillRectangle(image.getBounds());
 		gc.dispose();
 		return image;
+	}
+	
+	static Image createImageFromJpegData(byte[] jpegData) {
+		try {
+			ImageData imageData = new ImageData(new ByteArrayInputStream(jpegData));
+			return new Image(Display.getDefault(), imageData);
+		}
+		catch (SWTException e) {
+			return null;
+		}
 	}
 }

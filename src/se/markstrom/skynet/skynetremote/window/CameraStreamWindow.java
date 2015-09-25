@@ -1,12 +1,9 @@
 package se.markstrom.skynet.skynetremote.window;
 
-import java.io.ByteArrayInputStream;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -34,18 +31,18 @@ public class CameraStreamWindow {
 		shell.setVisible(false);
 		shell.open();
 	}
-	
+
+	// TODO: convert to Image outside this method and show error dialog when failed?
 	public void updateImage(byte [] jpegData) {
-		// TODO: This was thrown once: org.eclipse.swt.SWTException: Unsupported or unrecognized format
-		//       Did the API not return a correct image? Further testing is needed.
-		ImageData imageData = new ImageData(new ByteArrayInputStream(jpegData));
-		Image image = new Image(display, imageData);
-		Image oldImage = imageLabel.getImage();
-		imageLabel.setImage(image);
-		imageLabel.pack();
-		shell.pack();
-		if (oldImage != null) {
-			oldImage.dispose();
+		Image image = Utils.createImageFromJpegData(jpegData);
+		if (image != null) {
+			Image oldImage = imageLabel.getImage();
+			imageLabel.setImage(image);
+			imageLabel.pack();
+			shell.pack();
+			if (oldImage != null) {
+				oldImage.dispose();
+			}
 		}
 	}
 	
