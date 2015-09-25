@@ -188,6 +188,33 @@ public class Model {
 		logger.info("Settings written to " + SETTINGS_FILENAME);
 	}
 	
+	public int getNumberOfInfoEvents() {
+		if (summary != null) {
+			return summary.numInfoEvents;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	public int getNumberOfMinorEvents() {
+		if (summary != null) {
+			return summary.numMinorEvents;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	public int getNumberOfMajorEvents() {
+		if (summary != null) {
+			return summary.numMajorEvents;
+		}
+		else {
+			return 0;
+		}
+	}
+
 	public long getLatestEventIdFromSummary() {
 		if (summary != null) {
 			return summary.latestEventId;

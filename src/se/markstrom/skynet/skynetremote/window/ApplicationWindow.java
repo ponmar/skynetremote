@@ -1230,9 +1230,12 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				log.info("Received summary.xml");
 				
-				long prevPollEventId = model.getLatestEventIdFromSummary();
-				String prevPollControlChecksum = model.getControlChecksumFromSummary();
-				double prevPollLogTimestamp = model.getLogTimestampFromSummary();
+				long prevLatestEventId = model.getLatestEventIdFromSummary();
+				int prevNumInfoEvents = model.getNumberOfInfoEvents();
+				int prevNumMinorEvents = model.getNumberOfMinorEvents();
+				int prevNumMajorEvents = model.getNumberOfMajorEvents();
+				String prevControlChecksum = model.getControlChecksumFromSummary();
+				double prevLogTimestamp = model.getLogTimestampFromSummary();
 				
 				if (model.updateSummary(xml)) {
 					Summary summary = model.getSummary();
@@ -1253,14 +1256,17 @@ public class ApplicationWindow implements GUI {
 						setIcon(noneIcon);
 					}
 					
-					if (prevPollEventId != summary.latestEventId) {
+					if (prevLatestEventId != summary.latestEventId ||
+							prevNumInfoEvents != summary.numInfoEvents ||
+							prevNumMinorEvents != summary.numMinorEvents ||
+							prevNumMajorEvents != summary.numMajorEvents) {
 						if (model.getSettings().getNewEvents) {
-							log.info("New event detected, requesting events");
+							log.info("Event change detected, requesting events");
 							apiThread.runTask(new GetEventsXmlTask());
 						}
 					}
 					
-					if (!prevPollControlChecksum.equals(summary.controlChecksum)) {
+					if (!prevControlChecksum.equals(summary.controlChecksum)) {
 						if (model.getSettings().getNewControl) {
 							log.info("New control checksum detected, requesting control");
 							apiThread.runTask(new GetControlXmlTask());
@@ -1273,7 +1279,7 @@ public class ApplicationWindow implements GUI {
 						apiThread.runTask(new GetSensorsXmlTask());
 					}
 					
-					if (prevPollLogTimestamp != summary.logTimestamp) {
+					if (prevLogTimestamp != summary.logTimestamp) {
 						if (model.getSettings().getNewLog) {
 							log.info("New log timestamp detected, requesting log");
 							apiThread.runTask(new GetLogXmlTask());
