@@ -32,17 +32,13 @@ public class CameraStreamWindow {
 		shell.open();
 	}
 
-	// TODO: convert to Image outside this method and show error dialog when failed?
-	public void updateImage(byte [] jpegData) {
-		Image image = Utils.createImageFromJpegData(jpegData);
-		if (image != null) {
-			Image oldImage = imageLabel.getImage();
-			imageLabel.setImage(image);
-			imageLabel.pack();
-			shell.pack();
-			if (oldImage != null) {
-				oldImage.dispose();
-			}
+	public void updateImage(Image image) {
+		Image oldImage = imageLabel.getImage();
+		imageLabel.setImage(image);
+		imageLabel.pack();
+		shell.pack();
+		if (oldImage != null) {
+			oldImage.dispose();
 		}
 	}
 	

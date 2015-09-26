@@ -148,6 +148,9 @@ public class ApplicationWindow implements GUI {
 		commonLogger.addHandler(logHandler);
 		
 		apiThread.start();
+		
+		// Open connect window once when the application starts
+		connect();
 	}
 	
 	public void close() {
@@ -1307,7 +1310,7 @@ public class ApplicationWindow implements GUI {
 						new ImageWindow(windowTitle, image);
 					}
 					else {
-						// TODO: show error dialog
+						showApiError("Received invalid jpeg data");
 					}
 				}
 				
@@ -1330,7 +1333,7 @@ public class ApplicationWindow implements GUI {
 					new ImageWindow(title, image);
 				}
 				else {
-					// TODO: show error dialog
+					showApiError("Received invalid jpeg data");
 				}
 			}
 		});
@@ -1344,8 +1347,14 @@ public class ApplicationWindow implements GUI {
 				for (CameraStreamWindow streamWindow : streamWindows) {
 					if (streamWindow.getCameraIndex() == cameraIndex) {
 						if (streamWindow.isOpen()) {
-							streamWindow.updateImage(jpegData);
-							apiThread.runTask(new GetCameraImageTask(cameraIndex, ImageType.STREAM));
+							Image image = Utils.createImageFromJpegData(jpegData);
+							if (image != null) {
+								streamWindow.updateImage(image);
+								apiThread.runTask(new GetCameraImageTask(cameraIndex, ImageType.STREAM));
+							}
+							else {
+								showApiError("Received invalid jpeg data");
+							}
 						}
 					}
 				}
