@@ -12,6 +12,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import se.markstrom.skynet.skynetremote.model.Device;
+import se.markstrom.skynet.skynetremote.model.Device.DeviceType;
 
 public class ControlXmlParser extends XmlParser {
 	
@@ -31,14 +32,16 @@ public class ControlXmlParser extends XmlParser {
 		if (nl != null) {
 			devices = new ArrayList<Device>();
 			for (int i=0; i<nl.getLength(); i++) {
-				Device device = new Device();
 				Node deviceNode = nl.item(i);
+				
 				NamedNodeMap attributes = deviceNode.getAttributes();
-				device.id = Integer.parseInt(attributes.getNamedItem("id").getFirstChild().getNodeValue());
-				device.name = attributes.getNamedItem("name").getFirstChild().getNodeValue();
-				device.state = attributes.getNamedItem("state").getFirstChild().getNodeValue().equals("1");
-				device.timeLeft = (int) Double.parseDouble(attributes.getNamedItem("timeleft").getFirstChild().getNodeValue());
-				device.type = Integer.parseInt(attributes.getNamedItem("type").getFirstChild().getNodeValue());
+				int id = Integer.parseInt(attributes.getNamedItem("id").getFirstChild().getNodeValue());
+				String name = attributes.getNamedItem("name").getFirstChild().getNodeValue();
+				boolean state = attributes.getNamedItem("state").getFirstChild().getNodeValue().equals("1");
+				int timeLeft = (int) Double.parseDouble(attributes.getNamedItem("timeleft").getFirstChild().getNodeValue());
+				DeviceType type = Device.DeviceType.values()[Integer.parseInt(attributes.getNamedItem("type").getFirstChild().getNodeValue())];
+				
+				Device device = new Device(id, name, state, timeLeft, type);
 				devices.add(device);
 			}
 			return true;

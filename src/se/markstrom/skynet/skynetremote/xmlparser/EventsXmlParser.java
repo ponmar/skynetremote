@@ -33,40 +33,55 @@ public class EventsXmlParser extends XmlParser {
 			
 			for (int i=0; i<nl.getLength(); i++) {
 				Node eventNode = nl.item(i);
-				Event event = new Event();
+				
+				Long id = null;
+				String time = null;
+				String message = null;
+				String sensor = null;
+				String areas = null;
+				Severity severity = null;
+				Boolean armed = null;
+				Integer images = null;
+				
 				for (Node eventChildNode = eventNode.getFirstChild(); eventChildNode != null; eventChildNode = eventChildNode.getNextSibling()) {
 					String nodeName = eventChildNode.getNodeName();
 					if (nodeName.equals("id")) {
-						event.id = Long.parseLong(eventChildNode.getFirstChild().getNodeValue());
+						id = Long.parseLong(eventChildNode.getFirstChild().getNodeValue());
 					}
 					else if (nodeName.equals("severity")) {
-						event.severity = Severity.values()[Integer.parseInt(eventChildNode.getFirstChild().getNodeValue())];
+						severity = Severity.values()[Integer.parseInt(eventChildNode.getFirstChild().getNodeValue())];
 					}
 					else if (nodeName.equals("armed")) {
-						event.armed = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue()) == 1;
+						armed = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue()) == 1;
 					}
 					else if (nodeName.equals("time")) {
-						event.time = eventChildNode.getFirstChild().getNodeValue();
+						time = eventChildNode.getFirstChild().getNodeValue();
 					}
 					else if (nodeName.equals("message")) {
-						event.message = eventChildNode.getFirstChild().getNodeValue();
+						message = eventChildNode.getFirstChild().getNodeValue();
 					}
 					else if (nodeName.equals("sensor")) {
-						event.sensor = eventChildNode.getFirstChild().getNodeValue();
+						sensor = eventChildNode.getFirstChild().getNodeValue();
 					}
 					else if (nodeName.equals("areas")) {
 						Node child = eventChildNode.getFirstChild();
 						if (child != null) {
-							event.areas = child.getNodeValue();
+							areas = child.getNodeValue();
 						}
 						else {
-							event.areas = "";
+							areas = "";
 						}
 					}
 					else if (nodeName.equals("numimages")) {
-						event.images = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue());
+						images = Integer.parseInt(eventChildNode.getFirstChild().getNodeValue());
 					}
 				}
+				
+				if (id == null || time == null || message == null || sensor == null || areas == null || severity == null || armed == null || images == null) {
+					return false;
+				}
+
+				Event event = new Event(id, time, message, sensor, areas, severity, armed, images);
 				events.add(event);
 			}
 			return true;

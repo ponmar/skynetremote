@@ -93,6 +93,30 @@ abstract class XmlParser {
 		}
 		return null;
 	}
+
+	protected Long getNodeValueAsLong(Document xmlDoc, String tagName) {
+		String value = getNodeValueAsString(xmlDoc, tagName);
+		if (value != null) {
+			try {
+				return Long.parseLong(value);
+			}
+			catch (NumberFormatException e) {
+			}
+		}
+		return null;
+	}
+	
+	protected Double getNodeValueAsDouble(Document xmlDoc, String tagName) {
+		String value = getNodeValueAsString(xmlDoc, tagName);
+		if (value != null) {
+			try {
+				return Double.parseDouble(value);
+			}
+			catch (NumberFormatException e) {
+			}
+		}
+		return null;
+	}
 	
 	protected Boolean getNodeValueAsBoolean(Document xmlDoc, String tagName) {
 		String value = getNodeValueAsString(xmlDoc, tagName);

@@ -10,14 +10,25 @@ public class Event {
 	
 	public enum Severity { INFO, MINOR, MAJOR }
 	
-	public long id;
-	public String time;
-	public String message;
-	public String sensor;
-	public String areas;
-	public Severity severity;
-	public boolean armed;
-	public int images = 0;
+	public final long id;
+	public final String time;
+	public final String message;
+	public final String sensor;
+	public final String areas;
+	public final Severity severity;
+	public final boolean armed;
+	public final int images;
+	
+	public Event(long id, String time, String message, String sensor, String areas, Severity severity, boolean armed, int images) {
+		this.id = id;
+		this.time = time;
+		this.message = message;
+		this.sensor = sensor;
+		this.areas = areas;
+		this.severity = severity;
+		this.armed = armed;
+		this.images = images;
+	}
 	
 	public String getSeverityStr() {
 		switch (severity) {

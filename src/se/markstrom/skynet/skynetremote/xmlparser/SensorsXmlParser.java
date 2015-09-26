@@ -30,44 +30,60 @@ public class SensorsXmlParser extends XmlParser {
 		if (nl != null) {
 			sensors = new ArrayList<Sensor>();
 			for (int i=0; i<nl.getLength(); i++) {
-				Sensor sensor = new Sensor();
+
+				String name = null;
+				String details = null;
+				String updateFilter = null;
+				String triggerFilter = null;
+				Integer armedActions = null;
+				Integer disarmedActions = null;
+				Integer triggerCount = null;
+				Boolean muted = null;
+				String areas = null;
+				
 				Node sensorNode = nl.item(i);
 				for (Node sensorChildNode = sensorNode.getFirstChild(); sensorChildNode != null; sensorChildNode = sensorChildNode.getNextSibling()) {
 					String nodeName = sensorChildNode.getNodeName();
 					if (nodeName.equals("name")) {
-						sensor.name = sensorChildNode.getFirstChild().getNodeValue();
+						name = sensorChildNode.getFirstChild().getNodeValue();
 					}
 					else if (nodeName.equals("details")) {
-						sensor.details = sensorChildNode.getFirstChild().getNodeValue();
+						details = sensorChildNode.getFirstChild().getNodeValue();
 					}
 					else if (nodeName.equals("updatefilter")) {
-						sensor.updateFilter = sensorChildNode.getFirstChild().getNodeValue();
+						updateFilter = sensorChildNode.getFirstChild().getNodeValue();
 					}
 					else if (nodeName.equals("triggerfilter")) {
-						sensor.triggerFilter = sensorChildNode.getFirstChild().getNodeValue();
+						triggerFilter = sensorChildNode.getFirstChild().getNodeValue();
 					}
 					else if (nodeName.equals("mute")) {
-						sensor.muted = Integer.parseInt(sensorChildNode.getFirstChild().getNodeValue()) != 0;
+						muted = Integer.parseInt(sensorChildNode.getFirstChild().getNodeValue()) != 0;
 					}
 					else if (nodeName.equals("armedactions")) {
-						sensor.armedActions = Integer.parseInt(sensorChildNode.getFirstChild().getNodeValue());
+						armedActions = Integer.parseInt(sensorChildNode.getFirstChild().getNodeValue());
 					}
 					else if (nodeName.equals("disarmedactions")) {
-						sensor.disarmedActions = Integer.parseInt(sensorChildNode.getFirstChild().getNodeValue());
+						disarmedActions = Integer.parseInt(sensorChildNode.getFirstChild().getNodeValue());
 					}
 					else if (nodeName.equals("triggercount")) {
-						sensor.triggerCount = Integer.parseInt(sensorChildNode.getFirstChild().getNodeValue());
+						triggerCount = Integer.parseInt(sensorChildNode.getFirstChild().getNodeValue());
 					}
 					else if (nodeName.equals("areas")) {
 						Node areasNode = sensorChildNode.getFirstChild();
 						if (areasNode != null) {
-							sensor.areas = areasNode.getNodeValue();
+							areas = areasNode.getNodeValue();
 						}
 						else {
-							sensor.areas = "";
+							areas = "";
 						}
 					}
 				}
+				
+				if (name == null || details == null || updateFilter == null || triggerFilter == null || armedActions == null || disarmedActions == null || triggerCount == null || muted == null || areas == null) {
+					return false;
+				}
+				
+				Sensor sensor = new Sensor(name, details, updateFilter, triggerFilter, armedActions, disarmedActions, triggerCount, muted, areas);
 				sensors.add(sensor);
 			}
 			return true;

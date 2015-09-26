@@ -31,9 +31,11 @@ public class CamerasXmlParser extends XmlParser {
 			cameras = new ArrayList<Camera>();
 			for (int i=0; i<nl.getLength(); i++) {
 				Node cameraNode = nl.item(i);
+				
 				Integer index = null;
 				Integer width = null;
 				Integer height = null;
+				
 				for (Node cameraChildNode = cameraNode.getFirstChild(); cameraChildNode != null; cameraChildNode = cameraChildNode.getNextSibling()) {
 					String nodeName = cameraChildNode.getNodeName();
 					if (nodeName.equals("index")) {
@@ -46,9 +48,12 @@ public class CamerasXmlParser extends XmlParser {
 						height = Integer.parseInt(cameraChildNode.getFirstChild().getNodeValue());
 					}
 				}
-				if (index != null && width != null && height != null) {
-					cameras.add(new Camera(index, width, height));
+				
+				if (index == null || width == null || height == null) {
+					return false;
 				}
+				
+				cameras.add(new Camera(index, width, height));
 			}
 			return true;
 		}

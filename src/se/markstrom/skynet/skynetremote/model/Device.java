@@ -2,14 +2,28 @@ package se.markstrom.skynet.skynetremote.model;
 
 public class Device {
 	
+	public enum DeviceType {
+		TELLSTICK,
+		SIMULATED,
+		GPIO
+	}
+	
 	public static final String ON_STR = "On";
 	public static final String OFF_STR = "Off";
 	
-	public int id;
-	public String name;
-	public boolean state;
-	public int timeLeft;
-	public int type;
+	public final int id;
+	public final String name;
+	public final boolean state;
+	public final int timeLeft;
+	public final DeviceType type;
+	
+	public Device(int id, String name, boolean state, int timeLeft, DeviceType type) {
+		this.id = id;
+		this.name = name;
+		this.state = state;
+		this.timeLeft = timeLeft;
+		this.type = type; 
+	}
 	
 	public String getStateStr() {
 		if (state) {
@@ -22,11 +36,11 @@ public class Device {
 	
 	public String getTypeStr() {
 		switch (type) {
-		case 0:
+		case TELLSTICK:
 			return "Tellstick";
-		case 1:
+		case SIMULATED:
 			return "Simulated";
-		case 2:
+		case GPIO:
 			return "GPIO";
 		default:
 			return "Unknown";

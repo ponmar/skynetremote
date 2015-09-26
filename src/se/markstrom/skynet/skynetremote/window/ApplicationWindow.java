@@ -368,18 +368,18 @@ public class ApplicationWindow implements GUI {
 		// Action -> Accept events
 		Menu actionAcceptEventsMenu = new Menu(shell, SWT.DROP_DOWN);
 		actionAcceptEventsItem.setMenu(actionAcceptEventsMenu);
-		
-		MenuItem actionAcceptMinorEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
-		actionAcceptMinorEventsItem.setText("All with minor severity");
-		actionAcceptMinorEventsItem.addSelectionListener(new ActionAcceptMinorEventsItemListener());
+
+		MenuItem actionAcceptAllEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
+		actionAcceptAllEventsItem.setText("All");
+		actionAcceptAllEventsItem.addSelectionListener(new ActionAcceptAllEventsItemListener());
 
 		MenuItem actionAcceptMajorEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
 		actionAcceptMajorEventsItem.setText("All with major severity");
 		actionAcceptMajorEventsItem.addSelectionListener(new ActionAcceptMajorEventsItemListener());
 
-		MenuItem actionAcceptAllEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
-		actionAcceptAllEventsItem.setText("All");
-		actionAcceptAllEventsItem.addSelectionListener(new ActionAcceptAllEventsItemListener());
+		MenuItem actionAcceptMinorEventsItem = new MenuItem(actionAcceptEventsMenu, SWT.PUSH);
+		actionAcceptMinorEventsItem.setText("All with minor severity");
+		actionAcceptMinorEventsItem.addSelectionListener(new ActionAcceptMinorEventsItemListener());
 	}
 	
 	private void createHelpMenu(Menu menuBar) {

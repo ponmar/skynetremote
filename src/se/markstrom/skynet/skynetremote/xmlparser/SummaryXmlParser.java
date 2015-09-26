@@ -16,85 +16,50 @@ public class SummaryXmlParser extends XmlParser {
 	public SummaryXmlParser(String xml) {
 		super(xml);
 	}
-	
+
 	public Summary getSummary() {
 		return summary;
 	}
 
 	@Override
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
+
+		Integer majorApiVersion;
+		Integer minorApiVersion;
+		String site;
+		Boolean armed;
+		Double countdown;
+		Long latestEventId;
+		Integer numInfoEvents;
+		Integer numMinorEvents;
+		Integer numMajorEvents;
+		Double logTimestamp;
+		String controlChecksum;
+		String time;
 		
-		summary = new Summary();
-		
-		String value = getNodeValueAsString(xmlDoc, "majorapiversion");
-		if (value == null) {
-			return false;
-		}
-		summary.majorApiVersion = Integer.parseInt(value);
+		try {
+			majorApiVersion = getNodeValueAsInteger(xmlDoc, "majorapiversion");
+			minorApiVersion = getNodeValueAsInteger(xmlDoc, "minorapiversion");
+			site = getNodeValueAsString(xmlDoc, "site");
+			armed = getNodeValueAsInteger(xmlDoc, "armed") == 1;
+			countdown = getNodeValueAsDouble(xmlDoc, "countdown");
+			latestEventId = getNodeValueAsLong(xmlDoc, "latestid");
+			numInfoEvents = getNodeValueAsInteger(xmlDoc, "info");
+			numMinorEvents = getNodeValueAsInteger(xmlDoc, "minor");
+			numMajorEvents = getNodeValueAsInteger(xmlDoc, "major");
+			logTimestamp = getNodeValueAsDouble(xmlDoc, "logtimestamp");
+			controlChecksum = getNodeValueAsString(xmlDoc, "controlchecksum");
+			time = getNodeValueAsString(xmlDoc, "time");
 
-		value = getNodeValueAsString(xmlDoc, "minorapiversion");
-		if (value == null) {
+			if (majorApiVersion == null || minorApiVersion == null || site == null || armed == null || countdown == null || latestEventId == null || numInfoEvents == null || numMinorEvents == null || numMajorEvents == null || logTimestamp == null || controlChecksum == null || time == null) {
+				return false;
+			}
+			
+			summary = new Summary(majorApiVersion, minorApiVersion, site, armed, countdown, latestEventId, numInfoEvents, numMinorEvents, numMajorEvents, logTimestamp, controlChecksum, time);
+			return true;
+		}
+		catch (NumberFormatException e) {
 			return false;
 		}
-		summary.minorApiVersion = Integer.parseInt(value);
-
-		summary.site = getNodeValueAsString(xmlDoc, "site");
-		if (summary.site == null) {
-			return false;
-		}
-		
-		value = getNodeValueAsString(xmlDoc, "armed");
-		if (value == null) {
-			return false;
-		}
-		summary.armed = Integer.parseInt(value) == 1;
-
-		value = getNodeValueAsString(xmlDoc, "countdown");
-		if (value == null) {
-			return false;
-		}
-		summary.countdown = Double.parseDouble(value);
-
-		value = getNodeValueAsString(xmlDoc, "latestid");
-		if (value == null) {
-			return false;
-		}
-		summary.latestEventId = Long.parseLong(value);
-
-		value = getNodeValueAsString(xmlDoc, "info");
-		if (value == null) {
-			return false;
-		}
-		summary.numInfoEvents = Integer.parseInt(value);
-
-		value = getNodeValueAsString(xmlDoc, "minor");
-		if (value == null) {
-			return false;
-		}
-		summary.numMinorEvents = Integer.parseInt(value);
-		
-		value = getNodeValueAsString(xmlDoc, "major");
-		if (value == null) {
-			return false;
-		}
-		summary.numMajorEvents = Integer.parseInt(value);
-
-		value = getNodeValueAsString(xmlDoc, "logtimestamp");
-		if (value == null) {
-			return false;
-		}
-		summary.logTimestamp = Double.parseDouble(value);
-		
-		summary.controlChecksum = getNodeValueAsString(xmlDoc, "controlchecksum");
-		if (summary.controlChecksum == null) {
-			return false;
-		}
-		
-		summary.time = getNodeValueAsString(xmlDoc, "time");
-		if (summary.time == null) {
-			return false;
-		}
-
-		return true;
 	}
 }
