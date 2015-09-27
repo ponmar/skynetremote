@@ -42,7 +42,8 @@ public class Model {
 	private ArrayList<Device> devices = new ArrayList<Device>();
 	private ArrayList<Camera> cameras = new ArrayList<Camera>();
 	private ArrayList<Sensor> sensors = new ArrayList<Sensor>();
-	private Log log = new Log();
+	private ArrayList<String> logItems = new ArrayList<String>();
+	
 	private Settings settings = null;
 
 	public Model() {
@@ -68,7 +69,7 @@ public class Model {
 		devices.clear();
 		cameras.clear();
 		sensors.clear();
-		log.reset();
+		logItems.clear();
 	}
 	
 	private void readSettings() {
@@ -142,7 +143,7 @@ public class Model {
 	public boolean updateFromLogXml(String logXml) {
 		LogXmlParser parser = new LogXmlParser(logXml);
 		if (parser.isValid()) {
-			log = parser.getLog();
+			logItems = parser.getLogItems();
 			return true;
 		}
 		return false;
@@ -190,23 +191,22 @@ public class Model {
 		return null;
 	}
 
-	/*
-	public long getLatestEventId() {
-		if (events.size() > 0) {
-			return events.get(events.size()-1).id;
-		}
-		return -1;
-	}
-	*/
-
 	public List<Camera> getCameras() {
 		return cameras;
 	}
 	
-	public Log getLog() {
-		return log;
+	public List<String> getLogItems() {
+		return logItems;
 	}
-	
+
+	public String getLogText() {
+		String text = "";
+		for (String item : logItems) {
+			text += item + "\n";
+		}
+		return text;
+	}
+
 	public List<Sensor> getSensors() {
 		return sensors;
 	}

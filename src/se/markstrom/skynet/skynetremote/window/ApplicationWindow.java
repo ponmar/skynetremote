@@ -1222,7 +1222,7 @@ public class ApplicationWindow implements GUI {
 			@Override
 			public void run() {
 				if (model.updateFromLogXml(xml)) {
-					remoteLogText.setText(model.getLog().getText());
+					remoteLogText.setText(model.getLogText());
 				}
 			}
 		});

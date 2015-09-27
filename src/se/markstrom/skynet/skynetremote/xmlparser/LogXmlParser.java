@@ -1,6 +1,7 @@
 package se.markstrom.skynet.skynetremote.xmlparser;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -9,30 +10,28 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import se.markstrom.skynet.skynetremote.model.Log;
-
 public class LogXmlParser extends XmlParser {
 
-	private Log log;
+	private ArrayList<String> logItems;
 	
 	public LogXmlParser(String xml) {
 		super(xml);
 	}
 
-	public Log getLog() {
-		return log;
+	public ArrayList<String> getLogItems() {
+		return logItems;
 	}
 
 	@Override
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
 		NodeList nl = xmlDoc.getElementsByTagName("entry");
 		if (nl != null) {
-			log = new Log();
+			logItems = new ArrayList<String>();
 			for (int i=0; i<nl.getLength(); i++) {
 				Node entryNode = nl.item(i);
 				Node entryDataNode = entryNode.getFirstChild();
 				if (entryDataNode != null) {
-					log.addItem(entryDataNode.getNodeValue());
+					logItems.add(entryDataNode.getNodeValue());
 				}
 			}
 			return true;
