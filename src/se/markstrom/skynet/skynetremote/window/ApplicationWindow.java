@@ -72,6 +72,7 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	private static final String NAME = "Skynet Remote";
+	private static final String API_ERROR_NAME = "Skynet API Error";
 	
 	private FileCache fileCache = new FileCache();
 	
@@ -273,6 +274,10 @@ public class ApplicationWindow implements GUI {
 		fileSettingsItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileSettingsItem.setText("&Settings...");
 		fileSettingsItem.addSelectionListener(new FileSettingsItemListener());
+		
+		MenuItem fileHideItem = new MenuItem(fileMenu, SWT.PUSH);
+		fileHideItem.setText("Hide");
+		fileHideItem.addListener(SWT.Selection, new HideListener());
 		
 		MenuItem fileExitItem = new MenuItem(fileMenu, SWT.PUSH);
 		fileExitItem.setText("E&xit");
@@ -1042,6 +1047,9 @@ public class ApplicationWindow implements GUI {
 				if (model.updateFromCamerasXml(xml)) {
 					updateCameras();
 				}
+				else {
+					openApiError("Received invalid cameras.xml");
+				}
 			}
 		});
 	}
@@ -1098,6 +1106,9 @@ public class ApplicationWindow implements GUI {
 					}
 					controlTable.setRedraw(true);
 					controlTable.redraw();
+				}
+				else {
+					openApiError("Received invalid control.xml");
 				}
 			}
 		});
@@ -1171,6 +1182,9 @@ public class ApplicationWindow implements GUI {
 					eventsTable.setRedraw(true);
 					eventsTable.redraw();
 				}
+				else {
+					openApiError("Received invalid events.xml");
+				}
 			}
 		});
 	}
@@ -1212,6 +1226,9 @@ public class ApplicationWindow implements GUI {
 					sensorsTable.setRedraw(true);
 					sensorsTable.redraw();
 				}
+				else {
+					openApiError("Received invalid sensors.xml");
+				}
 			}
 		});
 	}
@@ -1223,6 +1240,9 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				if (model.updateFromLogXml(xml)) {
 					remoteLogText.setText(model.getLogText());
+				}
+				else {
+					openApiError("Received invalid log.xml");
 				}
 			}
 		});
@@ -1243,8 +1263,6 @@ public class ApplicationWindow implements GUI {
 				Double prevLogTimestamp = model.getLogTimestamp(0.0);
 				
 				if (model.updateFromSummaryXml(xml)) {
-					//Summary summary = model.getSummary();
-
 					updateTitle();
 					updateArmMenuItems();
 					
@@ -1291,6 +1309,9 @@ public class ApplicationWindow implements GUI {
 						}
 					}
 				}
+				else {
+					openApiError("Received invalid summary.xml");
+				}
 
 				display.timerExec(model.getSettings().summaryPollInterval*1000, getSummaryXmlRunnable);
 			}
@@ -1312,7 +1333,7 @@ public class ApplicationWindow implements GUI {
 						new ImageWindow(windowTitle, image);
 					}
 					else {
-						showApiError("Received invalid jpeg data");
+						openApiError("Received invalid jpeg data");
 					}
 				}
 				
@@ -1335,7 +1356,7 @@ public class ApplicationWindow implements GUI {
 					new ImageWindow(title, image);
 				}
 				else {
-					showApiError("Received invalid jpeg data");
+					openApiError("Received invalid jpeg data");
 				}
 			}
 		});
@@ -1355,7 +1376,7 @@ public class ApplicationWindow implements GUI {
 								apiThread.runTask(new GetCameraImageTask(cameraIndex, ImageType.STREAM));
 							}
 							else {
-								showApiError("Received invalid jpeg data");
+								openApiError("Received invalid jpeg data");
 							}
 						}
 					}
@@ -1380,11 +1401,19 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-				dialog.setText("Skynet API Error");
-				dialog.setMessage(message);
-				dialog.open();
+				openApiError(message);
 			}
 		});
+	}
+	
+	private void openApiError(String message) {
+		openError(API_ERROR_NAME, message);
+	}
+	
+	private void openError(String title, String message) {
+		MessageBox dialog = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+		dialog.setText(title);
+		dialog.setMessage(message);
+		dialog.open();
 	}
 }
