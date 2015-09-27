@@ -7,36 +7,28 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import se.markstrom.skynet.skynetremote.model.Summary;
-
 public class SummaryXmlParser extends XmlParser {
 
-	private Summary summary;
+	public Integer majorApiVersion;
+	public Integer minorApiVersion;
+	public String site;
+	public Boolean armed;
+	public Double countdown;
+	public Long latestEventId;
+	public Integer numInfoEvents;
+	public Integer numMinorEvents;
+	public Integer numMajorEvents;
+	public Double logTimestamp;
+	public String controlChecksum;
+	public String time;
 
 	public SummaryXmlParser(String xml) {
 		super(xml);
 	}
 
-	public Summary getSummary() {
-		return summary;
-	}
-
 	@Override
 	protected boolean parse(Document xmlDoc) throws ParserConfigurationException, SAXException, IOException {
 
-		Integer majorApiVersion;
-		Integer minorApiVersion;
-		String site;
-		Boolean armed;
-		Double countdown;
-		Long latestEventId;
-		Integer numInfoEvents;
-		Integer numMinorEvents;
-		Integer numMajorEvents;
-		Double logTimestamp;
-		String controlChecksum;
-		String time;
-		
 		try {
 			majorApiVersion = getNodeValueAsInteger(xmlDoc, "majorapiversion");
 			minorApiVersion = getNodeValueAsInteger(xmlDoc, "minorapiversion");
@@ -51,12 +43,7 @@ public class SummaryXmlParser extends XmlParser {
 			controlChecksum = getNodeValueAsString(xmlDoc, "controlchecksum");
 			time = getNodeValueAsString(xmlDoc, "time");
 
-			if (majorApiVersion == null || minorApiVersion == null || site == null || armed == null || countdown == null || latestEventId == null || numInfoEvents == null || numMinorEvents == null || numMajorEvents == null || logTimestamp == null || controlChecksum == null || time == null) {
-				return false;
-			}
-			
-			summary = new Summary(majorApiVersion, minorApiVersion, site, armed, countdown, latestEventId, numInfoEvents, numMinorEvents, numMajorEvents, logTimestamp, controlChecksum, time);
-			return true;
+			return majorApiVersion != null && minorApiVersion != null && site != null && armed != null && countdown != null && latestEventId != null && numInfoEvents != null && numMinorEvents != null && numMajorEvents != null && logTimestamp != null && controlChecksum != null && time != null;
 		}
 		catch (NumberFormatException e) {
 			return false;

@@ -25,7 +25,19 @@ public class Model {
 	
 	private static final String SETTINGS_FILENAME = "SkynetRemote.xml";
 	
-	private Summary summary;
+	private Integer majorApiVersion;
+	private Integer minorApiVersion;
+	private String site;
+	private Boolean armed;
+	private Double countdown;
+	private Long latestEventId;
+	private Integer numInfoEvents;
+	private Integer numMinorEvents;
+	private Integer numMajorEvents;
+	private Double logTimestamp;
+	private String controlChecksum;
+	private String time;
+	
 	private ArrayList<Event> events = new ArrayList<Event>();
 	private ArrayList<Device> devices = new ArrayList<Device>();
 	private ArrayList<Camera> cameras = new ArrayList<Camera>();
@@ -39,7 +51,19 @@ public class Model {
 	}
 
 	public void reset() {
-		summary = null;
+		majorApiVersion = null;
+		minorApiVersion = null;
+		site = null;
+		armed = null;
+		countdown = null;
+		latestEventId = null;
+		numInfoEvents = null;
+		numMinorEvents = null;
+		numMajorEvents = null;
+		logTimestamp = null;
+		controlChecksum = null;
+		time = null;
+		
 		events.clear();
 		devices.clear();
 		cameras.clear();
@@ -59,20 +83,27 @@ public class Model {
 		}
 	}
 	
-	public boolean updateSummary(String summaryXml) {
+	public boolean updateFromSummaryXml(String summaryXml) {
 		SummaryXmlParser parser = new SummaryXmlParser(summaryXml);
 		if (parser.isValid()) {
-			summary = parser.getSummary();
+			majorApiVersion = parser.majorApiVersion;
+			minorApiVersion = parser.minorApiVersion;
+			site = parser.site;
+			armed = parser.armed;
+			countdown = parser.countdown;
+			latestEventId = parser.latestEventId;
+			numInfoEvents = parser.numInfoEvents;
+			numMinorEvents = parser.numMinorEvents;
+			numMajorEvents = parser.numMajorEvents;
+			logTimestamp = parser.logTimestamp;
+			controlChecksum = parser.controlChecksum;
+			time = parser.time;
 			return true;
 		}
 		return false;
 	}
 	
-	public void resetSummary() {
-		summary = null;
-	}
-	
-	public boolean updateEvents(String eventsXml) {
+	public boolean updateFromEventsXml(String eventsXml) {
 		EventsXmlParser parser = new EventsXmlParser(eventsXml);
 		if (parser.isValid()) {
 			events = parser.getEvents();
@@ -81,7 +112,7 @@ public class Model {
 		return false;
 	}
 	
-	public boolean updateSensors(String sensorsXml) {
+	public boolean updateFromSensorsXml(String sensorsXml) {
 		SensorsXmlParser parser = new SensorsXmlParser(sensorsXml);
 		if (parser.isValid()) {
 			sensors = parser.getSensors();
@@ -90,7 +121,7 @@ public class Model {
 		return false;
 	}
 
-	public boolean updateDevices(String controlXml) {
+	public boolean updateFromControlXml(String controlXml) {
 		ControlXmlParser parser = new ControlXmlParser(controlXml);
 		if (parser.isValid()) {
 			devices = parser.getDevices();
@@ -99,7 +130,7 @@ public class Model {
 		return false;
 	}
 	
-	public boolean updateCameras(String camerasXml) {
+	public boolean updateFromCamerasXml(String camerasXml) {
 		CamerasXmlParser parser = new CamerasXmlParser(camerasXml);
 		if (parser.isValid()) {
 			cameras = parser.getCameras();
@@ -108,7 +139,7 @@ public class Model {
 		return false;
 	}
 	
-	public boolean updateLog(String logXml) {
+	public boolean updateFromLogXml(String logXml) {
 		LogXmlParser parser = new LogXmlParser(logXml);
 		if (parser.isValid()) {
 			log = parser.getLog();
@@ -131,10 +162,6 @@ public class Model {
 	
 	public Settings getSettings() {
 		return settings;
-	}
-	
-	public Summary getSummary() {
-		return summary;
 	}
 	
 	public List<Device> getDevices() {
@@ -162,13 +189,15 @@ public class Model {
 		}
 		return null;
 	}
-	
+
+	/*
 	public long getLatestEventId() {
 		if (events.size() > 0) {
 			return events.get(events.size()-1).id;
 		}
 		return -1;
 	}
+	*/
 
 	public List<Camera> getCameras() {
 		return cameras;
@@ -188,57 +217,125 @@ public class Model {
 		logger.info("Settings written to " + SETTINGS_FILENAME);
 	}
 	
-	public int getNumberOfInfoEvents() {
-		if (summary != null) {
-			return summary.numInfoEvents;
+	public Integer getMajorApiVersion(Integer defaultValue) {
+		if (majorApiVersion != null) {
+			return majorApiVersion;
 		}
 		else {
-			return 0;
+			return defaultValue;
 		}
 	}
 
-	public int getNumberOfMinorEvents() {
-		if (summary != null) {
-			return summary.numMinorEvents;
+	public Integer getMinorApiVersion(Integer defaultValue) {
+		if (minorApiVersion != null) {
+			return minorApiVersion;
 		}
 		else {
-			return 0;
+			return defaultValue;
 		}
 	}
 
-	public int getNumberOfMajorEvents() {
-		if (summary != null) {
-			return summary.numMajorEvents;
+	public String getSite(String defaultValue) {
+		if (site != null) {
+			return site;
 		}
 		else {
-			return 0;
+			return defaultValue;
 		}
 	}
 
-	public long getLatestEventIdFromSummary() {
-		if (summary != null) {
-			return summary.latestEventId;
+	public Boolean getArmed(Boolean defaultValue) {
+		if (armed != null) {
+			return armed;
 		}
 		else {
-			return -1;
+			return defaultValue;
 		}
 	}
 	
-	public String getControlChecksumFromSummary() {
-		if (summary != null) {
-			return summary.controlChecksum;
+	public String getArmedStr(String defaultValue) {
+		if (armed != null) {
+			if (armed) {
+				return "armed";
+			}
+			else {
+				return "disarmed";
+			}
 		}
 		else {
-			return "";
+			return defaultValue;
 		}
 	}
-	
-	public double getLogTimestampFromSummary() {
-		if (summary != null) {
-			return summary.logTimestamp;
+
+	public Double getCountdown(Double defaultValue) {
+		if (countdown != null) {
+			return countdown;
 		}
 		else {
-			return -1;
+			return defaultValue;
+		}
+	}
+
+	public Long getLatestEventId(Long defaultValue) {
+		if (latestEventId != null) {
+			return latestEventId;
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	public Integer getNumInfoEvents(Integer defaultValue) {
+		if (numInfoEvents != null) {
+			return numInfoEvents;
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	public Integer getNumMinorEvents(Integer defaultValue) {
+		if (numMinorEvents != null) {
+			return numMinorEvents;
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	public Integer getNumMajorEvents(Integer defaultValue) {
+		if (numMajorEvents != null) {
+			return numMajorEvents;
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	public Double getLogTimestamp(Double defaultValue) {
+		if (logTimestamp != null) {
+			return logTimestamp;
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	public String getControlChecksum(String defaultValue) {
+		if (controlChecksum != null) {
+			return controlChecksum;
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	public String getTime(String defaultValue) {
+		if (time != null) {
+			return time;
+		}
+		else {
+			return defaultValue;
 		}
 	}
 }

@@ -63,7 +63,6 @@ import se.markstrom.skynet.skynetremote.model.Event.Severity;
 import se.markstrom.skynet.skynetremote.model.Model;
 import se.markstrom.skynet.skynetremote.model.Sensor;
 import se.markstrom.skynet.skynetremote.model.Settings;
-import se.markstrom.skynet.skynetremote.model.Summary;
 
 public class ApplicationWindow implements GUI {
 
@@ -586,8 +585,9 @@ public class ApplicationWindow implements GUI {
 			break;
 		}
 		
-		Summary summary = model.getSummary();
-		if (summary != null) {
+		String site = model.getSite(null);
+		String armedStr = model.getArmedStr(null);
+		if (site != null && armedStr != null) {
 			String apiWorkingStr;
 			if (apiWorking) {
 				apiWorkingStr = "working";
@@ -595,7 +595,7 @@ public class ApplicationWindow implements GUI {
 			else {
 				apiWorkingStr = "idle";
 			}
-			setTitle(NAME + " (" + connectedStr + ", " + summary.site + " is " + summary.getArmedStr() + ", API-thread is " + apiWorkingStr + ")");
+			setTitle(NAME + " (" + connectedStr + ", " + site + " is " + armedStr + ", API-thread is " + apiWorkingStr + ")");
 		}
 		else {
 			setTitle(NAME + " (" + connectedStr + ")");
@@ -610,10 +610,12 @@ public class ApplicationWindow implements GUI {
 	}
 	
 	private void updateArmMenuItems() {
-		Summary summary = model.getSummary();
-		actionArmItem.setEnabled(!summary.armed);
-		actionDisarmItem.setEnabled(summary.armed);
-		actionTemporaryDisarmItem.setEnabled(summary.armed);
+		Boolean armed = model.getArmed(null);
+		if (armed != null) {
+			actionArmItem.setEnabled(!armed);
+			actionDisarmItem.setEnabled(armed);
+			actionTemporaryDisarmItem.setEnabled(armed);
+		}
 	}
 
 	public void run() {
@@ -819,7 +821,7 @@ public class ApplicationWindow implements GUI {
 			}
 
 			// Open a new window and request the first image
-			streamWindows.add(new CameraStreamWindow(model.getSummary().site, cameraIndex));
+			streamWindows.add(new CameraStreamWindow(model.getSite(""), cameraIndex));
 			apiThread.runTask(new GetCameraImageTask(cameraIndex, ImageType.STREAM));
 		}
 
@@ -1037,7 +1039,7 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				log.info("Received cameras.xml");
 				
-				if (model.updateCameras(xml)) {
+				if (model.updateFromCamerasXml(xml)) {
 					updateCameras();
 				}
 			}
@@ -1080,7 +1082,7 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				log.info("Received control.xml");
 				
-				if (model.updateDevices(xml)) {
+				if (model.updateFromControlXml(xml)) {
 					controlTable.setRedraw(false);
 					controlTable.removeAll();
 					for (Device device : model.getDevices()) {
@@ -1108,8 +1110,8 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				log.info("Received events.xml");
 				
-				long prevLatestEventId = model.getLatestEventId();
-				if (model.updateEvents(xml)) {
+				long prevLatestEventId = model.getLatestEventId(-1l);
+				if (model.updateFromEventsXml(xml)) {
 					log.fine("Parsed events.xml");
 
 					eventsTable.setRedraw(false);
@@ -1156,13 +1158,13 @@ public class ApplicationWindow implements GUI {
 						}
 						
 						if (model.getSettings().notifyOnNewMajorEvent && newMajorEvent) {
-							new Notification(model.getSummary().site, "New event with major severity detected!", Severity.MAJOR);
+							new Notification(model.getSite(""), "New event with major severity detected!", Severity.MAJOR);
 						}
 						else if (model.getSettings().notifyOnNewMinorEvent && newMinorEvent) {
-							new Notification(model.getSummary().site, "New event with minor severity detected!", Severity.MINOR);
+							new Notification(model.getSite(""), "New event with minor severity detected!", Severity.MINOR);
 						}
 						else if (model.getSettings().notifyOnNewInfoEvent && newInfoEvent) {
-							new Notification(model.getSummary().site, "New event with info severity detected!", Severity.INFO);
+							new Notification(model.getSite(""), "New event with info severity detected!", Severity.INFO);
 						}
 					}
 					
@@ -1180,7 +1182,7 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				log.info("Received sensors.xml");
 				
-				if (model.updateSensors(xml)) {
+				if (model.updateFromSensorsXml(xml)) {
 					log.fine("Parsed cameras.xml");
 					
 					sensorsTable.setRedraw(false);
@@ -1219,7 +1221,7 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				if (model.updateLog(xml)) {
+				if (model.updateFromLogXml(xml)) {
 					remoteLogText.setText(model.getLog().getText());
 				}
 			}
@@ -1233,43 +1235,43 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				log.info("Received summary.xml");
 				
-				long prevLatestEventId = model.getLatestEventIdFromSummary();
-				int prevNumInfoEvents = model.getNumberOfInfoEvents();
-				int prevNumMinorEvents = model.getNumberOfMinorEvents();
-				int prevNumMajorEvents = model.getNumberOfMajorEvents();
-				String prevControlChecksum = model.getControlChecksumFromSummary();
-				double prevLogTimestamp = model.getLogTimestampFromSummary();
+				long prevLatestEventId = model.getLatestEventId(-1l);
+				int prevNumInfoEvents = model.getNumInfoEvents(0);
+				int prevNumMinorEvents = model.getNumMinorEvents(0);
+				int prevNumMajorEvents = model.getNumMajorEvents(0);
+				String prevControlChecksum = model.getControlChecksum("");
+				Double prevLogTimestamp = model.getLogTimestamp(0.0);
 				
-				if (model.updateSummary(xml)) {
-					Summary summary = model.getSummary();
+				if (model.updateFromSummaryXml(xml)) {
+					//Summary summary = model.getSummary();
 
 					updateTitle();
 					updateArmMenuItems();
 					
-					if (summary.numMajorEvents > 0) {
+					if (model.getNumMajorEvents(0) > 0) {
 						setIcon(majorIcon);
 					}
-					else if (summary.numMinorEvents > 0) {
+					else if (model.getNumMinorEvents(0) > 0) {
 						setIcon(minorIcon);
 					}
-					else if (summary.numInfoEvents > 0) {
+					else if (model.getNumInfoEvents(0) > 0) {
 						setIcon(infoIcon);
 					}
 					else {
 						setIcon(noneIcon);
 					}
 					
-					if (prevLatestEventId != summary.latestEventId ||
-							prevNumInfoEvents != summary.numInfoEvents ||
-							prevNumMinorEvents != summary.numMinorEvents ||
-							prevNumMajorEvents != summary.numMajorEvents) {
+					if (prevLatestEventId != model.getLatestEventId(-1l) ||
+							prevNumInfoEvents != model.getNumInfoEvents(0) ||
+							prevNumMinorEvents != model.getNumMinorEvents(0) ||
+							prevNumMajorEvents != model.getNumMajorEvents(0)) {
 						if (model.getSettings().getNewEvents) {
 							log.info("Event change detected, requesting events");
 							apiThread.runTask(new GetEventsXmlTask());
 						}
 					}
 					
-					if (!prevControlChecksum.equals(summary.controlChecksum)) {
+					if (!prevControlChecksum.equals(model.getControlChecksum(""))) {
 						if (model.getSettings().getNewControl) {
 							log.info("New control checksum detected, requesting control");
 							apiThread.runTask(new GetControlXmlTask());
@@ -1282,7 +1284,7 @@ public class ApplicationWindow implements GUI {
 						apiThread.runTask(new GetSensorsXmlTask());
 					}
 					
-					if (prevLogTimestamp != summary.logTimestamp) {
+					if (prevLogTimestamp.compareTo(model.getLogTimestamp(0.0)) != 0) {
 						if (model.getSettings().getNewLog) {
 							log.info("New log timestamp detected, requesting log");
 							apiThread.runTask(new GetLogXmlTask());
@@ -1304,7 +1306,7 @@ public class ApplicationWindow implements GUI {
 				fileCache.addFile(Settings.createFilenameForEventImage(eventId, imageIndex), jpegData);
 				
 				if (show) {
-					String windowTitle = model.getSummary().site +  ": Event " + eventId + " (image " + (imageIndex+1) + ")";
+					String windowTitle = model.getSite("") +  ": Event " + eventId + " (image " + (imageIndex+1) + ")";
 					Image image = Utils.createImageFromJpegData(jpegData);
 					if (image != null) {
 						new ImageWindow(windowTitle, image);
@@ -1327,7 +1329,7 @@ public class ApplicationWindow implements GUI {
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				String title = model.getSummary().site + ": Camera " + (cameraIndex+1) + " snapshot";
+				String title = model.getSite("") + ": Camera " + (cameraIndex+1) + " snapshot";
 				Image image = Utils.createImageFromJpegData(jpegData);
 				if (image != null) {
 					new ImageWindow(title, image);
