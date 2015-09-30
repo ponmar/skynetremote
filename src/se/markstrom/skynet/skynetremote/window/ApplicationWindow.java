@@ -623,6 +623,14 @@ public class ApplicationWindow implements GUI {
 		updateTitle();
 	}
 	
+	private void clearTableData() {
+		eventsTable.removeAll();
+		controlTable.removeAll();
+		weatherTable.removeAll();
+		sensorsTable.removeAll();
+	}
+	
+	
 	private void setIcon(Image image) {
 		if (trayItem != null) {
 			trayItem.setImage(image);
@@ -1086,6 +1094,8 @@ public class ApplicationWindow implements GUI {
 					// Reset old fetched data when connected, cause it might be invalid for this host.
 					model.reset();
 					
+					clearTableData();
+
 					// Update cameras once to enable menu items
 					apiThread.runTask(new GetCamerasXmlTask());
 					
