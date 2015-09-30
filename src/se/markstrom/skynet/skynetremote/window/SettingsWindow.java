@@ -27,6 +27,7 @@ public class SettingsWindow {
 	private Button updateControlButton;
 	private Button updateSensorsButton;
 	private Button updateLogButton;
+	private Button updateWeatherButton;
 	private Button notifyOnNewInfoEventButton;
 	private Button notifyOnNewMinorEventButton;
 	private Button notifyOnNewMajorEventButton;
@@ -106,6 +107,12 @@ public class SettingsWindow {
 		sensorsGd.horizontalSpan = 2;
 		updateSensorsButton.setLayoutData(sensorsGd);
 
+		updateWeatherButton = new Button(pollGroup, SWT.CHECK);
+		updateWeatherButton.setText("Download weather when a new checksum is detected");
+		GridData weatherGd = new GridData();
+		weatherGd.horizontalSpan = 2;
+		updateWeatherButton.setLayoutData(weatherGd);
+		
 		updateLogButton = new Button(pollGroup, SWT.CHECK);
 		updateLogButton.setText("Download log when a new timestamp is detected");
 		GridData logGd = new GridData();
@@ -154,6 +161,7 @@ public class SettingsWindow {
 		updateEventsButton.setSelection(settings.getNewEvents);
 		updateControlButton.setSelection(settings.getNewControl);
 		updateSensorsButton.setSelection(settings.getNewSensors);
+		updateWeatherButton.setSelection(settings.getNewWeather);
 		updateLogButton.setSelection(settings.getNewLog);
 		notifyOnNewInfoEventButton.setSelection(settings.notifyOnNewInfoEvent);
 		notifyOnNewMinorEventButton.setSelection(settings.notifyOnNewMinorEvent);
@@ -195,6 +203,7 @@ public class SettingsWindow {
 		settings.getNewControl = updateControlButton.getSelection();
 		settings.getNewSensors = updateSensorsButton.getSelection();
 		settings.getNewLog = updateLogButton.getSelection();
+		settings.getNewWeather = updateWeatherButton.getSelection();
 		settings.notifyOnNewInfoEvent = notifyOnNewInfoEventButton.getSelection();
 		settings.notifyOnNewMinorEvent = notifyOnNewMinorEventButton.getSelection();
 		settings.notifyOnNewMajorEvent = notifyOnNewMajorEventButton.getSelection();

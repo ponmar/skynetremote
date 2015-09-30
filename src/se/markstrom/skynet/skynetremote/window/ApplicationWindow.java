@@ -1399,8 +1399,7 @@ public class ApplicationWindow implements GUI {
 					}
 
 					if (!prevWeatherChecksum.equals(model.getWeatherChecksum(""))) {
-						// TODO: add weather setting
-						if (true) {
+						if (model.getSettings().getNewWeather) {
 							log.info("New weather checksum detected, requesting weather");
 							apiThread.runTask(new GetWeatherXmlTask());
 						}

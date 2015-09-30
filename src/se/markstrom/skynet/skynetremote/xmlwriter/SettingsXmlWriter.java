@@ -27,6 +27,7 @@ public class SettingsXmlWriter extends XmlWriter {
 		xml += "<getNewControl>" + settings.getNewControl + "</getNewControl>";
 		xml += "<getNewSensors>" + settings.getNewSensors + "</getNewSensors>";
 		xml += "<getNewLog>" + settings.getNewLog + "</getNewLog>";
+		xml += "<getNewWeather>" + settings.getNewWeather + "</getNewWeather>";
 		xml += "<summaryPollInterval>" + settings.summaryPollInterval + "</summaryPollInterval>";
 		xml += "<host>" + settings.host + "</host>";
 		xml += "<port>" + settings.port + "</port>";

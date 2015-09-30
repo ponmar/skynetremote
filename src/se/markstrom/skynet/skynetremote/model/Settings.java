@@ -9,6 +9,7 @@ public class Settings {
 	public boolean getNewControl;
 	public boolean getNewSensors;
 	public boolean getNewLog;
+	public boolean getNewWeather;
 	public int summaryPollInterval;
 	public String host;
 	public int port;
@@ -27,6 +28,7 @@ public class Settings {
 		getNewControl = true;
 		getNewSensors = true;
 		getNewLog = true;
+		getNewWeather = true;
 		summaryPollInterval = 30;
 		host = "";
 		port = 22;
