@@ -48,6 +48,7 @@ import se.markstrom.skynet.skynetremote.apitask.GetEventsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetLogXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetSensorsXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.GetSummaryXmlTask;
+import se.markstrom.skynet.skynetremote.apitask.GetWeatherXmlTask;
 import se.markstrom.skynet.skynetremote.apitask.TemporaryDisarmTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffAllDevicesTask;
 import se.markstrom.skynet.skynetremote.apitask.TurnOffDeviceTask;
@@ -63,6 +64,7 @@ import se.markstrom.skynet.skynetremote.model.Event.Severity;
 import se.markstrom.skynet.skynetremote.model.Model;
 import se.markstrom.skynet.skynetremote.model.Sensor;
 import se.markstrom.skynet.skynetremote.model.Settings;
+import se.markstrom.skynet.skynetremote.model.WeatherReport;
 
 public class ApplicationWindow implements GUI {
 
@@ -108,6 +110,7 @@ public class ApplicationWindow implements GUI {
 	private TrayItem trayItem;
 	private Table eventsTable;
 	private Table controlTable;
+	private Table weatherTable;
 	private Table sensorsTable;
 	private Text logText;
 	private Text remoteLogText;
@@ -402,6 +405,7 @@ public class ApplicationWindow implements GUI {
 		tabFolder = new TabFolder(shell, SWT.BORDER);
 		createEventsTab();
 	    createControlTab();
+	    createWeatherTab();
 	    createSensorsTab();
 	    createLogTab();
 	    createRemoteLogTab();
@@ -466,6 +470,62 @@ public class ApplicationWindow implements GUI {
 	    typeColumn.pack();
 	    
 	    controlTab.setControl(controlTable);
+	}
+	
+	private void createWeatherTab() {
+	    weatherTable = new Table(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+	    weatherTable.setHeaderVisible(true);
+	    weatherTable.setLinesVisible(true);
+
+	    TabItem weatherTab = new TabItem(tabFolder, SWT.BORDER);
+	    weatherTab.setText("Weather");
+	    weatherTab.setToolTipText("Weather reports");
+	    
+	    TableColumn providerColumn = new TableColumn(weatherTable, SWT.NULL);
+	    providerColumn.setText("Provider");
+	    providerColumn.pack();
+
+	    TableColumn areaColumn = new TableColumn(weatherTable, SWT.NULL);
+	    areaColumn.setText("Area");
+	    areaColumn.pack();
+
+	    TableColumn updatedColumn = new TableColumn(weatherTable, SWT.NULL);
+	    updatedColumn.setText("Updated");
+	    updatedColumn.pack();
+
+	    TableColumn validFromColumn = new TableColumn(weatherTable, SWT.NULL);
+	    validFromColumn.setText("Valid from");
+	    validFromColumn.pack();
+
+	    TableColumn validToColumn = new TableColumn(weatherTable, SWT.NULL);
+	    validToColumn.setText("Valid to");
+	    validToColumn.pack();
+	    
+	    TableColumn temperatureColumn = new TableColumn(weatherTable, SWT.NULL);
+	    temperatureColumn.setText("Temperature [Celsius]");
+	    temperatureColumn.pack();
+	    
+	    TableColumn precipitationColumn = new TableColumn(weatherTable, SWT.NULL);
+	    precipitationColumn.setText("Precipitation [mm/h]");
+	    precipitationColumn.pack();
+	    
+	    TableColumn windColumn = new TableColumn(weatherTable, SWT.NULL);
+	    windColumn.setText("Wind [m/s]");
+	    windColumn.pack();
+
+	    TableColumn pressureColumn = new TableColumn(weatherTable, SWT.NULL);
+	    pressureColumn.setText("Pressure [hPa]");
+	    pressureColumn.pack();
+
+	    TableColumn sunriseColumn = new TableColumn(weatherTable, SWT.NULL);
+	    sunriseColumn.setText("Sunrise");
+	    sunriseColumn.pack();
+
+	    TableColumn sunsetColumn = new TableColumn(weatherTable, SWT.NULL);
+	    sunsetColumn.setText("Sunset");
+	    sunsetColumn.pack();
+	    
+	    weatherTab.setControl(weatherTable);
 	}
 	
 	private void createSensorsTab() {
@@ -1036,6 +1096,44 @@ public class ApplicationWindow implements GUI {
 			}
 		});
 	}
+
+	@Override
+	public void updateWeatherXml(String xml) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				log.info("Received weather.xml");
+				
+				if (model.updateFromWeatherXml(xml)) {
+					weatherTable.setRedraw(false);
+					weatherTable.removeAll();
+					for (WeatherReport report : model.getWeatherReports()) {
+						TableItem item = new TableItem(weatherTable, SWT.NULL);
+						int col = 0;
+						item.setText(col++, report.provider);
+						item.setText(col++, report.area);
+						item.setText(col++, report.updated);
+						item.setText(col++, report.validFrom);
+						item.setText(col++, report.validTo);
+						item.setText(col++, report.getTemperatureStr());
+						item.setText(col++, report.getPrecipitationStr());
+						item.setText(col++, report.getWindspeedStr());
+						item.setText(col++, report.getPressureStr());
+						item.setText(col++, report.sunrise);
+						item.setText(col++, report.sunset);
+					}
+					for (int i=0; i<weatherTable.getColumnCount(); i++) {
+						weatherTable.getColumn(i).pack();
+					}
+					weatherTable.setRedraw(true);
+					weatherTable.redraw();
+				}
+				else {
+					openApiError("Received invalid weather.xml");
+				}
+			}
+		});
+	}
 	
 	@Override
 	public void updateCamerasXml(String xml) {
@@ -1095,10 +1193,11 @@ public class ApplicationWindow implements GUI {
 					controlTable.removeAll();
 					for (Device device : model.getDevices()) {
 						TableItem item = new TableItem(controlTable, SWT.NULL);
-						item.setText(0, device.name);
-						item.setText(1, device.getStateStr());
-						item.setText(2, String.valueOf(device.timeLeft));
-						item.setText(3, device.getTypeStr());
+						int col = 0;
+						item.setText(col++, device.name);
+						item.setText(col++, device.getStateStr());
+						item.setText(col++, String.valueOf(device.timeLeft));
+						item.setText(col++, device.getTypeStr());
 						item.setData(device.id);
 					}
 					for (int i=0; i<controlTable.getColumnCount(); i++) {
@@ -1154,13 +1253,14 @@ public class ApplicationWindow implements GUI {
 							}
 							
 							TableItem item = new TableItem(eventsTable, SWT.NULL);
-							item.setText(0, String.valueOf(event.id));
-							item.setText(1, event.time);
-							item.setText(2, event.getSeverityStr());
-							item.setText(3, event.message);
-							item.setText(4, event.sensor);
-							item.setText(5, event.getArmedStr());
-							item.setText(6, String.valueOf(event.images));
+							int col = 0;
+							item.setText(col++, String.valueOf(event.id));
+							item.setText(col++, event.time);
+							item.setText(col++, event.getSeverityStr());
+							item.setText(col++, event.message);
+							item.setText(col++, event.sensor);
+							item.setText(col++, event.getArmedStr());
+							item.setText(col++, String.valueOf(event.images));
 							item.setData(event.id);
 						}
 						
@@ -1207,15 +1307,16 @@ public class ApplicationWindow implements GUI {
 					if (!sensors.isEmpty()) {
 						for (Sensor sensor : sensors) {
 							TableItem item = new TableItem(sensorsTable, SWT.NULL);
-							item.setText(0, sensor.name);
-							item.setText(1, sensor.details);
-							item.setText(2, sensor.updateFilter);
-							item.setText(3, sensor.triggerFilter);
-							item.setText(4, String.valueOf(sensor.armedActions));
-							item.setText(5, String.valueOf(sensor.disarmedActions));
-							item.setText(6, String.valueOf(sensor.triggerCount));
-							item.setText(7, String.valueOf(sensor.muted));
-							item.setText(8, sensor.areas);
+							int col = 0;
+							item.setText(col++, sensor.name);
+							item.setText(col++, sensor.details);
+							item.setText(col++, sensor.updateFilter);
+							item.setText(col++, sensor.triggerFilter);
+							item.setText(col++, String.valueOf(sensor.armedActions));
+							item.setText(col++, String.valueOf(sensor.disarmedActions));
+							item.setText(col++, String.valueOf(sensor.triggerCount));
+							item.setText(col++, String.valueOf(sensor.muted));
+							item.setText(col++, sensor.areas);
 						}
 					}
 					
@@ -1260,6 +1361,7 @@ public class ApplicationWindow implements GUI {
 				int prevNumMinorEvents = model.getNumMinorEvents(0);
 				int prevNumMajorEvents = model.getNumMajorEvents(0);
 				String prevControlChecksum = model.getControlChecksum("");
+				String prevWeatherChecksum = model.getWeatherChecksum("");
 				Double prevLogTimestamp = model.getLogTimestamp(0.0);
 				
 				if (model.updateFromSummaryXml(xml)) {
@@ -1295,7 +1397,15 @@ public class ApplicationWindow implements GUI {
 							apiThread.runTask(new GetControlXmlTask());
 						}
 					}
-					
+
+					if (!prevWeatherChecksum.equals(model.getWeatherChecksum(""))) {
+						// TODO: add weather setting
+						if (true) {
+							log.info("New weather checksum detected, requesting weather");
+							apiThread.runTask(new GetWeatherXmlTask());
+						}
+					}
+
 					// TODO: add total sensor trigger count to API
 					if (model.getSettings().getNewSensors) {
 						log.info("New sensor trigger sum detected, requesting sensors");

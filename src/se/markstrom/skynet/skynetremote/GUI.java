@@ -19,6 +19,7 @@ public interface GUI {
 	void updateCamerasXml(String xml);
 	void updateControlXml(String xml);
 	void updateEventsXml(String xml);
+	void updateWeatherXml(String xml);
 	void updateLogXml(String xml);
 	void updateSummaryXml(String xml);
 	void updateSensorsXml(String xml);

@@ -20,6 +20,7 @@ public class SummaryXmlParser extends XmlParser {
 	public Integer numMajorEvents;
 	public Double logTimestamp;
 	public String controlChecksum;
+	public String weatherChecksum;
 	public String time;
 
 	public SummaryXmlParser(String xml) {
@@ -41,9 +42,10 @@ public class SummaryXmlParser extends XmlParser {
 			numMajorEvents = getNodeValueAsInteger(xmlDoc, "major");
 			logTimestamp = getNodeValueAsDouble(xmlDoc, "logtimestamp");
 			controlChecksum = getNodeValueAsString(xmlDoc, "controlchecksum");
+			weatherChecksum = getNodeValueAsString(xmlDoc, "weatherchecksum");
 			time = getNodeValueAsString(xmlDoc, "time");
 
-			return majorApiVersion != null && minorApiVersion != null && site != null && armed != null && countdown != null && latestEventId != null && numInfoEvents != null && numMinorEvents != null && numMajorEvents != null && logTimestamp != null && controlChecksum != null && time != null;
+			return majorApiVersion != null && minorApiVersion != null && site != null && armed != null && countdown != null && latestEventId != null && numInfoEvents != null && numMinorEvents != null && numMajorEvents != null && logTimestamp != null && controlChecksum != null && weatherChecksum != null && time != null;
 		}
 		catch (NumberFormatException e) {
 			return false;

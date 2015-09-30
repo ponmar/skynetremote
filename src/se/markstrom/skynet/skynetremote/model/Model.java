@@ -14,6 +14,7 @@ import se.markstrom.skynet.skynetremote.xmlparser.LogXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SensorsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SettingsXmlParser;
 import se.markstrom.skynet.skynetremote.xmlparser.SummaryXmlParser;
+import se.markstrom.skynet.skynetremote.xmlparser.WeatherXmlParser;
 import se.markstrom.skynet.skynetremote.xmlwriter.SettingsXmlWriter;
 
 public class Model {
@@ -36,12 +37,14 @@ public class Model {
 	private Integer numMajorEvents;
 	private Double logTimestamp;
 	private String controlChecksum;
+	private String weatherChecksum;
 	private String time;
 	
 	private ArrayList<Event> events = new ArrayList<Event>();
 	private ArrayList<Device> devices = new ArrayList<Device>();
 	private ArrayList<Camera> cameras = new ArrayList<Camera>();
 	private ArrayList<Sensor> sensors = new ArrayList<Sensor>();
+	private ArrayList<WeatherReport> weatherReports = new ArrayList<WeatherReport>();
 	private ArrayList<String> logItems = new ArrayList<String>();
 	
 	private Settings settings = null;
@@ -63,12 +66,14 @@ public class Model {
 		numMajorEvents = null;
 		logTimestamp = null;
 		controlChecksum = null;
+		weatherChecksum = null;
 		time = null;
 		
 		events.clear();
 		devices.clear();
 		cameras.clear();
 		sensors.clear();
+		weatherReports.clear();
 		logItems.clear();
 	}
 	
@@ -98,6 +103,7 @@ public class Model {
 			numMajorEvents = parser.numMajorEvents;
 			logTimestamp = parser.logTimestamp;
 			controlChecksum = parser.controlChecksum;
+			weatherChecksum = parser.weatherChecksum;
 			time = parser.time;
 			return true;
 		}
@@ -108,6 +114,15 @@ public class Model {
 		EventsXmlParser parser = new EventsXmlParser(eventsXml);
 		if (parser.isValid()) {
 			events = parser.getEvents();
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean updateFromWeatherXml(String weatherXml) {
+		WeatherXmlParser parser = new WeatherXmlParser(weatherXml);
+		if (parser.isValid()) {
+			weatherReports = parser.getWeatherReports();
 			return true;
 		}
 		return false;
@@ -191,6 +206,10 @@ public class Model {
 		return null;
 	}
 
+	public List<WeatherReport> getWeatherReports() {
+		return weatherReports;
+	}
+	
 	public List<Camera> getCameras() {
 		return cameras;
 	}
@@ -324,6 +343,15 @@ public class Model {
 	public String getControlChecksum(String defaultValue) {
 		if (controlChecksum != null) {
 			return controlChecksum;
+		}
+		else {
+			return defaultValue;
+		}
+	}
+
+	public String getWeatherChecksum(String defaultValue) {
+		if (weatherChecksum != null) {
+			return weatherChecksum;
 		}
 		else {
 			return defaultValue;
