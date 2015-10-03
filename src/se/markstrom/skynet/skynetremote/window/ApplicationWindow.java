@@ -12,6 +12,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -107,6 +108,9 @@ public class ApplicationWindow implements GUI {
 	private Image minorIcon;
 	private Image majorIcon;
 	
+	private Image deviceOffIcon;
+	private Image deviceOnIcon;
+	
 	private TrayItem trayItem;
 	private Table eventsTable;
 	private Table controlTable;
@@ -199,8 +203,11 @@ public class ApplicationWindow implements GUI {
 		int roundSize = size / 2;
 		noneIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_BLACK), roundSize);
 		infoIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_GREEN), roundSize);
-		minorIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_YELLOW), roundSize);
+		minorIcon = Utils.createFilledRoundRect(size, size, new Color(Display.getCurrent(), 255, 128, 0), roundSize);
 		majorIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_RED), roundSize);
+		
+		deviceOffIcon = noneIcon;
+		deviceOnIcon = minorIcon;
 	}
 	
 	private void createTray() {
@@ -414,28 +421,40 @@ public class ApplicationWindow implements GUI {
 	private void createEventsTab() {
 		TabItem eventsTab = new TabItem(tabFolder, SWT.BORDER);
 		eventsTab.setText("Events");
+
 		eventsTable = new Table(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 		eventsTable.setHeaderVisible(true);
 		eventsTable.setLinesVisible(true);
 		eventsTable.addMouseListener(new EventSelectedListener());
+		
+		TableColumn iconColumn = new TableColumn(eventsTable, SWT.NULL);
+		iconColumn.setText("Icon");
+		iconColumn.pack();
+		
 		TableColumn eventIdColumn = new TableColumn(eventsTable, SWT.NULL);
 		eventIdColumn.setText("Id");
 		eventIdColumn.pack();
+		
 		TableColumn eventTimeColumn = new TableColumn(eventsTable, SWT.NULL);
 		eventTimeColumn.setText("Time");
 		eventTimeColumn.pack();
+		
 		TableColumn eventSeverityColumn = new TableColumn(eventsTable, SWT.NULL);
 		eventSeverityColumn.setText("Severity");
 		eventSeverityColumn.pack();
+		
 		TableColumn eventMessageColumn = new TableColumn(eventsTable, SWT.NULL);
 		eventMessageColumn.setText("Message");
 		eventMessageColumn.pack();
+		
 		TableColumn eventSensorColumn = new TableColumn(eventsTable, SWT.NULL);
 		eventSensorColumn.setText("Sensor");
 		eventSensorColumn.pack();
+		
 		TableColumn eventArmedColumn = new TableColumn(eventsTable, SWT.NULL);
 		eventArmedColumn.setText("Armed");
 		eventArmedColumn.pack();
+		
 		TableColumn eventImagesColumn = new TableColumn(eventsTable, SWT.NULL);
 		eventImagesColumn.setText("Images");
 		eventImagesColumn.pack();
@@ -452,6 +471,10 @@ public class ApplicationWindow implements GUI {
 	    TabItem controlTab = new TabItem(tabFolder, SWT.BORDER);
 	    controlTab.setText("Device Control");
 	    controlTab.setToolTipText("Home automation device control");
+
+	    TableColumn iconColumn = new TableColumn(controlTable, SWT.NULL);
+	    iconColumn.setText("Icon");
+	    iconColumn.pack();
 	    
 	    TableColumn nameColumn = new TableColumn(controlTable, SWT.NULL);
 	    nameColumn.setText("Device name");
@@ -1206,6 +1229,12 @@ public class ApplicationWindow implements GUI {
 					for (Device device : model.getDevices()) {
 						TableItem item = new TableItem(controlTable, SWT.NULL);
 						int col = 0;
+						if (device.state) {
+							item.setImage(col++, deviceOnIcon);
+						}
+						else {
+							item.setImage(col++, deviceOffIcon);
+						}
 						item.setText(col++, device.name);
 						item.setText(col++, device.getStateStr());
 						item.setText(col++, String.valueOf(device.timeLeft));
@@ -1266,6 +1295,22 @@ public class ApplicationWindow implements GUI {
 							
 							TableItem item = new TableItem(eventsTable, SWT.NULL);
 							int col = 0;
+							Image icon;
+							switch (event.severity) {
+							case INFO:
+								icon = infoIcon;
+								break;
+							case MINOR:
+								icon = minorIcon;
+								break;
+							case MAJOR:
+								icon = majorIcon;
+								break;
+							default:
+								icon = noneIcon;
+								break;
+							}
+							item.setImage(col++, icon);
 							item.setText(col++, String.valueOf(event.id));
 							item.setText(col++, event.time);
 							item.setText(col++, event.getSeverityStr());
