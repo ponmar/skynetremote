@@ -202,9 +202,9 @@ public class ApplicationWindow implements GUI {
 	private void createIcons(int size) {
 		int roundSize = size / 2;
 		noneIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_BLACK), roundSize);
-		infoIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_GREEN), roundSize);
+		infoIcon = Utils.createFilledRoundRect(size, size, new Color(Display.getCurrent(), 100, 200, 100), roundSize);
 		minorIcon = Utils.createFilledRoundRect(size, size, new Color(Display.getCurrent(), 255, 128, 0), roundSize);
-		majorIcon = Utils.createFilledRoundRect(size, size, display.getSystemColor(SWT.COLOR_RED), roundSize);
+		majorIcon = Utils.createFilledRoundRect(size, size, new Color(Display.getCurrent(), 196, 60, 60), roundSize);
 		
 		deviceOffIcon = noneIcon;
 		deviceOnIcon = minorIcon;
