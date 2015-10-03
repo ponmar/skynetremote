@@ -16,7 +16,7 @@ public class AboutWindow {
 	private Display display;
 	private Shell shell;
 	
-	public AboutWindow(Shell parentShell, Image noneIcon, Image infoIcon, Image minorIcon, Image majorIcon) {
+	public AboutWindow(Shell parentShell, Image noneIcon, Image infoIcon, Image minorIcon, Image majorIcon, Image deviceOffIcon, Image deviceOnIcon) {
 		display = Display.getDefault();
 		shell = new Shell(display, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 		shell.setText("About");
@@ -60,29 +60,86 @@ public class AboutWindow {
 		close.setText("Escape");
 		close.pack();
 
+		Label windowIconsHeading = new Label(shell, SWT.NONE);
+		windowIconsHeading.setText("Window icons:");
+		windowIconsHeading.pack();
+		
+		new Label(shell, SWT.NONE);
+		
 		Label noneIconLabel = new Label(shell, SWT.NONE);
 		noneIconLabel.setImage(noneIcon);
 
 		Label noneIconText = new Label(shell, SWT.NONE);
-		noneIconText.setText("The icon used when no event information has been fetched");
+		noneIconText.setText("No event information has been fetched");
+		noneIconText.pack();
 		
 		Label infoIconLabel = new Label(shell, SWT.NONE);
 		infoIconLabel.setImage(infoIcon);
 
 		Label infoIconText = new Label(shell, SWT.NONE);
-		infoIconText.setText("The icon used when there are only info events");
+		infoIconText.setText("There are only info events");
+		infoIconText.pack();
 		
 		Label minorIconLabel = new Label(shell, SWT.NONE);
 		minorIconLabel.setImage(minorIcon);
 
 		Label minorIconText = new Label(shell, SWT.NONE);
-		minorIconText.setText("The icon used when there are minor events");
+		minorIconText.setText("There are minor events");
+		minorIconText.pack();
 
 		Label majorIconLabel = new Label(shell, SWT.NONE);
 		majorIconLabel.setImage(majorIcon);
 
 		Label majorIconText = new Label(shell, SWT.NONE);
-		majorIconText.setText("The icon used when there are major events");
+		majorIconText.setText("There are major events");
+		majorIconText.pack();
+
+		Label eventIconsHeading = new Label(shell, SWT.NONE);
+		eventIconsHeading.setText("Event icons:");
+		eventIconsHeading.pack();
+		
+		new Label(shell, SWT.NONE);
+		
+		Label eventInfoIconLabel = new Label(shell, SWT.NONE);
+		eventInfoIconLabel.setImage(infoIcon);
+
+		Label eventInfoIconText = new Label(shell, SWT.NONE);
+		eventInfoIconText.setText("Info event severity");
+		eventInfoIconText.pack();
+		
+		Label eventMinorIconLabel = new Label(shell, SWT.NONE);
+		eventMinorIconLabel.setImage(minorIcon);
+
+		Label eventMinorIconText = new Label(shell, SWT.NONE);
+		eventMinorIconText.setText("Minor event severity");
+		eventMinorIconText.pack();
+
+		Label eventMajorIconLabel = new Label(shell, SWT.NONE);
+		eventMajorIconLabel.setImage(majorIcon);
+
+		Label eventMajorIconText = new Label(shell, SWT.NONE);
+		eventMajorIconText.setText("Major event severity");
+		eventMajorIconText.pack();
+		
+		Label deviceIconsHeading = new Label(shell, SWT.NONE);
+		deviceIconsHeading.setText("Device icons:");
+		deviceIconsHeading.pack();
+		
+		new Label(shell, SWT.NONE);
+		
+		Label deviceOffIconLabel = new Label(shell, SWT.NONE);
+		deviceOffIconLabel.setImage(deviceOffIcon);
+		
+		Label deviceOffIconText = new Label(shell, SWT.NONE);
+		deviceOffIconText.setText("The device is turned off");
+		deviceOffIconText.pack();
+
+		Label deviceOnIconLabel = new Label(shell, SWT.NONE);
+		deviceOnIconLabel.setImage(deviceOnIcon);
+		
+		Label deviceOnIconText = new Label(shell, SWT.NONE);
+		deviceOnIconText.setText("The device is turned on");
+		deviceOnIconText.pack();
 
 		shell.addTraverseListener(new KeyListener());		
 		shell.pack();

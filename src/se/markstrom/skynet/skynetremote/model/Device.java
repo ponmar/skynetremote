@@ -11,6 +11,13 @@ public class Device {
 	public static final String ON_STR = "On";
 	public static final String OFF_STR = "Off";
 	
+	public static final String NO_TIME_LEFT_STR = "";
+	
+	public static final String TELLSTICK_STR = "Tellstick";
+	public static final String SIMULATED_STR = "Simulated";
+	public static final String GPIO_STR = "GPIO";
+	public static final String UNKNOWN_STR = "Unknown";
+	
 	public final int id;
 	public final String name;
 	public final boolean state;
@@ -37,13 +44,22 @@ public class Device {
 	public String getTypeStr() {
 		switch (type) {
 		case TELLSTICK:
-			return "Tellstick";
+			return TELLSTICK_STR;
 		case SIMULATED:
-			return "Simulated";
+			return SIMULATED_STR;
 		case GPIO:
-			return "GPIO";
+			return GPIO_STR;
 		default:
-			return "Unknown";
+			return UNKNOWN_STR;
+		}
+	}
+	
+	public String getTimeLeftStr() {
+		if (timeLeft == -1) {
+			return NO_TIME_LEFT_STR;
+		}
+		else {
+			return String.valueOf(timeLeft);
 		}
 	}
 }

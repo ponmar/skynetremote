@@ -927,7 +927,7 @@ public class ApplicationWindow implements GUI {
 	
 	private class HelpAboutItemListener implements SelectionListener {
 		public void widgetSelected(SelectionEvent event) {
-			new AboutWindow(shell, noneIcon, infoIcon, minorIcon, majorIcon).run();
+			new AboutWindow(shell, noneIcon, infoIcon, minorIcon, majorIcon, deviceOffIcon, deviceOnIcon).run();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent event) {
@@ -1237,7 +1237,7 @@ public class ApplicationWindow implements GUI {
 						}
 						item.setText(col++, device.name);
 						item.setText(col++, device.getStateStr());
-						item.setText(col++, String.valueOf(device.timeLeft));
+						item.setText(col++, device.getTimeLeftStr());
 						item.setText(col++, device.getTypeStr());
 						item.setData(device.id);
 					}
