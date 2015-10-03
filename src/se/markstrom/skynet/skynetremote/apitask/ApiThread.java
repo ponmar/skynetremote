@@ -47,7 +47,7 @@ public class ApiThread extends Thread {
 				isWorking(false);
 
 				synchronized (this) {
-					if (queue.isEmpty()) {
+					if (run && queue.isEmpty()) {
 						try {
 							wait();
 						}
