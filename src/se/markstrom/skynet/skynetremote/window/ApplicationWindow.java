@@ -972,11 +972,13 @@ public class ApplicationWindow implements GUI {
 			SkynetAPI.Protocol protocol = connectWindow.getProtocol();
 			String password = connectWindow.getPassword();
 			boolean debug = false;
+			boolean hashKnownHosts = connectWindow.getHashKnownHosts();
+			boolean strictHostKeyChecking = connectWindow.getStrictHostKeyChecking();
 
 			// Note that settings are written when a connection attempt has been done
 			model.updateSettingsFromGui(host, port, protocol);
 			
-			apiThread.runTask(new ConnectTask(host, port, protocol, password, debug));
+			apiThread.runTask(new ConnectTask(host, port, protocol, password, hashKnownHosts, strictHostKeyChecking, debug));
 		}
 		else {
 			log.fine("Connect window has invalid input");

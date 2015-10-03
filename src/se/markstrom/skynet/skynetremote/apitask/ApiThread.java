@@ -105,10 +105,10 @@ public class ApiThread extends Thread {
 		}
 	}
 
-	void connect(String host, int port, Protocol protocol, String password, boolean debug) throws SkynetAPIError {
+	void connect(String host, int port, Protocol protocol, String password, boolean hashKnownHosts, boolean strictHostKeyChecking, boolean debug) throws SkynetAPIError {
 		if (api == null) {
 			log.info("Connecting to host " + host + "...");
-			api = new SkynetAPI(host, port, protocol, password, debug);
+			api = new SkynetAPI(host, port, protocol, password, hashKnownHosts, strictHostKeyChecking, debug);
 			log.info("Connected");
 		}
 	}

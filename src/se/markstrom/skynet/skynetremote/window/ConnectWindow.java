@@ -30,12 +30,15 @@ public class ConnectWindow {
 	private Button telnetButton;
 	private Text passwordText;
 	private Button savePasswordButton;
+	private Button hashKnownHostsButton;
 	
 	private String host;
 	private int port;
 	private Protocol protocol;
 	private String password;
 	private boolean savePassword;
+	
+	private boolean hashKnownHosts = false;
 	
 	static String savedPassword;
 	
@@ -104,7 +107,14 @@ public class ConnectWindow {
 		GridData savePasswordLayout = new GridData(GridData.FILL_HORIZONTAL);
 	    savePasswordLayout.horizontalSpan = 2;
 	    savePasswordButton.setLayoutData(savePasswordLayout);
-	    
+
+		hashKnownHostsButton = new Button(shell, SWT.CHECK);
+		hashKnownHostsButton.setText("Save SSH host key");
+		hashKnownHostsButton.setSelection(false);
+		GridData hashKnownHostsLayout = new GridData(GridData.FILL_HORIZONTAL);
+		hashKnownHostsLayout.horizontalSpan = 2;
+	    hashKnownHostsButton.setLayoutData(hashKnownHostsLayout);
+
 		// Skip a column
 		new Label(shell, SWT.NONE);
 
@@ -176,6 +186,8 @@ public class ConnectWindow {
 			savedPassword = null;
 		}
 		
+		hashKnownHosts = hashKnownHostsButton.getSelection();
+		
 		return true;
 	}
 	
@@ -205,6 +217,15 @@ public class ConnectWindow {
 	
 	public boolean savePassword() {
 		return savePassword;
+	}
+	
+	public boolean getHashKnownHosts() {
+		return hashKnownHosts;
+	}
+
+	public boolean getStrictHostKeyChecking() {
+		// Strict key checking can not be used when the SSH host key should be added
+		return !hashKnownHosts;
 	}
 	
 	private class KeyListener implements TraverseListener {
