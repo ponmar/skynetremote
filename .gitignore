@@ -2,3 +2,4 @@
 /bin
 /SkynetRemote*.jar
 /SkynetRemote.xml
+/SkynetAPI_ssh_known_hosts
