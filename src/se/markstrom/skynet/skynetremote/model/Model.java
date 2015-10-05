@@ -303,6 +303,15 @@ public class Model {
 			return defaultValue;
 		}
 	}
+	
+	public Long getLatestEventIdFromEvents(Long defaultValue) {
+		if (!events.isEmpty()) {
+			return events.get(events.size()-1).id;
+		}
+		else {
+			return defaultValue;
+		}
+	}
 
 	public Integer getNumInfoEvents(Integer defaultValue) {
 		if (numInfoEvents != null) {

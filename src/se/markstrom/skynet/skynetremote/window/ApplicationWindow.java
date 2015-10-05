@@ -1261,7 +1261,7 @@ public class ApplicationWindow implements GUI {
 			public void run() {
 				log.info("Received events.xml");
 				
-				long prevLatestEventId = model.getLatestEventId(-1l);
+				long prevLatestEventId = model.getLatestEventIdFromEvents(-1l);
 				if (model.updateFromEventsXml(xml)) {
 					log.fine("Parsed events.xml");
 
