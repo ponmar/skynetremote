@@ -35,6 +35,7 @@ public class CamerasXmlParser extends XmlParser {
 				Integer index = null;
 				Integer width = null;
 				Integer height = null;
+				String name = null;
 				
 				for (Node cameraChildNode = cameraNode.getFirstChild(); cameraChildNode != null; cameraChildNode = cameraChildNode.getNextSibling()) {
 					String nodeName = cameraChildNode.getNodeName();
@@ -47,13 +48,16 @@ public class CamerasXmlParser extends XmlParser {
 					else if (nodeName.equals("height")) {
 						height = Integer.parseInt(cameraChildNode.getFirstChild().getNodeValue());
 					}
+					else if (nodeName.equals("name")) {
+						name = cameraChildNode.getFirstChild().getNodeValue();
+					}
 				}
 				
-				if (index == null || width == null || height == null) {
+				if (index == null || width == null || height == null || name == null) {
 					return false;
 				}
 				
-				cameras.add(new Camera(index, width, height));
+				cameras.add(new Camera(name, index, width, height));
 			}
 			return true;
 		}

@@ -1204,7 +1204,7 @@ public class ApplicationWindow implements GUI {
 		streamWindows.clear();
 		
 		for (Camera camera : model.getCameras()) {
-			String cameraName = "Camera " + (camera.index+1) + " [" + camera.width + "x" + camera.height + "]";
+			String cameraName = (camera.index+1) + ". " + camera.name + " [" + camera.width + "x" + camera.height + "]";
 			
 			MenuItem snapshotMenuItem = new MenuItem(cameraSnapshotMenu, SWT.PUSH);
 			snapshotMenuItem.setText(cameraName);
