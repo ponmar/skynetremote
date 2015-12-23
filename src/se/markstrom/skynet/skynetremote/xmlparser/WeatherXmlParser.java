@@ -49,6 +49,12 @@ public class WeatherXmlParser extends XmlParser {
 					temperature = Double.parseDouble(temperatureStr);
 				}
 				
+				Double humidity = null;
+				String humidityStr = attributes.getNamedItem("humidity").getFirstChild().getNodeValue();
+				if (!humidityStr.equals("")) {
+					humidity = Double.parseDouble(humidityStr);
+				}
+				
 				Double precipitation = null;
 				String precipitationStr = attributes.getNamedItem("precipitation").getFirstChild().getNodeValue();
 				if (!precipitationStr.equals("")){
@@ -67,7 +73,7 @@ public class WeatherXmlParser extends XmlParser {
 					pressure = Double.parseDouble(pressureStr);
 				}
 				
-				WeatherReport report = new WeatherReport(provider, updated, validFrom, validTo, area, sunrise, sunset, windCode, temperature, precipitation, windspeed, pressure);
+				WeatherReport report = new WeatherReport(provider, updated, validFrom, validTo, area, sunrise, sunset, windCode, temperature, humidity, precipitation, windspeed, pressure);
 				weatherReports.add(report);
 			}
 			return true;

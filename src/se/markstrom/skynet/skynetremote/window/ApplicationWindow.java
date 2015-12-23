@@ -528,6 +528,10 @@ public class ApplicationWindow implements GUI {
 	    temperatureColumn.setText("Temperature [Celsius]");
 	    temperatureColumn.pack();
 	    
+	    TableColumn humidityColumn = new TableColumn(weatherTable, SWT.NULL);
+	    humidityColumn.setText("Humidity [%]");
+	    humidityColumn.pack();
+	    
 	    TableColumn precipitationColumn = new TableColumn(weatherTable, SWT.NULL);
 	    precipitationColumn.setText("Precipitation [mm/h]");
 	    precipitationColumn.pack();
@@ -1151,6 +1155,7 @@ public class ApplicationWindow implements GUI {
 						item.setText(col++, report.validFrom);
 						item.setText(col++, report.validTo);
 						item.setText(col++, report.getTemperatureStr());
+						item.setText(col++, report.getHumidityStr());
 						item.setText(col++, report.getPrecipitationStr());
 						item.setText(col++, report.getWindspeedStr());
 						item.setText(col++, report.getPressureStr());
