@@ -49,7 +49,7 @@ Please send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_si
 
 ### Licenses ###
 
-Licenses for included software is placed in the licenses directory.
+Licenses for included software are placed in the licenses directory.
 
 ### Screenshots ###
 
