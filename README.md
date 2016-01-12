@@ -51,7 +51,7 @@ Please send comments regarding [Skynet][skynet_site], [Skynet API][skynet_api_si
 
 Licenses for included software is placed in the licenses directory.
 
-### Screenshot ###
+### Screenshots ###
 
 ![skynet_events.png](https://bitbucket.org/repo/xxXqE8/images/1485010940-skynet_events.png)
 
